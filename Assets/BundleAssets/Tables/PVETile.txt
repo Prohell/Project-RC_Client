@@ -1,0 +1,5 @@
+Id	Desc	Name	Level	Resource
+INT	STRING	STRING	INT	STRING
+#MAX_ID=99999;MAX_RECORD=1024;TableType=Hash;				
+#ID	程序不读	名称	等级	资源
+1	pve点	1级pve点	1	a
