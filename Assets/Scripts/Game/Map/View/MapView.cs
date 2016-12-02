@@ -24,7 +24,6 @@ public partial class MapView : MonoBehaviour
         GoingToLod0,
         GoingToLod1,
     }
-
     bool inited = false;
     public LodState State = LodState.Lod0;
     public MapViewLod0 Lod0;
@@ -224,6 +223,7 @@ public partial class MapView : MonoBehaviour
     Vector3 _highlightedPos;
     public void ShowHighLight(Vector3 pos)
     {
+        return;
         _highlightedPos = pos;
         highlight.transform.position = pos;
         highlight.gameObject.SetActive(true);
@@ -231,6 +231,7 @@ public partial class MapView : MonoBehaviour
 
     public void HideHighlight(Coord c)
     {
+        return;
         Vector3 pos = Layout.HexCenter(c);
         if (pos.NearlyEquals(_highlightedPos))
             highlight.gameObject.SetActive(false);

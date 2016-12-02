@@ -1,0 +1,4 @@
+{
+	"Platform"  : "Android",
+	"SDKList"  : [ "Xiaomi_a", "Xiaomi_b", "Xiaomi_c" ]
+}

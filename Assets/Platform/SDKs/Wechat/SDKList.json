@@ -1,0 +1,4 @@
+{
+	"Platform"  : "Android",
+	"SDKList"  : [ "Wechat_a", "Wechat_b", "Wechat_c" ]
+}

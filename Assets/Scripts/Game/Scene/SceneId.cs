@@ -5,4 +5,6 @@ public enum SceneId
 {
 	Start,
 	MapEditor,
+    Map,
+    LuaTest
 }

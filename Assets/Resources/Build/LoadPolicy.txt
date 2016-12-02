@@ -1,0 +1,1 @@
+{"policys":[{"policyName":"load_preload","list":["load_preload$g_lua$lua.assetbundle"]},{"policyName":"load_table","list":["load_table$s_table$animationevent.assetbundle","load_table$s_table$battlesceneconfig.assetbundle","load_table$s_table$pvetile.assetbundle","load_table$s_table$teamconfig.assetbundle","load_table$s_table$unittemplate.assetbundle"]}]}

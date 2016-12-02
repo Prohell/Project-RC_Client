@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// 游戏入口
@@ -9,14 +10,28 @@ public class Main : MonoBehaviour
 {
     public static Transform DontDestroyRoot;
 
+    /// <summary>
+    /// Set to first to show full log.
+    /// </summary>
+    public static InGameLog InGameLogManager { get; private set; }
+
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
         DontDestroyRoot = transform;
 
-        // Game Start
-        Game.GetInstance().OnInit();
+        //InGame log.
+        InGameLogManager = GameObjectCreater.CreateComponent<InGameLog>("InGameLog", Main.DontDestroyRoot);
+
+        StartCoroutine(InitGameAssets());
     }
+		
+	//异步初始化 和热更资源 缓存表格等
+	private IEnumerator InitGameAssets(){
+		yield return GameAssets.Init ();
+		// Game Start
+		Game.GetInstance().OnInit();
+	}
 
     void Start()
     {
@@ -32,12 +47,4 @@ public class Main : MonoBehaviour
     {
         Game.GetInstance().OnUpdate();
     }
-
-    //void OnGUI()
-    //{
-    //    if (GUILayout.Button("Map Editor"))
-    //    {
-    //        Game.SceneManager.SwitchToScene(SceneId.MapEditor);
-    //    }
-    //}
 }

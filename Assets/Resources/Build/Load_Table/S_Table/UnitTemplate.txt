@@ -1,0 +1,6 @@
+Id	Desc	UnitType	UnitView	UnitAttackRange	UnitMaxHP	AttackSpaceTime	ResoucePath	AttackType	Attack
+INT	STRING	INT	FLOAT	FLOAT	FLOAT	FLOAT	STRING	INT	FLOAT
+#									
+#									
+100001		100001	45	3	100	0.8	RolelPrefab/Gongjianshou_01	1	20
+100002		100002	45	45	90	1	olelPrefab/Kuangzhanshi_01	2	20

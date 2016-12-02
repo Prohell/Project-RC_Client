@@ -15,6 +15,8 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
     private static MySceneManager mSceneManager = null;
     public static MySceneManager SceneManager { get { return mSceneManager; } }
 
+    public static LuaManager LuaManager { get; private set; }
+
     /// <summary>
     /// 游戏初始化完成
     /// </summary>
@@ -23,10 +25,10 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
     /// <summary>
     /// 游戏初始化
     /// </summary>
-	public void OnInit ()
+	public void OnInit()
     {
         GameSettings.InitGame();
-
+        
         Application.logMessageReceived += OnLog;
         Application.logMessageReceivedThreaded += OnLog;
 
@@ -43,6 +45,15 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
         // 对象池管理
         GameObject invisibleGoPoolRoot = GameObjectCreater.CreateGo("GoPoolRoot", Main.DontDestroyRoot);
         GameObjectPool.GetInstance().root = invisibleGoPoolRoot;
+
+        //FPS
+        GameObjectCreater.CreateComponent<FPSCounter>("FPSCounter", Main.DontDestroyRoot);
+
+        //Start lua VM.
+        LuaManager = GameObjectCreater.CreateComponent<LuaManager>("LuaManager", Main.DontDestroyRoot);
+        LuaManager.OnInit();
+
+        NetManager.GetInstance().OnInit();
         // 游戏初始化完成
         IsInit = true;
     }
@@ -50,6 +61,7 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
     public void OnUpdate()
     {
         UpdateManager.GetInstance().OnUpdate();
+        NetManager.GetInstance().OnUpdate();
     }
 
     public void OnReset()

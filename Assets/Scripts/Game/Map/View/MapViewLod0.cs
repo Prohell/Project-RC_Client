@@ -8,7 +8,7 @@ public class MapViewLod0 : MonoBehaviour
     [HideInInspector]
     public Camera MapCamera;
     public HexMapLayout Layout;
-    private HexSubMapView subMapViewTemplate = null;
+    public HexSubMapView subMapViewTemplate;
     //	private Dictionary<string, MapTile> tileTmpDict = new Dictionary<string, MapTile>();
 
     private Dictionary<Coord, HexSubMapView> subMapViews = new Dictionary<Coord, HexSubMapView>();
@@ -55,9 +55,7 @@ public class MapViewLod0 : MonoBehaviour
 
     public IEnumerator Init()
     {
-        // 加载地块
-        //yield return App.MapTileLoader.BeginLoadCo ();
-        yield break;
+        yield return null;
     }
 
     HexSubMapView CreateSubMapView(int x, int y)
@@ -69,14 +67,6 @@ public class MapViewLod0 : MonoBehaviour
         var cachedGo = GameObjectPool.GetInstance().WithdrawGo(MapPrefabDef.MAP_SUB_VIEW);
         if (null == cachedGo)
         {
-            if (null == subMapViewTemplate)
-            {
-                AssetManager.GetInstance().LoadAsset(MapPrefabDef.MAP_SUB_VIEW,
-                 (GameObject go) =>
-                 {
-                     subMapViewTemplate = go.GetComponent<HexSubMapView>();
-                 });
-            }
             sub = Instantiate(subMapViewTemplate);
             LogModule.WarningLog("HexSubMapView Allocated!");
         }
@@ -142,65 +132,6 @@ public class MapViewLod0 : MonoBehaviour
         //}
     }
 
-    /// <summary>
-    /// 地图编辑器强制刷新
-    /// </summary>
-    /// <param name="tileCoord"></param>
-    public void ForceRereshSubMapView(Coord tileCoord)
-    {
-        List<Coord> needRefresh = new List<Coord>();
-
-        Coord submapCoord = new Coord();
-        submapCoord.x = Mathf.FloorToInt(tileCoord.x / hex.xTile);
-        submapCoord.y = Mathf.FloorToInt(tileCoord.y / hex.yTile);
-        needRefresh.Add(submapCoord);
-
-        int cx = tileCoord.x % hex.xTile;
-        int cy = tileCoord.y % hex.yTile;
-
-        if (cx == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
-        if (cy == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
-        if (cx == 0 && cy == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y - 1));
-
-        if (cx == hex.xTile - 1) needRefresh.Add(new Coord(submapCoord.x + 1, submapCoord.y));
-        if (cy == hex.yTile) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
-        if (cx == hex.xTile && cy == hex.yTile) needRefresh.Add(new Coord(submapCoord.x + 1, submapCoord.y + 1));
-
-        foreach (Coord coord in needRefresh)
-        {
-            if (subMapViews.ContainsKey(coord))
-            {
-                HexSubMapView submap = subMapViews[coord];
-                if (MapEditorEntry.Instance != null)
-                {
-                    submap.DestroyTiles();
-                    submap.DestroyBlocks();
-                    submap.ReplaceMesh();
-                    switch (MapEditorEntry.Instance.curOp)
-                    {
-                        case MapEditorEntry.EDIT_OP.EDIT_AREA:
-                            submap.InitBg(false);
-                            submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_AREA, MapEditorEntry.Instance.campColors);
-                            return;
-
-                        case MapEditorEntry.EDIT_OP.EDIT_LV:
-                            submap.InitBg(false);
-                            submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_LV, MapEditorEntry.Instance.levelColors);
-                            return;
-
-                        default:
-                            submap.InitBg();
-                            submap.InitWater();
-                            submap.InitBlocks();
-                            submap.HideMarks();
-                            break;
-                    }
-                }
-                submap.SetPitch(MapView.Current.CameraPitch);
-            }
-        }
-    }
-
     public void OnCameraPitch(float eulurX)
     {
         SetPitch(eulurX);
@@ -224,7 +155,7 @@ public class MapViewLod0 : MonoBehaviour
             else
             {
                 item.Value.inUse = false;
-                if(isUseObjPool)
+                if (isUseObjPool)
                 {
                     RetireSubMapView(item.Value);
                 }
@@ -301,14 +232,6 @@ public class MapViewLod0 : MonoBehaviour
         var cachedGo = GameObjectPool.GetInstance().WithdrawGo(MapPrefabDef.MAP_SUB_VIEW);
         if (null == cachedGo)
         {
-            if (null == subMapViewTemplate)
-            {
-                AssetManager.GetInstance().LoadAsset(MapPrefabDef.MAP_SUB_VIEW,
-                 (GameObject go) =>
-                 {
-                     subMapViewTemplate = go.GetComponent<HexSubMapView>();
-                 });
-            }
             sub = Instantiate(subMapViewTemplate);
             LogModule.WarningLog("HexSubMapView Allocated!");
         }
@@ -349,6 +272,65 @@ public class MapViewLod0 : MonoBehaviour
             }
         }
         return sub;
+    }
+
+    /// <summary>
+    /// 地图编辑器强制刷新
+    /// </summary>
+    /// <param name="tileCoord"></param>
+    public void ForceRereshSubMapView(Coord tileCoord)
+    {
+        List<Coord> needRefresh = new List<Coord>();
+
+        Coord submapCoord = new Coord();
+        submapCoord.x = Mathf.FloorToInt(tileCoord.x / hex.xTile);
+        submapCoord.y = Mathf.FloorToInt(tileCoord.y / hex.yTile);
+        needRefresh.Add(submapCoord);
+
+        int cx = tileCoord.x % hex.xTile;
+        int cy = tileCoord.y % hex.yTile;
+
+        if (cx == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
+        if (cy == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
+        if (cx == 0 && cy == 0) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y - 1));
+
+        if (cx == hex.xTile - 1) needRefresh.Add(new Coord(submapCoord.x + 1, submapCoord.y));
+        if (cy == hex.yTile) needRefresh.Add(new Coord(submapCoord.x - 1, submapCoord.y));
+        if (cx == hex.xTile && cy == hex.yTile) needRefresh.Add(new Coord(submapCoord.x + 1, submapCoord.y + 1));
+
+        foreach (Coord coord in needRefresh)
+        {
+            if (subMapViews.ContainsKey(coord))
+            {
+                HexSubMapView submap = subMapViews[coord];
+                if (MapEditorEntry.Instance != null)
+                {
+                    submap.DestroyTiles();
+                    submap.DestroyBlocks();
+                    submap.ReplaceMesh();
+                    switch (MapEditorEntry.Instance.curOp)
+                    {
+                        case MapEditorEntry.EDIT_OP.EDIT_AREA:
+                            submap.InitBg(false);
+                            submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_AREA, MapEditorEntry.Instance.campColors);
+                            return;
+
+                        case MapEditorEntry.EDIT_OP.EDIT_LV:
+                            submap.InitBg(false);
+                            submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_LV, MapEditorEntry.Instance.levelColors);
+                            return;
+
+                        default:
+                            submap.InitBg();
+                            submap.InitWater();
+                            submap.InitBlocks();
+                            submap.HideMarks();
+                            break;
+                    }
+                }
+                submap.SetPitch(MapView.Current.CameraPitch);
+            }
+        }
     }
 #endif
 }

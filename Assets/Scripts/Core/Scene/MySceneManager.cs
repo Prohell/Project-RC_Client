@@ -27,6 +27,8 @@ public class MySceneManager : MonoBehaviour, IInit, IReset
         mCurrentSceneId = Parse(SceneManager.GetActiveScene().name);
         // add new scene here.
         RegisterScene(SceneId.MapEditor, typeof(SceneMapEditor));
+        RegisterScene(SceneId.Map, typeof(SceneMap));
+        RegisterScene(SceneId.LuaTest, typeof(SceneLuaTest));
     }
 
     public void SwitchToScene(SceneId sceneId, object param = null)

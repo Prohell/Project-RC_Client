@@ -1,0 +1,4 @@
+{
+	"Platform"  : "iOS",
+	"SDKList"  : [ "AppStore_a", "AppStore_b", "AppStore_c" ]
+}

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 /// <summary>
 /// 工具
 /// by TT
@@ -23,6 +24,24 @@ public static class Utils
         if (!cond)
         {
             throw new UnityException(err);
+        }
+    }
+
+    /// <summary>
+    /// Copy all (sub)directories and files RECURSIVEly.
+    /// </summary>
+    /// <param name="sourcePath"></param>
+    /// <param name="destPath"></param>
+    public static void CopyAll(string sourcePath, string destPath)
+    {
+        foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
+        {
+            Directory.CreateDirectory(dirPath.Replace(sourcePath, destPath));
+        }
+
+        foreach (string newPath in Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories))
+        {
+            File.Copy(newPath, newPath.Replace(sourcePath, destPath), true);
         }
     }
 }

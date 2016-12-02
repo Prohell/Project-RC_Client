@@ -10,6 +10,17 @@ public struct Coord
         y = ay;
     }
 
+    /// <summary>
+    /// 用字符串创建坐标
+    /// </summary>
+    /// <param name="coordText">0,0</param>
+    public Coord(string coordText)
+    {
+        string[] value = coordText.Split(',');
+        if (value.Length == 2 || int.TryParse(value[0], out x) || !int.TryParse(value[1], out y))
+            throw new UnityException("Error Coord Input : " + coordText);
+    }
+
     public static bool operator <(Coord lhs, Coord rhs)
     {
         if (lhs.x != rhs.x)

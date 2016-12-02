@@ -19,6 +19,12 @@ public class MapEditorEntry : MonoBehaviour
     public GameObject levelLayout;
     public GameObject tileTypeLayout;
     public GameObject blockTypeLayout;
+    // 区域操作
+    public InputField[] recCoords;
+    public Toggle recToggle;
+    public Text recOp;
+    public Button applyBtn;
+    // 存储操作  
     public Button saveBtn;
 
     public Color[] campColors;
@@ -45,6 +51,8 @@ public class MapEditorEntry : MonoBehaviour
     bool mHeightOp = true;// true:+1  false:-1
     byte mCampIndex = 0;
     byte mLvIndex = 0;
+    byte mTypeIndex = 0;
+    byte mBlockTypeIndex = 0;
     #endregion
 
     IEnumerator Start()
@@ -58,6 +66,7 @@ public class MapEditorEntry : MonoBehaviour
 
     void Init()
     {
+        mapProxy = GameFacade.GetProxy<MapProxy>();
         foreach (Button btn in texLayout.GetComponentsInChildren<Button>())
         {
             byte index = byte.Parse(btn.name.Substring(1, 1));
@@ -67,6 +76,7 @@ public class MapEditorEntry : MonoBehaviour
                 ChangeCurOp(EDIT_OP.EDIT_TEX);
                 blockTypeLayout.transform.parent.gameObject.SetActive(false);
                 mTexIndex = (byte)(index - 1);
+                UpdateCurOpTips("Texture " + mTexIndex);
             });
         }
 
@@ -79,7 +89,7 @@ public class MapEditorEntry : MonoBehaviour
                 ChangeCurOp(EDIT_OP.EDIT_HEIGHT);
                 blockTypeLayout.transform.parent.gameObject.SetActive(false);
                 mHeightOp = index == 2 ? true : false;
-                curEdit.text = mHeightOp ? "Height+1 " : "Height-1";
+                UpdateCurOpTips(mHeightOp ? "Height+1 " : "Height-1");
             });
         }
 
@@ -92,6 +102,7 @@ public class MapEditorEntry : MonoBehaviour
                 ChangeCurOp(EDIT_OP.EDIT_AREA);
                 blockTypeLayout.transform.parent.gameObject.SetActive(false);
                 mCampIndex = index;
+                UpdateCurOpTips("Area " + mCampIndex);
             });
         }
 
@@ -104,6 +115,7 @@ public class MapEditorEntry : MonoBehaviour
                 ChangeCurOp(EDIT_OP.EDIT_LV);
                 blockTypeLayout.transform.parent.gameObject.SetActive(false);
                 mLvIndex = index;
+                UpdateCurOpTips("Level " + mLvIndex);
             });
         }
 
@@ -114,24 +126,51 @@ public class MapEditorEntry : MonoBehaviour
             {
                 mIsClickEditArea = true;
                 ChangeCurOp(EDIT_OP.EDIT_TILETYPE);
-                blockTypeLayout.transform.parent.gameObject.SetActive(index == 2);
+                blockTypeLayout.transform.parent.gameObject.SetActive(index == 1);
+                mTypeIndex = index;
+                UpdateCurOpTips("MapTileType " + ((MapTileType)mTypeIndex).ToString());
             });
         }
 
         foreach (Button btn in blockTypeLayout.GetComponentsInChildren<Button>())
         {
+            byte index = byte.Parse(btn.name.Substring(1, 1));
             btn.onClick.AddListener(() =>
             {
                 mIsClickEditArea = true;
                 ChangeCurOp(EDIT_OP.EDIT_BLOCKTYPE);
-                blockTypeLayout.transform.parent.gameObject.SetActive(false);
+                mBlockTypeIndex = index;
+                UpdateCurOpTips("BlockType " + ((MapBlockType)mBlockTypeIndex).ToString());
             });
         }
+
         saveBtn.onClick.AddListener(() => 
         {
             mIsClickEditArea = true;
             GameFacade.GetProxy<MapProxy>().Export();
         });
+
+        recToggle.onValueChanged.AddListener((bool isOn) => 
+        {
+            if(isOn)
+            {
+                recOp.text = curEdit.text;
+            }
+        });
+
+        applyBtn.onClick.AddListener(BulkEdit);
+    }
+
+    /// <summary>
+    /// 更新显示
+    /// </summary>
+    void UpdateCurOpTips(string msg)
+    {
+        curEdit.text = msg;
+        if(recToggle.isOn)
+        {
+            recOp.text = msg;
+        }
     }
 
     void ChangeCurOp(EDIT_OP goingOp)
@@ -162,7 +201,7 @@ public class MapEditorEntry : MonoBehaviour
         {
             Coord newdst = MapView.Current.Layout.ScreenPos2Coord(MapView.Current.MapCamera, Input.mousePosition.xy());
             mDst = newdst;
-            OnMRBAction_Common(mDst);
+            OnMRBAction_Common();
         }
         else if (Input.GetMouseButton(1))
         {
@@ -170,24 +209,28 @@ public class MapEditorEntry : MonoBehaviour
             if (newdst != mDst)
             {
                 mDst = newdst;
-                OnMRBAction_Common(mDst);
+                OnMRBAction_Common();
             }
         }
     }
 
     //Seed All
-    void OnMRBAction_Common(Coord c)
+    void OnMRBAction_Common()
     {
-        if(mapProxy == null)
-        {
-            mapProxy = GameFacade.GetProxy<MapProxy>();
-        }
         MapTileVO tile = mapProxy.GetTile(mDst);
-        switch(curOp)
+        ModifyVOByOp(tile);
+        GameFacade.GetProxy<MapProxy>().SeedTile(tile);
+    }
+
+    void ModifyVOByOp(MapTileVO tile)
+    {
+        switch (curOp)
         {
             case EDIT_OP.EDIT_TEX:
                 if (tile.mat == mTexIndex) return;
                 tile.mat = mTexIndex;
+                tile.type = MapTileType.Normal;
+                tile.blockType = MapBlockType.None;
                 break;
             case EDIT_OP.EDIT_HEIGHT:
                 byte newHeight = 0;
@@ -218,8 +261,51 @@ public class MapEditorEntry : MonoBehaviour
                 if (tile.level == mLvIndex) return;
                 tile.level = mLvIndex;
                 break;
+
+            case EDIT_OP.EDIT_TILETYPE:
+                MapTileType newType = (MapTileType)mTypeIndex;
+                if (tile.type == newType) return;
+                tile.type = newType;
+                if (tile.type != MapTileType.Block)
+                {
+                    tile.blockType = MapBlockType.None;
+                }
+                break;
+
+            case EDIT_OP.EDIT_BLOCKTYPE:
+                MapBlockType newBType = (MapBlockType)mBlockTypeIndex;
+                if (tile.blockType == newBType) return;
+                tile.mat = 8;
+                tile.blockType = newBType;
+                tile.type = MapTileType.Block;
+                break;
         }
-        GameFacade.GetProxy<MapProxy>().SeedTile(tile);
+    }
+
+    /// <summary>
+    /// 批量编辑
+    /// </summary>
+    void BulkEdit()
+    {
+        if (recToggle.isOn)
+        {
+            if (recCoords.Length != 4)
+            {
+                Debug.LogError("Error input coords length. Fix Map Edit Prefab.");
+            }
+            int x = int.Parse(recCoords[0].text);
+            int y = int.Parse(recCoords[1].text);
+            int w = int.Parse(recCoords[2].text);
+            int h = int.Parse(recCoords[3].text);
+            for (int i = y; i <= y + h; i++)
+            {
+                for(int j = x; j <= x + w; j++)
+                {
+                    ModifyVOByOp(mapProxy.EditorTiles[i,j]);
+                }
+            }
+            MapView.Current.Lod0.ForceRereshSubMapView(new Coord(x, y));
+        }
     }
 
     /// <summary>

@@ -11,18 +11,15 @@ public delegate void SerializableTable(string[] valuesList, int skey, Dictionary
  {
  private static string GetLoadPath(string localName)
  {
- string localPath = Application.persistentDataPath + "/ResData/Tables/" + localName + ".txt";
+ string localPath = Application.persistentDataPath + "/Tables/" + localName + ".txt";
  if (File.Exists(localPath))
  {
  return localPath;
  }
- #if UNITY_ANDROID && !UNITY_EDITOR
- return localPath;
- #elif UNITY_EDITOR
- return Application.dataPath + "/BundleAssets/Tables/" + localName + ".txt";
- #else
- return Application.streamingAssetsPath + "/Tables/" + localName + ".txt";
+ #if UNITY_EDITOR
+ return Application.dataPath + "/Resources/Build/Load_Table/S_Table/" + localName + ".txt";
  #endif
+ return null;
  }
  private static string[] MySplit(string str, string[] nTypeList, string regix)
  {
@@ -170,6 +167,40 @@ public delegate void SerializableTable(string[] valuesList, int skey, Dictionary
  return true;
  }
 
+private static Dictionary<int, List<Tab_AnimationEvent> > g_AnimationEvent = new Dictionary<int, List<Tab_AnimationEvent> >(); 
+ public static bool InitTable_AnimationEvent()
+ {
+ g_AnimationEvent.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_AnimationEvent.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_AnimationEvent> values = new List<Tab_AnimationEvent>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_AnimationEvent)subit);
+ }
+ g_AnimationEvent.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_BattleSceneConfig> > g_BattleSceneConfig = new Dictionary<int, List<Tab_BattleSceneConfig> >(); 
+ public static bool InitTable_BattleSceneConfig()
+ {
+ g_BattleSceneConfig.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_BattleSceneConfig.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_BattleSceneConfig> values = new List<Tab_BattleSceneConfig>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_BattleSceneConfig)subit);
+ }
+ g_BattleSceneConfig.Add(kv.Key, values);
+ }
+ return true;
+ }
 private static Dictionary<int, List<Tab_PVETile> > g_PVETile = new Dictionary<int, List<Tab_PVETile> >(); 
  public static bool InitTable_PVETile()
  {
@@ -187,13 +218,123 @@ private static Dictionary<int, List<Tab_PVETile> > g_PVETile = new Dictionary<in
  }
  return true;
  }
+private static Dictionary<int, List<Tab_TeamConfig> > g_TeamConfig = new Dictionary<int, List<Tab_TeamConfig> >(); 
+ public static bool InitTable_TeamConfig()
+ {
+ g_TeamConfig.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_TeamConfig.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_TeamConfig> values = new List<Tab_TeamConfig>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_TeamConfig)subit);
+ }
+ g_TeamConfig.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_UnitTemplate> > g_UnitTemplate = new Dictionary<int, List<Tab_UnitTemplate> >(); 
+ public static bool InitTable_UnitTemplate()
+ {
+ g_UnitTemplate.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_UnitTemplate.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_UnitTemplate> values = new List<Tab_UnitTemplate>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_UnitTemplate)subit);
+ }
+ g_UnitTemplate.Add(kv.Key, values);
+ }
+ return true;
+ }
 public bool InitTable()
  {
  bool bRet=true;
- bRet &= InitTable_PVETile();
+ bRet &= InitTable_AnimationEvent();
+
+bRet &= InitTable_BattleSceneConfig();
+
+bRet &= InitTable_PVETile();
+
+bRet &= InitTable_TeamConfig();
+
+bRet &= InitTable_UnitTemplate();
 
 
  return bRet;
+ }
+
+public static List<Tab_AnimationEvent> GetAnimationEventByID(int nKey)
+ {
+ if(g_AnimationEvent.Count==0)
+ {
+ InitTable_AnimationEvent();
+ }
+ if( g_AnimationEvent.ContainsKey(nKey))
+ {
+ return g_AnimationEvent[nKey];
+ }
+ return null;
+ }
+ public static Tab_AnimationEvent GetAnimationEventByID(int nKey, int nIndex)
+ {
+ if(g_AnimationEvent.Count==0)
+ {
+ InitTable_AnimationEvent();
+ }
+ if( g_AnimationEvent.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_AnimationEvent[nKey].Count)
+ return g_AnimationEvent[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_AnimationEvent> > GetAnimationEvent()
+ {
+ if(g_AnimationEvent.Count==0)
+ {
+ InitTable_AnimationEvent();
+ }
+ return g_AnimationEvent;
+ }
+
+public static List<Tab_BattleSceneConfig> GetBattleSceneConfigByID(int nKey)
+ {
+ if(g_BattleSceneConfig.Count==0)
+ {
+ InitTable_BattleSceneConfig();
+ }
+ if( g_BattleSceneConfig.ContainsKey(nKey))
+ {
+ return g_BattleSceneConfig[nKey];
+ }
+ return null;
+ }
+ public static Tab_BattleSceneConfig GetBattleSceneConfigByID(int nKey, int nIndex)
+ {
+ if(g_BattleSceneConfig.Count==0)
+ {
+ InitTable_BattleSceneConfig();
+ }
+ if( g_BattleSceneConfig.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_BattleSceneConfig[nKey].Count)
+ return g_BattleSceneConfig[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_BattleSceneConfig> > GetBattleSceneConfig()
+ {
+ if(g_BattleSceneConfig.Count==0)
+ {
+ InitTable_BattleSceneConfig();
+ }
+ return g_BattleSceneConfig;
  }
 
 public static List<Tab_PVETile> GetPVETileByID(int nKey)
@@ -228,6 +369,74 @@ public static List<Tab_PVETile> GetPVETileByID(int nKey)
  InitTable_PVETile();
  }
  return g_PVETile;
+ }
+
+public static List<Tab_TeamConfig> GetTeamConfigByID(int nKey)
+ {
+ if(g_TeamConfig.Count==0)
+ {
+ InitTable_TeamConfig();
+ }
+ if( g_TeamConfig.ContainsKey(nKey))
+ {
+ return g_TeamConfig[nKey];
+ }
+ return null;
+ }
+ public static Tab_TeamConfig GetTeamConfigByID(int nKey, int nIndex)
+ {
+ if(g_TeamConfig.Count==0)
+ {
+ InitTable_TeamConfig();
+ }
+ if( g_TeamConfig.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_TeamConfig[nKey].Count)
+ return g_TeamConfig[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_TeamConfig> > GetTeamConfig()
+ {
+ if(g_TeamConfig.Count==0)
+ {
+ InitTable_TeamConfig();
+ }
+ return g_TeamConfig;
+ }
+
+public static List<Tab_UnitTemplate> GetUnitTemplateByID(int nKey)
+ {
+ if(g_UnitTemplate.Count==0)
+ {
+ InitTable_UnitTemplate();
+ }
+ if( g_UnitTemplate.ContainsKey(nKey))
+ {
+ return g_UnitTemplate[nKey];
+ }
+ return null;
+ }
+ public static Tab_UnitTemplate GetUnitTemplateByID(int nKey, int nIndex)
+ {
+ if(g_UnitTemplate.Count==0)
+ {
+ InitTable_UnitTemplate();
+ }
+ if( g_UnitTemplate.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_UnitTemplate[nKey].Count)
+ return g_UnitTemplate[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_UnitTemplate> > GetUnitTemplate()
+ {
+ if(g_UnitTemplate.Count==0)
+ {
+ InitTable_UnitTemplate();
+ }
+ return g_UnitTemplate;
  }
 
 

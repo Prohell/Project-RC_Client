@@ -143,4 +143,25 @@ public class LogModule
     {
         Debug.Assert(condition, msg);
     }
+
+    /// <summary>
+    /// 这个函数轻易不要用，只在打印一些调试日志时用，效率较低
+    /// </summary>
+    /// <returns></returns>
+    public static string ByteToString(byte[] byteData, int nStartIndex, int nCount)
+    {
+        if (!PlatformHelper.IsEnableDebugMode()) return "";
+
+        string strResult = "";
+        if (nStartIndex < 0 || nStartIndex >= byteData.Length)
+        {
+            return strResult;
+        }
+
+        for (int i = nStartIndex; i < nCount && i < byteData.Length; i++)
+        {
+            strResult += Convert.ToString(byteData[i]);
+        }
+        return strResult;
+    }
 }

@@ -127,40 +127,49 @@ public class MapTileGeneratorRun : EditorWindow
         }
         bw.Close();
 
-        /* Rewrite Map Binary with PvE Tiles
-		tileVOs = GeneratePVETiles(tileVOs);
-		
-		fs = File.Open(Application.dataPath + "/Resources/mapuint16.bytes", FileMode.OpenOrCreate, FileAccess.Write);
-		bw = new BinaryWriter(fs, System.Text.Encoding.BigEndianUnicode);
-		
-		for (int y=0; y<MapConst.MAP_HEIGHT; ++y){
-			for (int x=0; x<MapConst.MAP_WIDTH; ++x){
-				// TileType-TileCamp-TileCamp1-TileLevel-PvELevel-BlockType
-				//  4b     -   4b   -    4b   -   2b    -   6b   -   2b    
-				try {
-					UInt32 tileInfo = MapTileVO.TileEncodeLocal(tileVOs[y, x]);
-					bw.Write(tileInfo);
-				} catch (Exception e) {
-					Debug.Log(tileVOs[y, x].camp);
-					Debug.Log((int)tileVOs[y, x].type);
-					Debug.Log(tileVOs[y, x].level);
-					throw e;
-				}
-			}
-		}
-		if (wayPoints != null){
-			foreach (MapTileVO wayPoint in wayPoints){
-				try {
-					UInt32 tileInfo = MapTileVO.WayPointEncodeLocal(wayPoint);
-					bw.Write(tileInfo);
-				} catch (Exception e) {
-					Debug.Log("writing waypoint error: " + wayPoint.coord.x + ", " + wayPoint.coord.y);
-					throw e;
-				}
-			}
-		}
-		bw.Close ();
-        */
+        // Rewrite Map Binary with PvE Tiles
+        //tileVOs = GeneratePVETiles(tileVOs);
+
+        fs = File.Open(Application.dataPath + "/Resources/mapuint16.bytes", FileMode.OpenOrCreate, FileAccess.Write);
+        bw = new BinaryWriter(fs, System.Text.Encoding.BigEndianUnicode);
+
+        for (int y = 0; y < MapConst.MAP_HEIGHT; ++y)
+        {
+            for (int x = 0; x < MapConst.MAP_WIDTH; ++x)
+            {
+                // TileType-TileCamp-TileCamp1-TileLevel-PvELevel-BlockType
+                //  4b     -   4b   -    4b   -   2b    -   6b   -   2b    
+                try
+                {
+                    UInt32 tileInfo = MapTileVO.TileEncodeLocal(tileVOs[y, x]);
+                    bw.Write(tileInfo);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(tileVOs[y, x].camp);
+                    Debug.Log((int)tileVOs[y, x].type);
+                    Debug.Log(tileVOs[y, x].level);
+                    throw e;
+                }
+            }
+        }
+        if (wayPoints != null)
+        {
+            foreach (MapTileVO wayPoint in wayPoints)
+            {
+                try
+                {
+                    UInt32 tileInfo = MapTileVO.WayPointEncodeLocal(wayPoint);
+                    bw.Write(tileInfo);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("writing waypoint error: " + wayPoint.coord.x + ", " + wayPoint.coord.y);
+                    throw e;
+                }
+            }
+        }
+        bw.Close();
         AssetDatabase.Refresh();
     }
 

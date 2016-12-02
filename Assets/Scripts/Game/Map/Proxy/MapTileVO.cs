@@ -51,7 +51,7 @@ public class MapTileVO : IDisposable
     }
 
     #region Encode & Decode
-    static bool mDecodeTestMode = false;
+    static bool mDecodeTestMode = true;
     public static uint WayPointEncodeLocal(MapTileVO tile)
     {
         uint re = 0;
