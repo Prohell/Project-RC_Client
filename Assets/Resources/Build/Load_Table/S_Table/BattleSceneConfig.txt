@@ -1,5 +1,0 @@
-Id	Desc	ABornPosX	ABornPosY	ABornPosZ	BBornPosX	BBornPosY	BBornPosZ	StartTime
-INT	STRING	FLOAT	FLOAT	FLOAT	FLOAT	FLOAT	FLOAT	FLOAT
-#								
-#								
-100001		95	0.01	-25	30	0.01	-25	3

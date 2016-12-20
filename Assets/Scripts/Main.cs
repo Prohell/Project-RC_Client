@@ -20,18 +20,24 @@ public class Main : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         DontDestroyRoot = transform;
 
+        //Show loading
+        LoadingController.GetInstance().Show(9, Login.GetInstance().ConnectToServer);
+
         //InGame log.
         InGameLogManager = GameObjectCreater.CreateComponent<InGameLog>("InGameLog", Main.DontDestroyRoot);
 
         StartCoroutine(InitGameAssets());
     }
-		
-	//异步初始化 和热更资源 缓存表格等
-	private IEnumerator InitGameAssets(){
-		yield return GameAssets.Init ();
-		// Game Start
-		Game.GetInstance().OnInit();
-	}
+
+    //异步初始化 和热更资源 缓存表格等
+    private IEnumerator InitGameAssets()
+    {
+        yield return GameAssets.Init();
+        LoadingController.GetInstance().UpdateProgress(1, LoadingController.initText);
+
+        // Game init
+        Game.GetInstance().OnInit();
+    }
 
     void Start()
     {

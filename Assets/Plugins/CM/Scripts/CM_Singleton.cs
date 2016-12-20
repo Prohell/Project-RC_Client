@@ -6,71 +6,73 @@ using System.Collections;
 /// </summary>
 public abstract class CM_Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static GameObject m_parentObject;
+    private static GameObject m_attachObject;
 
-	/// <summary>
-	/// Gets a value indicating whether this instance is destroyed.
-	/// </summary>
-	/// <value><c>true</c> if is destroyed; otherwise, <c>false</c>.</value>
-	public static bool IsDestroyed { get { return _instance == null;	}}
+    /// <summary>
+    /// Gets a value indicating whether this instance is destroyed.
+    /// </summary>
+    /// <value><c>true</c> if is destroyed; otherwise, <c>false</c>.</value>
+    public static bool IsDestroyed { get { return _instance == null; } }
 
-	private static bool _applicationIsQuitting = false;
+    private static bool _applicationIsQuitting = false;
 
-	/// <summary>
-	/// Sets whether this instance will be lazily initialised i.e. only initialised when needed.
-	/// </summary>
-	private static readonly bool LAZY_INIT = false;
-	
-	private static T _instance = null;
+    /// <summary>
+    /// Sets whether this instance will be lazily initialised i.e. only initialised when needed.
+    /// </summary>
+    private static readonly bool LAZY_INIT = false;
 
-	/// <summary>
-	/// Gets the instance. The instance is created if not currently past of the scene.
-	/// </summary>
-	/// <value>The instance.</value>
-	public static T instance {
-		get {
+    private static T _instance = null;
 
-			if (_applicationIsQuitting) {
-				return null;
-			}
+    /// <summary>
+    /// Gets the instance. The instance is created if not currently past of the scene.
+    /// </summary>
+    /// <value>The instance.</value>
+    public static T instance
+    {
+        get
+        {
+            if (_applicationIsQuitting)
+            {
+                return null;
+            }
 
-			if (!_instance) {
-				_instance = GameObject.FindObjectOfType<T> ();
-				
-				if (!_instance) {
+            if (!_instance)
+            {
+                _instance = GameObject.FindObjectOfType<T>();
 
-				    if (m_parentObject == null)
-				    {
-				        m_parentObject = new GameObject("CM_Singleton");
-				    }
+                if (!_instance)
+                {
+                    if (m_attachObject == null)
+                    {
+                        m_attachObject = new GameObject("CM_Singleton");
+                        DontDestroyOnLoad(m_attachObject);
+                    }
 
-				    _instance = m_parentObject.AddComponent<T> ();
-					_instance.gameObject.name = _instance.GetType ().Name;
-				}
-			}
+                    _instance = m_attachObject.AddComponent<T>();
+                }
+            }
 
-			return _instance;
-		}
-	}
+            return _instance;
+        }
+    }
 
-	void Awake ()
-	{
-		if (!LAZY_INIT) {
-			_instance = GameObject.FindObjectOfType<T> ();
-		}
-	}
-	
-	protected virtual void OnDestroy () 
-	{
-		_instance = null;
-		_applicationIsQuitting = true;
-	}
-	
-	protected virtual void OnApplicationQuit () 
-	{
-		_instance = null;
-		_applicationIsQuitting = true;
-	}
+    void Awake()
+    {
+        if (!LAZY_INIT)
+        {
+            _instance = GameObject.FindObjectOfType<T>();
+        }
+    }
 
+    protected virtual void OnDestroy()
+    {
+        _instance = null;
+        _applicationIsQuitting = true;
+    }
 
+    protected virtual void OnApplicationQuit()
+    {
+        _instance = null;
+        _applicationIsQuitting = true;
+    }
 }

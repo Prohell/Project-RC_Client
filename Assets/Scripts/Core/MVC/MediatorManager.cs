@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+
 /// <summary>
 /// Mediator管理者
 /// by TT
@@ -44,6 +46,16 @@ public class MediatorManager : Singleton<MediatorManager>, IReset, IDestroy
             return (T)m;
         }
         return (T)m;
+    }
+
+    public object Get(string name)
+    {
+        IMediator m;
+        if (mMediators.TryGetValue(Type.GetType(name), out m))
+        {
+            return Convert.ChangeType(m, Type.GetType(name));
+        }
+        return Convert.ChangeType(m, Type.GetType(name));
     }
 
     public void OnDestroy()

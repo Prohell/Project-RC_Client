@@ -2,7 +2,7 @@
 
 namespace InputKit
 {
-    public class DragGesture : BaseGesture
+	public class DragGesture : BaseGesture
     {
         public DragGesture(InputWrapper input) : base(input) { }
 
@@ -126,7 +126,6 @@ namespace InputKit
 
         public override void Update()
         {
-
             switch (_state)
             {
                 case State.kIdle:
@@ -145,5 +144,10 @@ namespace InputKit
                 _prePos = _input.GetTouchPosition(0);
             }
         }
+
+		override public void Reset(){
+			_state = State.kIdle;
+		}
+
     }
 }

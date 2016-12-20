@@ -6,6 +6,7 @@ public class MapProxy : IProxy
 {
     // this array is arranged by coordinate
     private uint[,] _tiles = new uint[MapConst.MAP_WIDTH, MapConst.MAP_HEIGHT];
+    private uint[,] _tilesSprs = new uint[MapConst.MAP_SUBMAPS, MapConst.MAP_SUBMAPS];
     /// <summary>
     /// 不同区域之间的通路，先保留
     /// </summary>
@@ -24,16 +25,17 @@ public class MapProxy : IProxy
     public void OnInit()
     {
         TextAsset ta;
+        TextAsset ta2;
         // Source Map Bytes
         if (MapView.Current != null && MapView.Current.EditMode == true)
         {
-            ta = Resources.Load("mapsource", typeof(TextAsset)) as TextAsset; // Final Map Bytes
+            ta = Resources.Load(MapPrefabDef.MapSource, typeof(TextAsset)) as TextAsset; // Final Map Bytes
         }
         else
         {
-            ta = Resources.Load("mapuint16", typeof(TextAsset)) as TextAsset; // Final Map Bytes
+            ta = Resources.Load(MapPrefabDef.MapUint16, typeof(TextAsset)) as TextAsset; // Final Map Bytes
         }
-
+        ta2 = Resources.Load(MapPrefabDef.MapSprData, typeof(TextAsset)) as TextAsset;
         if (ta)
         {
             byte[] byteTiles = ta.bytes;
@@ -60,6 +62,23 @@ public class MapProxy : IProxy
             Debug.LogError("Can't Load mapsource");
         }
 
+        if (ta2)
+        {
+            byte[] byteTiles = ta2.bytes;
+            for (int y = 0; y < MapConst.MAP_SUBMAPS; ++y)
+            {
+                for (int x = 0; x < MapConst.MAP_SUBMAPS; ++x)
+                {
+                    uint tileBytes = GetTileSprBytes(x, y, byteTiles);
+                    _tilesSprs[y, x] = tileBytes;
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Can't Load mapsprdata");
+        }
+
         //mapAStar = new MapAStarLua();
         //mapAStar = new MapAStar();
         //mapAStar = new MapAStarCompact();
@@ -78,6 +97,17 @@ public class MapProxy : IProxy
     uint GetTileBytes(int x, int y, byte[] bytes)
     {
         int idx = y * MapConst.MAP_HEIGHT + x;
+        uint data = 0;
+        data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx + 3]) << 24);
+        data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx + 2]) << 16);
+        data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx + 1]) << 8);
+        data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx]) << 0);
+        return data;
+    }
+
+    uint GetTileSprBytes(int x, int y, byte[] bytes)
+    {
+        int idx = y * MapConst.MAP_SUBMAPS + x;
         uint data = 0;
         data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx + 3]) << 24);
         data |= Convert.ToUInt32(Convert.ToUInt32(bytes[4 * idx + 2]) << 16);
@@ -182,12 +212,17 @@ public class MapProxy : IProxy
         MapView.Current.Lod0.ForceRereshSubMapView(tile.coord);
     }
 
+    public void SeedSprList(Coord submapCoord, List<int> sprList)
+    {
+        _tilesSprs[submapCoord.y, submapCoord.x] = MapTileVO.TileSprEncodeLocal(sprList);
+    }
+
     /// <summary>
     /// 保存地图配置
     /// </summary>
     public void Export()
     {
-        MapTileGeneratorRun.GenerateMapTilesLocal(_editorTiles, _wayPoints);
+        MapTileGeneratorRun.GenerateMapTilesLocal(_editorTiles, _wayPoints, _tilesSprs);
     }
 #endif
 
@@ -207,6 +242,23 @@ public class MapProxy : IProxy
 #else
 			return MapTileVO.TileDecodeLocal(_tiles[y, x], new Coord(x, y));
 #endif
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public List<int> GetSprLists(Coord c)
+    {
+        return GetSprLists(c.x, c.y);
+    }
+
+    public List<int> GetSprLists(int x, int y)
+    {
+        if (x >= 0 && x < MapConst.MAP_SUBMAPS && y >= 0 && y < MapConst.MAP_SUBMAPS)
+        {
+			return MapTileVO.TileSprDecodeLocal(_tilesSprs[y, x]);
         }
         else
         {

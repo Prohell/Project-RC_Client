@@ -262,7 +262,7 @@ public class AstarPath : MonoBehaviour {
 	 * At least 500 nodes will be searched each frame (if there are that many to search).
 	 * When using multithreading this value is quite irrelevant,
 	 * but do not set it too low since that could add upp to some overhead, 10ms will work good for multithreading */
-	public float maxFrameTime = 1F;
+	public float maxFrameTime = 10F;
 
 	/** Defines the minimum amount of nodes in an area.
 	 * If an area has less than this amount of nodes, the area will be flood filled again with the area ID GraphNode.MaxAreaIndex-1,
@@ -839,7 +839,7 @@ public class AstarPath : MonoBehaviour {
 		if (logPathResults == PathLog.InGame) {
 			inGameDebugPath = debug;
 		} else {
-//			Debug.Log(debug);
+			Debug.Log(debug);
 		}
 	}
 
@@ -2719,12 +2719,12 @@ public class AstarPath : MonoBehaviour {
 			// Cleans up node tagging and other things
 			p.Cleanup();
 
-			//Log path results
-			AstarProfiler.StartProfile("Log Path Results");
-			active.LogPathResults(p);
-			AstarProfiler.EndProfile();
+            //Log path results
+            AstarProfiler.StartProfile("Log Path Results");
+            //active.LogPathResults(p);
+            AstarProfiler.EndProfile();
 
-			AstarProfiler.EndFastProfile(8);
+            AstarProfiler.EndFastProfile(8);
 
 			// Call the immediate callback
 			// It needs to be stored in a local variable to avoid race conditions

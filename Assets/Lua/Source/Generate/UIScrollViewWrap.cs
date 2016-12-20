@@ -42,10 +42,12 @@ public class UIScrollViewWrap
 		L.RegVar("onDragFinished", get_onDragFinished, set_onDragFinished);
 		L.RegVar("onMomentumMove", get_onMomentumMove, set_onMomentumMove);
 		L.RegVar("onStoppedMoving", get_onStoppedMoving, set_onStoppedMoving);
+		L.RegVar("onDragEndFromTop", get_onDragEndFromTop, set_onDragEndFromTop);
+		L.RegVar("onDragEndFromBottom", get_onDragEndFromBottom, set_onDragEndFromBottom);
 		L.RegVar("centerOnChild", get_centerOnChild, set_centerOnChild);
 		L.RegVar("panel", get_panel, null);
 		L.RegVar("isDragging", get_isDragging, null);
-		L.RegVar("bounds", get_bounds, null);
+		L.RegVar("bounds", get_bounds, set_bounds);
 		L.RegVar("canMoveHorizontally", get_canMoveHorizontally, null);
 		L.RegVar("canMoveVertically", get_canMoveVertically, null);
 		L.RegVar("shouldMoveHorizontally", get_shouldMoveHorizontally, null);
@@ -697,6 +699,44 @@ public class UIScrollViewWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_onDragEndFromTop(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollView obj = (UIScrollView)o;
+			UIScrollView.OnDragNotification ret = obj.onDragEndFromTop;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index onDragEndFromTop on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_onDragEndFromBottom(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollView obj = (UIScrollView)o;
+			UIScrollView.OnDragNotification ret = obj.onDragEndFromBottom;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index onDragEndFromBottom on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_centerOnChild(IntPtr L)
 	{
 		object o = null;
@@ -1273,6 +1313,68 @@ public class UIScrollViewWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_onDragEndFromTop(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollView obj = (UIScrollView)o;
+			UIScrollView.OnDragNotification arg0 = null;
+			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+
+			if (funcType2 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg0 = (UIScrollView.OnDragNotification)ToLua.CheckObject(L, 2, typeof(UIScrollView.OnDragNotification));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 2);
+				arg0 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func) as UIScrollView.OnDragNotification;
+			}
+
+			obj.onDragEndFromTop = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index onDragEndFromTop on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_onDragEndFromBottom(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollView obj = (UIScrollView)o;
+			UIScrollView.OnDragNotification arg0 = null;
+			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+
+			if (funcType2 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg0 = (UIScrollView.OnDragNotification)ToLua.CheckObject(L, 2, typeof(UIScrollView.OnDragNotification));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 2);
+				arg0 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func) as UIScrollView.OnDragNotification;
+			}
+
+			obj.onDragEndFromBottom = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index onDragEndFromBottom on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_centerOnChild(IntPtr L)
 	{
 		object o = null;
@@ -1288,6 +1390,25 @@ public class UIScrollViewWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index centerOnChild on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_bounds(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIScrollView obj = (UIScrollView)o;
+			UnityEngine.Bounds arg0 = ToLua.ToBounds(L, 2);
+			obj.bounds = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index bounds on a nil value" : e.Message);
 		}
 	}
 

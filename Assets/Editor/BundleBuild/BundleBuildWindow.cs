@@ -14,31 +14,6 @@ public enum NameType{
 
 
 public class BundleBuildWindow : EditorWindow{
-	static private AssetbundleConfig _config;
-	static private AssetbundleConfig config{
-		get{
-			if(_config == null){
-				CheckAndLoadConfig ();
-			}
-			return _config;
-		}
-		set{ 
-			_config = value;
-		}
-	}
-	static private BundleBuildSetting _setting;
-	static private BundleBuildSetting setting{
-		get{ 
-			if(_setting == null){
-				CheckAndLoadSetting ();
-			}
-			return _setting;
-		}
-		set{ 
-			_setting = value;
-		}
-	}
-
 	static private Vector2 selectedScrolView;
 	static private bool selectedShow = true;
 	static private bool isShowPath = true;
@@ -51,7 +26,6 @@ public class BundleBuildWindow : EditorWindow{
 
 	static private BundlesInfo bundlesInfo;
 	static private AssetsInfo assetsInfo;
-	static private LoadPolicyJson loadPolicy;
 
 	private bool needSave = false;
 	void OnGUI() {
@@ -70,9 +44,9 @@ public class BundleBuildWindow : EditorWindow{
 						ShowNotification (new GUIContent("不存在的文件夹路径：" + path));
 						continue;
 					}
-					if (!setting.pathList.Contains(path)) {
-						setting.pathList.Add (path);
-						setting.pathSelectList.Add (false);
+					if (!DevelopUtility.bundleSetting.pathList.Contains(path)) {
+						DevelopUtility.bundleSetting.pathList.Add (path);
+						DevelopUtility.bundleSetting.pathSelectList.Add (false);
 					}
 				}
 			}
@@ -101,14 +75,14 @@ public class BundleBuildWindow : EditorWindow{
 		isShowPath = EditorGUILayout.Foldout (isShowPath,"自定义操作路径");
 		if(isShowPath){
 			EditorGUI.indentLevel = 1;
-			if (setting.pathList.Count > 0) {
-				for(int i = 0;i < setting.pathList.Count;i++){
+			if (DevelopUtility.bundleSetting.pathList.Count > 0) {
+				for(int i = 0;i < DevelopUtility.bundleSetting.pathList.Count;i++){
 					EditorGUILayout.BeginHorizontal ();
-					setting.pathSelectList [i] = EditorGUILayout.ToggleLeft (setting.pathList [i], setting.pathSelectList [i]);
+					DevelopUtility.bundleSetting.pathSelectList [i] = EditorGUILayout.ToggleLeft (DevelopUtility.bundleSetting.pathList [i], DevelopUtility.bundleSetting.pathSelectList [i]);
 
 					if(GUILayout.Button ("移除",GUILayout.Width(100))){
-						setting.pathList.RemoveAt (i);
-						setting.pathSelectList.RemoveAt (i);
+						DevelopUtility.bundleSetting.pathList.RemoveAt (i);
+						DevelopUtility.bundleSetting.pathSelectList.RemoveAt (i);
 					}
 					EditorGUILayout.EndHorizontal ();
 				}
@@ -120,15 +94,17 @@ public class BundleBuildWindow : EditorWindow{
 
 		EditorGUILayout.LabelField ("\n\n\n");
 
+
+
 		nameOptionShow = EditorGUILayout.Foldout (nameOptionShow, "Bundle命名操作选项");
 		EditorGUILayout.BeginVertical (EditorStyles.textArea);
 		if (nameOptionShow) {
 			EditorGUILayout.Space();
-			setting.eventPrefix = EditorGUILayout.TextField ("加载项前缀",setting.eventPrefix);
-			setting.groupPrefix = EditorGUILayout.TextField ("捆绑包前缀",setting.groupPrefix);
-			setting.singlePrefix = EditorGUILayout.TextField ("独立包前缀",setting.singlePrefix);
-			setting.seqSign = EditorGUILayout.TextField ("分隔符标记",setting.seqSign);
-			config.assetBundleVariant = EditorGUILayout.TextField ("Asset Bundle Variant", config.assetBundleVariant);
+			DevelopUtility.bundleSetting.eventPrefix = EditorGUILayout.TextField ("加载项前缀",DevelopUtility.bundleSetting.eventPrefix);
+			DevelopUtility.bundleSetting.groupPrefix = EditorGUILayout.TextField ("捆绑包前缀",DevelopUtility.bundleSetting.groupPrefix);
+			DevelopUtility.bundleSetting.singlePrefix = EditorGUILayout.TextField ("独立包前缀",DevelopUtility.bundleSetting.singlePrefix);
+			DevelopUtility.bundleSetting.seqSign = EditorGUILayout.TextField ("分隔符标记",DevelopUtility.bundleSetting.seqSign);
+			DevelopUtility.clientConfig.assetBundleVariant = EditorGUILayout.TextField ("Asset Bundle Variant", DevelopUtility.clientConfig.assetBundleVariant);
 			EditorGUILayout.Space();
 
 			EditorGUILayout.BeginHorizontal ();
@@ -156,9 +132,9 @@ public class BundleBuildWindow : EditorWindow{
 		buildOptionShow = EditorGUILayout.Foldout (buildOptionShow, "Bundle构建与导出操作选项");
 		EditorGUILayout.BeginVertical (EditorStyles.textArea);
 		if (buildOptionShow) {
-			setting.buildAssetBundleOptions = (BuildAssetBundleOptions)EditorGUILayout.EnumPopup ("资源包选项", setting.buildAssetBundleOptions);
-			setting.buildOptions = (BuildOptions)EditorGUILayout.EnumPopup ("场景包选项", setting.buildOptions);
-			config.hotfixFile = EditorGUILayout.TextField ("Bundle输出相对路径",config.hotfixFile);
+			DevelopUtility.bundleSetting.buildAssetBundleOptions = (BuildAssetBundleOptions)EditorGUILayout.EnumPopup ("资源包选项", DevelopUtility.bundleSetting.buildAssetBundleOptions);
+			DevelopUtility.bundleSetting.buildOptions = (BuildOptions)EditorGUILayout.EnumPopup ("场景包选项", DevelopUtility.bundleSetting.buildOptions);
+			DevelopUtility.clientConfig.hotfixFile = EditorGUILayout.TextField ("Bundle输出相对路径", DevelopUtility.clientConfig.hotfixFile);
 			EditorGUILayout.Space ();
 
 			if (GUILayout.Button ("构建<所选路径>下的所有资源包")) {
@@ -187,36 +163,36 @@ public class BundleBuildWindow : EditorWindow{
 	}
 
 	static private void BuildAllBundlesClick() {
-		if (setting.pathList.Count > 0) {
+		if (DevelopUtility.bundleSetting.pathList.Count > 0) {
 			if (bundlesInfo == null) {
 				bundlesInfo = new BundlesInfo();
 			} else {
 				bundlesInfo.bundleList.Clear ();
 			}
-			for(int i = 0;i < setting.pathList.Count;i++){
-				if(setting.pathSelectList[i]){
-					string path = Application.dataPath + "/" + setting.pathList[i].Replace("Assets/","");
+			for(int i = 0;i < DevelopUtility.bundleSetting.pathList.Count;i++){
+				if(DevelopUtility.bundleSetting.pathSelectList[i]){
+					string path = Application.dataPath + "/" + DevelopUtility.bundleSetting.pathList[i].Replace("Assets/","");
 					GetBundleInfoAt (path);
 				}
 			}
 			BuildAssetBundles ();
 			CreateCV ();
-			CreateBundlesInfo (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile);
+			CreateBundlesInfo (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile);
 		} else {
 			Debug.LogError ("没有选择任何可执行路径。");
 		}
 	}
 
 	static private void BuildAllLevelsClick(){
-		if (setting.pathList.Count > 0) {
+		if (DevelopUtility.bundleSetting.pathList.Count > 0) {
 			if (sceneInfoList == null) {
 				sceneInfoList = new List<BundleInfo> ();
 			} else {
 				sceneInfoList.Clear ();
 			}
-			for(int i = 0;i < setting.pathList.Count;i++){
-				if(setting.pathSelectList[i]){
-					string path = Application.dataPath + "/" + setting.pathList[i].Replace("Assets/","");
+			for(int i = 0;i < DevelopUtility.bundleSetting.pathList.Count;i++){
+				if(DevelopUtility.bundleSetting.pathSelectList[i]){
+					string path = Application.dataPath + "/" + DevelopUtility.bundleSetting.pathList[i].Replace("Assets/","");
 					GetLevelInfoAt (path);
 				}
 			}
@@ -227,31 +203,23 @@ public class BundleBuildWindow : EditorWindow{
 	}
 
 	static private void CreatePolicys(string filePath){
-		if (loadPolicy == null) {
-			loadPolicy = new LoadPolicyJson ();
-		} else {
-			loadPolicy.policys.Clear();
-		}
+		DevelopUtility.loadPolicys.policys.Clear ();
 
 		for (int i = 0; i < assetsInfo.assetList.Count; i++) {
-			string policyName = assetsInfo.assetList [i].bundleName.Remove(assetsInfo.assetList [i].bundleName.IndexOf(setting.seqSign));
-			loadPolicy.AddBundleName (policyName,assetsInfo.assetList [i].bundleName);
+			string policyName = assetsInfo.assetList [i].bundleName.Remove(assetsInfo.assetList [i].bundleName.IndexOf(DevelopUtility.bundleSetting.seqSign));
+			DevelopUtility.loadPolicys.AddBundleName (policyName,assetsInfo.assetList [i].bundleName);
 		}
 
-		if(!Directory.Exists(filePath)){
-			Directory.CreateDirectory (filePath);
-		}
-		string policyJson = JsonUtility.ToJson (loadPolicy);
-		File.WriteAllText(filePath + "/LoadPolicy.txt", policyJson);
+		EditorUtility.SetDirty (DevelopUtility.loadPolicys);
+		AssetDatabase.SaveAssets();
 
-		AssetDatabase.Refresh ();
-		NameBundle (filePath + "/LoadPolicy.txt", "LoadPolicy", "Load_First", "");
+		NameBundle (filePath + "/LoadPolicys.asset", "LoadFirst", "Load_First", "");
 
 		AssetInfo assetInfo = new AssetInfo ();
-		assetInfo.name = "LoadPolicy";
-		assetInfo.bundleName = "load_first" + setting.seqSign + "loadpolicy.assetbundle";
-		assetInfo.suffix = ".txt";
-		assetInfo.path = filePath.Replace ("Assets/Resources/","") + "/LoadPolicy";
+		assetInfo.name = "LoadPolicys";
+		assetInfo.bundleName = "load_first" + DevelopUtility.bundleSetting.seqSign + "loadfirst.assetbundle";
+		assetInfo.suffix = ".asset";
+		assetInfo.path = filePath.Replace ("Assets/Resources/","") + "/LoadPolicys";
 		assetsInfo.assetList.Add (assetInfo);
 	}
 
@@ -266,8 +234,8 @@ public class BundleBuildWindow : EditorWindow{
 
 	static private void CreateCV(){
 		ClientVersion cc = new ClientVersion ();
-		cc.md5 = GetFileMD5 (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile + "/" + config.hotfixFile);
-		string ccPath = "Assets/StreamingAssets/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile + "/" + "ClientVersion.txt";
+		cc.md5 = GetFileMD5 (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile + "/" + DevelopUtility.clientConfig.hotfixFile);
+		string ccPath = "Assets/StreamingAssets/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile + "/" + "ClientVersion.txt";
 		string ccStr = JsonUtility.ToJson (cc);
 		File.WriteAllText(ccPath, ccStr);
 	}
@@ -296,7 +264,7 @@ public class BundleBuildWindow : EditorWindow{
 			Directory.CreateDirectory (filePath);
 		}
 		for(int i = 0;i < bundlesInfo.bundleList.Count;i++){
-			string str = Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile + "/" + bundlesInfo.bundleList [i].name;
+			string str = Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile + "/" + bundlesInfo.bundleList [i].name;
 			FileInfo fileInfo = new FileInfo (str);
 			bundlesInfo.bundleList [i].size = fileInfo.Length;
 		}
@@ -306,25 +274,24 @@ public class BundleBuildWindow : EditorWindow{
 
 	//点击 Bundle命名 相关操作
 	static public void NameBundleClick(){
-		if (setting.pathList.Count > 0) {
+		if (DevelopUtility.bundleSetting.pathList.Count > 0) {
 			if (assetsInfo == null) {
 				assetsInfo = new AssetsInfo ();
 			} else {
 				assetsInfo.assetList.Clear ();
 			}
 
-			//删除<加载策略文件> 以免产生错误
-			File.Delete (setting.pathList[0] + "/LoadPolicy.txt");
-			for (int i = 0; i < setting.pathList.Count; i++) {
-				if (setting.pathSelectList [i]) {
-					assetsInfo.assetList = NameBundleStart (setting.pathList [i], config.assetBundleVariant);
+			//对所有文件命名
+			for (int i = 0; i < DevelopUtility.bundleSetting.pathList.Count; i++) {
+				if (DevelopUtility.bundleSetting.pathSelectList [i]) {
+					assetsInfo.assetList = NameBundleStart (DevelopUtility.bundleSetting.pathList [i], DevelopUtility.clientConfig.assetBundleVariant);
 				}
 			}
 			//创建新的加载策略文件
-			CreatePolicys (setting.pathList[0]);
+			CreatePolicys (DevelopUtility.bundleSetting.pathList[0]);
 
 			CheckAssetsInfo ();
-			CreateAssetsInfo (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile);
+			CreateAssetsInfo (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile);
 		} else {
 			Debug.LogError("没有选择任何可执行路径。");
 		}
@@ -354,10 +321,10 @@ public class BundleBuildWindow : EditorWindow{
 
 	//点击 清除所选路径 相关操作
 	static public void ClearSelectClick(){
-		if (setting.pathList.Count > 0) {
-			for(int i = 0;i < setting.pathList.Count;i++){
-				if(setting.pathSelectList[i]){
-					ClearBundleNameAt (setting.pathList[i]);
+		if (DevelopUtility.bundleSetting.pathList.Count > 0) {
+			for(int i = 0;i < DevelopUtility.bundleSetting.pathList.Count;i++){
+				if(DevelopUtility.bundleSetting.pathSelectList[i]){
+					ClearBundleNameAt (DevelopUtility.bundleSetting.pathList[i]);
 				}
 			}
 		}
@@ -369,28 +336,29 @@ public class BundleBuildWindow : EditorWindow{
 		DirectoryInfo dirInfo = new DirectoryInfo (path);
 		//如果路径存在说明是路径 
 		if (dirInfo.Exists) {
-			if (dirInfo.Name.StartsWith (setting.groupPrefix)) {
-				assetInfos.AddRange (NameByFirstChild (path, preName + setting.seqSign + dirInfo.Name, variantName));
-			} else if (dirInfo.Name.StartsWith (setting.singlePrefix)) {
-				assetInfos.AddRange (NameBundleBySelf (path,  preName + setting.seqSign + dirInfo.Name, variantName));
+			if (dirInfo.Name.StartsWith (DevelopUtility.bundleSetting.groupPrefix)) {
+				assetInfos.AddRange (NameByFirstChild (path, preName + DevelopUtility.bundleSetting.seqSign + dirInfo.Name, variantName));
+			} else if (dirInfo.Name.StartsWith (DevelopUtility.bundleSetting.singlePrefix)) {
+				assetInfos.AddRange (NameBundleBySelf (path,  preName + DevelopUtility.bundleSetting.seqSign + dirInfo.Name, variantName));
 			} else {
 				FileSystemInfo[] files = dirInfo.GetFileSystemInfos ();
 				for (int i = 0; i < files.Length; i++) {
 					if(files[i].FullName.EndsWith(".meta")){
 						continue;
 					}
-					if(files[i].Name.StartsWith(setting.eventPrefix)){
+					if(files[i].Name.StartsWith(DevelopUtility.bundleSetting.eventPrefix)){
 						preName = files [i].Name;
 					}
 					assetInfos.AddRange(NameBundleStart (files [i].FullName, preName,variantName));
 				}
 			}
-		} else {
-			if(!dirInfo.FullName.EndsWith(".meta")){
-				//父级未找到Group或Single标记的 说明放置错误
-				Debug.LogWarning("未放入标记的文件夹下：" + path);
-			}
 		}
+//		else {
+//			if(!dirInfo.FullName.EndsWith(".meta")){
+//				//父级未找到Group或Single标记的 说明放置错误
+//				Debug.LogWarning("初始加载：" + path);
+//			}
+//		}
 		return assetInfos;
 	}
 
@@ -459,7 +427,7 @@ public class BundleBuildWindow : EditorWindow{
 		if (assetPath.EndsWith (".unity")) {
 			assetImporter.assetBundleName = bundleName + ".level";
 		} else {
-			assetImporter.assetBundleName = preName + setting.seqSign + bundleName + ".assetbundle";
+			assetImporter.assetBundleName = preName + DevelopUtility.bundleSetting.seqSign + bundleName + ".assetbundle";
 			assetImporter.assetBundleVariant = assetBundleVariant;
 		}
 		FileInfo fileInfo = new FileInfo (path);
@@ -497,13 +465,13 @@ public class BundleBuildWindow : EditorWindow{
 	}
 
 	static private void BuildAssetBundles(){
-		if(string.IsNullOrEmpty(config.hotfixFile)){
+		if(string.IsNullOrEmpty(DevelopUtility.clientConfig.hotfixFile)){
 			Debug.LogWarning ("hotfixfile name is null.");
-			config.hotfixFile = "Custom";
+			DevelopUtility.clientConfig.hotfixFile = "Custom";
 		}
 
-		if (!Directory.Exists (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile)){
-			Directory.CreateDirectory(Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile);
+		if (!Directory.Exists (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile)){
+			Directory.CreateDirectory(Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile);
 		}
 
 		if(bundlesInfo != null && bundlesInfo.bundleList.Count > 0){
@@ -511,11 +479,12 @@ public class BundleBuildWindow : EditorWindow{
 			for(int i = 0;i < bundlesInfo.bundleList.Count;i++){
 				AssetBundleBuild build = new AssetBundleBuild ();
 				build.assetBundleName = bundlesInfo.bundleList[i].name;
-				build.assetBundleVariant = config.assetBundleVariant;
+				build.assetBundleVariant = DevelopUtility.clientConfig.assetBundleVariant;
 				build.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(bundlesInfo.bundleList [i].name);
 				builds [i] = build;
 			}
-			BuildPipeline.BuildAssetBundles (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName () + "/" + config.hotfixFile, builds, setting.buildAssetBundleOptions, EditorUserBuildSettings.activeBuildTarget);
+
+			BuildPipeline.BuildAssetBundles (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName () + "/" + DevelopUtility.clientConfig.hotfixFile, builds, DevelopUtility.bundleSetting.buildAssetBundleOptions, EditorUserBuildSettings.activeBuildTarget);
 		}
 	}
 		
@@ -555,13 +524,13 @@ public class BundleBuildWindow : EditorWindow{
 	}
 
 	static private void BuildLevels(){
-		if (!Directory.Exists (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile)){
-			Directory.CreateDirectory(Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile);
+		if (!Directory.Exists (Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile)){
+			Directory.CreateDirectory(Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile);
 		}
 
 		if (sceneInfoList != null && sceneInfoList.Count > 0) {
 			for (int i = 0; i < sceneInfoList.Count; i++) {
-				BuildPipeline.BuildPlayer (AssetDatabase.GetAssetPathsFromAssetBundle(sceneInfoList [i].name), Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + config.hotfixFile + "/" + sceneInfoList [i].name, EditorUserBuildSettings.activeBuildTarget, setting.buildOptions);
+				BuildPipeline.BuildPlayer (AssetDatabase.GetAssetPathsFromAssetBundle(sceneInfoList [i].name), Application.streamingAssetsPath + "/" + GameUtility.GetPlatformName() + "/" + DevelopUtility.clientConfig.hotfixFile + "/" + sceneInfoList [i].name, EditorUserBuildSettings.activeBuildTarget, DevelopUtility.bundleSetting.buildOptions);
 			}
 		}
 	}
@@ -596,85 +565,17 @@ public class BundleBuildWindow : EditorWindow{
 		}
 	}
 
-
-
 	void OnSelectionChange(){
 		this.Repaint ();
 	}
 
-	//void OnFocus(){}
-
 	void OnLostFocus(){
-		///SaveConfig ();
-		EditorUtility.SetDirty(setting);
-		EditorUtility.SetDirty(config);
-	}
-		
-	void OnEnable(){
-		CheckAndLoadSetting ();
-		CheckAndLoadConfig ();
+		EditorUtility.SetDirty(DevelopUtility.bundleSetting);
+		EditorUtility.SetDirty(DevelopUtility.clientConfig);
 	}
 
 
-	static private void CheckAndLoadSetting(){
-		string settingPath = Application.dataPath + "/" + "Editor Default Resources/Settings";
-		if (_setting == null) {
-			if (!Directory.Exists (settingPath)){
-				Directory.CreateDirectory(settingPath);
-			}
-			LoadSetting ();
-		}
-	}
-
-	static private void LoadSetting(){
-		string settingPath = "Assets/Editor Default Resources/Settings";
-		var obj = AssetDatabase.LoadAssetAtPath (settingPath + "/" + "BundleBuildSetting.asset", typeof(BundleBuildSetting));
-		if (obj != null) {
-			BundleBuildWindow.setting = (BundleBuildSetting)obj;
-			obj = null;
-		} else {
-			CreateSetting (settingPath);
-		}
-	}
-
-	static private void CreateSetting(string path){
-		if(!Directory.Exists (path)){
-			Directory.CreateDirectory (path);
-		}
-		setting = ScriptableObject.CreateInstance<BundleBuildSetting>();
-		AssetDatabase.CreateAsset (setting, path + "/" + "BundleBuildSetting.asset");
-		AssetDatabase.SaveAssets ();
-		AssetDatabase.Refresh ();
-	}
-
-	static private void CheckAndLoadConfig(){
-		if (_config == null) {
-			LoadConfig ();
-		}
-	}
-
-	static private void LoadConfig(){
-		string configPath = "Assets/Resources/Configs";
-		var obj = AssetDatabase.LoadAssetAtPath (configPath + "/" + "AssetbundleConfig.asset", typeof(AssetbundleConfig));
-		if (obj != null) {
-			BundleBuildWindow.config = (AssetbundleConfig)obj;
-			obj = null;
-		} else {
-			CreateConfig (configPath);
-		}
-	}
-	static private void CreateConfig(string path){
-		if(!Directory.Exists (path)){
-			Directory.CreateDirectory (path);
-		}
-		config = ScriptableObject.CreateInstance<AssetbundleConfig>();
-		AssetDatabase.CreateAsset (config, path + "/" + "AssetbundleConfig.asset");
-		AssetDatabase.SaveAssets ();
-		AssetDatabase.Refresh ();
-	}
-
-
-	[MenuItem("Window/Game/Bundle Build Window")]
+	[MenuItem("Window/AssetBundle/Bundle Build Window")]
 	static void Init() {
 		EditorWindow.GetWindow<BundleBuildWindow>("Build");
 	}
@@ -682,7 +583,7 @@ public class BundleBuildWindow : EditorWindow{
 	[MenuItem("Build/AssetBundle/Build_Release")]
 	static public void Build_Release()
 	{
-		GameUtility.bundleConfig.isReleaseBundle = true;
+		Configs.clientConfig.isReleaseBundle = true;
 		//清除冗余bundle名
 		AssetDatabase.RemoveUnusedAssetBundleNames();
 		//对配置文件所选目录下的所有资源执行Bundle命名操作
@@ -694,13 +595,15 @@ public class BundleBuildWindow : EditorWindow{
 
 		AssetDatabase.SaveAssets ();
 		AssetDatabase.Refresh ();
+
+		EditorUtility.DisplayDialog ("Bundle Build Dialog","Finish Build.","ok");
 	}
 
 
 	[MenuItem("Build/AssetBundle/Build_Develop")]
 	static public void Build_Develop()
 	{
-		GameUtility.bundleConfig.isReleaseBundle = false;
+		Configs.clientConfig.isReleaseBundle = false;
 		//清除冗余bundle名
 		AssetDatabase.RemoveUnusedAssetBundleNames();
 		//对配置文件所选目录下的所有资源执行Bundle命名操作
@@ -708,5 +611,7 @@ public class BundleBuildWindow : EditorWindow{
 
 		AssetDatabase.SaveAssets ();
 		AssetDatabase.Refresh ();
+
+		EditorUtility.DisplayDialog ("Bundle Build Dialog","Finish Build.","ok");
 	}
 }

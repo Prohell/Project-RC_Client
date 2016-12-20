@@ -14,6 +14,7 @@ public class ResourceLoader : IAssetAsyncLoader{
 
 	public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T:Object{
 		string assetPath = null;
+		Debug.Log (assetBundleName);
 		AssetsInfo assetsInfo = GameUtility.assetsInfo;
 		if(assetsInfo.assetList != null && assetsInfo.assetList.Count > 0){
 			for(int i = 0;i < assetsInfo.assetList.Count;i++){

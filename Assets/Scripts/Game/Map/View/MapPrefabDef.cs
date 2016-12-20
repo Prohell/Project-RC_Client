@@ -1,5 +1,13 @@
 ﻿public class MapPrefabDef
 {
+    // 需要动态加载的地图数据
+    public const string MapAtlas = "Map/MapAtlas";
+    public const string MapTerrainSprData = "Map/TerrainSprData";
+    public const string MapSource = "Map/mapsource";
+    public const string MapSprData = "Map/mapsprdata";
+    public const string MapUint16 = "Map/mapuint16";
+    public const string MapBytes = "Map/mapbytes";
+
     public const string MAP_VIEW = "MapView";
     public const string MAP_TILE_CITY = "MapTileCity";
     public const string MAP_TILE_PVE = "MapTilePve";

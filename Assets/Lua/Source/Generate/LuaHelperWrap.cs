@@ -11,9 +11,14 @@ public class LuaHelperWrap
 		L.RegFunction("CallStaticFunction", CallStaticFunction);
 		L.RegFunction("CallFunction", CallFunction);
 		L.RegFunction("LoadGB", LoadGB);
+		L.RegFunction("GetTypeInAll", GetTypeInAll);
+		L.RegFunction("GetTypeInUnityEngine", GetTypeInUnityEngine);
+		L.RegFunction("GetTypeInNGUI", GetTypeInNGUI);
 		L.RegFunction("GetComponent", GetComponent);
 		L.RegFunction("GetOutletComponent", GetOutletComponent);
 		L.RegFunction("GetComponents", GetComponents);
+		L.RegFunction("GetNewTable", GetNewTable);
+		L.RegFunction("LoadBundleGB", LoadBundleGB);
 		L.RegFunction("AddListener", AddListener);
 		L.RegFunction("New", _CreateLuaHelper);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -115,6 +120,57 @@ public class LuaHelperWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeInAll(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			System.Type o = LuaHelper.GetTypeInAll(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeInUnityEngine(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			System.Type o = LuaHelper.GetTypeInUnityEngine(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeInNGUI(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			System.Type o = LuaHelper.GetTypeInNGUI(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetComponent(IntPtr L)
 	{
 		try
@@ -161,6 +217,57 @@ public class LuaHelperWrap
 			System.Collections.Generic.List<LuaInterface.LuaTable> o = LuaHelper.GetComponents(arg0, arg1);
 			ToLua.PushObject(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetNewTable(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			LuaInterface.LuaTable o = LuaHelper.GetNewTable();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LoadBundleGB(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(LuaInterface.LuaFunction)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				string arg1 = ToLua.ToString(L, 2);
+				LuaFunction arg2 = ToLua.ToLuaFunction(L, 3);
+				LuaHelper.LoadBundleGB(arg0, arg1, arg2);
+				return 0;
+			}
+			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(LuaInterface.LuaTable), typeof(LuaInterface.LuaFunction)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				string arg1 = ToLua.ToString(L, 2);
+				LuaTable arg2 = ToLua.ToLuaTable(L, 3);
+				LuaFunction arg3 = ToLua.ToLuaFunction(L, 4);
+				LuaHelper.LoadBundleGB(arg0, arg1, arg2, arg3);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: LuaHelper.LoadBundleGB");
+			}
 		}
 		catch(Exception e)
 		{

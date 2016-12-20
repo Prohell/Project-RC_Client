@@ -50,8 +50,13 @@ public class MapTileVO : IDisposable
         return (int)type;
     }
 
+    public bool IsWater()
+    {
+        return type == MapTileType.Block && (blockType == MapBlockType.WaterWave || blockType == MapBlockType.WaterNormal);
+    }
+
     #region Encode & Decode
-    static bool mDecodeTestMode = true;
+    static bool mDecodeTestMode = false;
     public static uint WayPointEncodeLocal(MapTileVO tile)
     {
         uint re = 0;
@@ -117,6 +122,40 @@ public class MapTileVO : IDisposable
         }
         tile.coord = coord;
         return tile;
+    }
+
+    public static uint TileSprEncodeLocal(List<int> sprs)
+    {
+        // spr1-spr2-spr3-spr4
+        //  8b - 8b - 8b - 8b
+        uint re = 0;
+        re |= Convert.ToUInt32(Convert.ToUInt32(sprs[0]) << 24);
+        re |= Convert.ToUInt32(Convert.ToUInt32(sprs[1]) << 16);
+        re |= Convert.ToUInt32(Convert.ToUInt32(sprs[2]) << 8);
+        re |= Convert.ToUInt32(Convert.ToUInt32(sprs[3]) << 0);
+        return re;
+    }
+
+    public static List<int> TileSprDecodeLocal(uint bin)
+    {
+        // spr1-spr2-spr3-spr4
+        //  8b - 8b - 8b - 8b
+        List<int> ret = new List<int>(4);
+        if (mDecodeTestMode)
+        {
+            ret.Add(0);
+            ret.Add(1);
+            ret.Add(2);
+            ret.Add(3);
+        }
+        else
+        {
+            ret.Add(Convert.ToInt32((bin & 0xff000000) >> 24));
+            ret.Add(Convert.ToInt32((bin & 0xff0000) >> 16));
+            ret.Add(Convert.ToInt32((bin & 0xff00) >> 8));
+            ret.Add(Convert.ToInt32((bin & 0xff) >> 0));
+        }
+        return ret;
     }
 
     public static Color ColorDecode(ushort bin)

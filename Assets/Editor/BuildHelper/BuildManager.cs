@@ -231,19 +231,22 @@ public class BuildManager
 
     private static void ProcessBundle(bool isUsingBundle)
     {
-        //lua bundle, use Resources for temp.
-        ToLuaMenu.CopyLuaFilesToRes();
-
         //assets bundle.
-        GameUtility.bundleConfig.isReleaseBundle = isUsingBundle;
+		Configs.clientConfig.isReleaseBundle = isUsingBundle;
         AssetDatabase.SaveAssets();
 
         if (isUsingBundle)
         {
+            ToLuaMenu.CopyLuaFilesToPrepareBundle();
+            UIConfigEditor.SOToBundle();
+
             BundleBuildWindow.Build_Release();
         }
         else
         {
+            ToLuaMenu.CopyLuaFilesToRes();
+            UIConfigEditor.SOToBundle();
+
             BundleBuildWindow.Build_Develop();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using GCGame.Table;
+using UnityEngine;
 /// <summary>
 /// 个体数据部分
 /// by Zhengxuesong
@@ -104,5 +105,9 @@ public class UnitData {
     public void SetAdjustAttackRange(float tempAttackRange)
     {
         mAdjustAttackRange = tempAttackRange;
+    }
+    public float GetMaxHp()
+    {
+        return mUnitMaxHp;
     }
 }

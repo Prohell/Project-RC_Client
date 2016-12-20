@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ReleaseLoader :  IAssetAsyncLoader {
-	private VersionInfo versionInfo;
 	private AssetBundleManifest	streamManifest;
 	private AssetBundleManifest remoteManifest;
 
@@ -52,7 +51,7 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 
 
 	IEnumerator LoadManifest(){
-		string file = GameUtility.StreamingHotfixPathApp + "/" + GameUtility.bundleConfig.hotfixFile;
+		string file = GameUtility.StreamingHotfixPathApp + "/" + Configs.clientConfig.hotfixFile;
 
 		AssetBundle curBundle = null;
 		yield return GameLoader.LoadFromFileAsync (file,(bundle)=>{
@@ -66,7 +65,7 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 		curBundle.Unload (false);
 		curBundle = null;
 
-		yield return GameLoader.LoadAssetBundle (GameUtility.resURL + GameUtility.bundleConfig.hotfixFile,(bundle)=>{
+		yield return GameLoader.LoadAssetBundle (GameUtility.resURL + Configs.clientConfig.hotfixFile,(bundle)=>{
 			curBundle = bundle;
 		});
 		requst = curBundle.LoadAssetAsync<AssetBundleManifest> ("AssetBundleManifest");
@@ -105,7 +104,6 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 	}
 
 	public IEnumerator LoadAssetBundle(string assetBundleName, Callback<AssetBundle> callback = null){
-		AddReferens (assetBundleName);
 		if(bundleDic.ContainsKey(assetBundleName)){
 			yield break;
 		}

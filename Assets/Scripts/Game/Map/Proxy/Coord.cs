@@ -75,8 +75,16 @@ public struct Coord
     public static Coord RandomMapCoord()
     {
         Coord re = new Coord();
-        re.x = UnityEngine.Random.Range(0, MapConst.MAP_WIDTH - 1);
-        re.y = UnityEngine.Random.Range(0, MapConst.MAP_HEIGHT - 1);
+        re.x = Random.Range(0, MapConst.MAP_WIDTH - 1);
+        re.y = Random.Range(0, MapConst.MAP_HEIGHT - 1);
         return re;
+    }
+
+    public Coord GetSubmapCoord()
+    {
+        Coord submapCoord = new Coord();
+        submapCoord.x = Mathf.FloorToInt(x / MapConst.MAP_TILES_PER_SUB);
+        submapCoord.y = Mathf.FloorToInt(y / MapConst.MAP_TILES_PER_SUB);
+        return submapCoord;
     }
 }

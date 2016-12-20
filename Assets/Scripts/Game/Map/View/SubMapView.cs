@@ -203,7 +203,7 @@ public class SubMapView : MonoBehaviour
                 MapTileVO tileVo = GameFacade.GetProxy<MapProxy>().GetTile(c);
                 if (tileVo != null)
                 {
-                    if (tileVo.type == MapTileType.Block && tileVo.blockType != MapBlockType.Water)
+                    if (!tileVo.IsWater())
                     {
                         SpriteRenderer block = CreateBlock(tileVo);
                         block.transform.parent = blockRoot;

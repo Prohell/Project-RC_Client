@@ -2,6 +2,10 @@ public class MapConst
 {
     public const int MAP_WIDTH = 1024;
     public const int MAP_HEIGHT = 1024;
+
+    public const int MAP_SUBMAPS = 64;
+    public const int MAP_TILES_PER_SUB = 16;
+
     /// <summary>
     /// 地图单位高度，代表1高度升高或者下陷多少米
     /// </summary>
@@ -21,7 +25,8 @@ public enum MapBlockType
     None = 0,
     Mountain = 1,
     Forest = 2,
-    Water = 3
+    WaterWave = 3,
+    WaterNormal = 4
 }
 
 public enum CampType

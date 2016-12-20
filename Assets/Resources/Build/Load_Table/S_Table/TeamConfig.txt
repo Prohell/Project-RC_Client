@@ -1,6 +1,6 @@
-Id	Desc	SquadSpace	UnitSpace	UnitNumbers	SquadRowCount	SquadNumbers
-INT	STRING	FLOAT	FLOAT	INT	INT	INT
-#						
-#						
-100001		40	4	15	3	6
-100002		40	4	15	3	6
+Id	Desc	SquadL	SquadH
+INT	STRING	FLOAT	FLOAT
+#			
+#			
+100001		25	25
+100002		25	15

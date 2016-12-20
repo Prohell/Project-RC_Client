@@ -16,14 +16,30 @@ public static class LuaBinder
 		UICameraWrap.Register(L);
 		UILabelWrap.Register(L);
 		UIGridWrap.Register(L);
+		UIButtonWrap.Register(L);
 		NGUIToolsWrap.Register(L);
+		EventDelegateWrap.Register(L);
 		LuaOutletWrap.Register(L);
 		LuaHelperWrap.Register(L);
+		ProxyManagerWrap.Register(L);
+		MediatorManagerWrap.Register(L);
+		EventManagerWrap.Register(L);
+		UIManagerWrap.Register(L);
+		UIItemWrap.Register(L);
 		LuaTestProxyWrap.Register(L);
 		LuaTestMediatorWrap.Register(L);
+		LuaTestMediator2Wrap.Register(L);
+		LuaTestMediator3Wrap.Register(L);
+		LuaTestMediator4Wrap.Register(L);
 		UIRectWrap.Register(L);
 		UIWidgetWrap.Register(L);
 		UIWidgetContainerWrap.Register(L);
+		UIButtonColorWrap.Register(L);
+		Singleton_ProxyManagerWrap.Register(L);
+		Singleton_MediatorManagerWrap.Register(L);
+		Singleton_EventManagerWrap.Register(L);
+		Singleton_UIManagerWrap.Register(L);
+		L.RegFunction("Callback_UnityEngine_GameObject", Callback_UnityEngine_GameObject);
 		L.BeginModule("UnityEngine");
 		UnityEngine_ComponentWrap.Register(L);
 		UnityEngine_TransformWrap.Register(L);
@@ -64,6 +80,10 @@ public static class LuaBinder
 		UnityEngine_WrapModeWrap.Register(L);
 		UnityEngine_QualitySettingsWrap.Register(L);
 		UnityEngine_RenderSettingsWrap.Register(L);
+		UnityEngine_GUILayoutWrap.Register(L);
+		UnityEngine_GUILayoutOptionWrap.Register(L);
+		UnityEngine_GUIStyleWrap.Register(L);
+		UnityEngine_GUIContentWrap.Register(L);
 		L.BeginModule("Experimental");
 		L.BeginModule("Director");
 		UnityEngine_Experimental_Director_DirectorPlayerWrap.Register(L);
@@ -82,6 +102,9 @@ public static class LuaBinder
 		L.BeginModule("AudioClip");
 		L.RegFunction("PCMReaderCallback", UnityEngine_AudioClip_PCMReaderCallback);
 		L.RegFunction("PCMSetPositionCallback", UnityEngine_AudioClip_PCMSetPositionCallback);
+		L.EndModule();
+		L.BeginModule("GUI");
+		L.RegFunction("WindowFunction", UnityEngine_GUI_WindowFunction);
 		L.EndModule();
 		L.EndModule();
 		L.BeginModule("UIGrid");
@@ -102,13 +125,6 @@ public static class LuaBinder
 		L.RegFunction("StringDelegate", DelegateUtil_StringDelegate);
 		L.RegFunction("TableDelegate", DelegateUtil_TableDelegate);
 		L.EndModule();
-		L.BeginModule("UIPanel");
-		L.RegFunction("OnGeometryUpdated", UIPanel_OnGeometryUpdated);
-		L.RegFunction("OnClippingMoved", UIPanel_OnClippingMoved);
-		L.EndModule();
-		L.BeginModule("UIScrollView");
-		L.RegFunction("OnDragNotification", UIScrollView_OnDragNotification);
-		L.EndModule();
 		L.BeginModule("UIEventListener");
 		L.RegFunction("VoidDelegate", UIEventListener_VoidDelegate);
 		L.RegFunction("BoolDelegate", UIEventListener_BoolDelegate);
@@ -116,6 +132,13 @@ public static class LuaBinder
 		L.RegFunction("VectorDelegate", UIEventListener_VectorDelegate);
 		L.RegFunction("ObjectDelegate", UIEventListener_ObjectDelegate);
 		L.RegFunction("KeyCodeDelegate", UIEventListener_KeyCodeDelegate);
+		L.EndModule();
+		L.BeginModule("UIPanel");
+		L.RegFunction("OnGeometryUpdated", UIPanel_OnGeometryUpdated);
+		L.RegFunction("OnClippingMoved", UIPanel_OnClippingMoved);
+		L.EndModule();
+		L.BeginModule("UIScrollView");
+		L.RegFunction("OnDragNotification", UIScrollView_OnDragNotification);
 		L.EndModule();
 		L.BeginModule("UICamera");
 		L.RegFunction("GetKeyStateFunc", UICamera_GetKeyStateFunc);
@@ -145,6 +168,12 @@ public static class LuaBinder
 		L.BeginModule("UIDrawCall");
 		L.RegFunction("OnRenderCallback", UIDrawCall_OnRenderCallback);
 		L.EndModule();
+		L.BeginModule("EventDelegate");
+		L.RegFunction("Callback", EventDelegate_Callback);
+		L.EndModule();
+		L.BeginModule("EventManager");
+		L.RegFunction("EventHandler", EventManager_EventHandler);
+		L.EndModule();
 		L.EndModule();
 		L.BeginPreLoad();
 		L.AddPreLoad("UnityEngine.MeshRenderer", LuaOpen_UnityEngine_MeshRenderer, typeof(UnityEngine.MeshRenderer));
@@ -164,6 +193,33 @@ public static class LuaBinder
 		L.AddPreLoad("UnityEngine.Rigidbody", LuaOpen_UnityEngine_Rigidbody, typeof(UnityEngine.Rigidbody));
 		L.EndPreLoad();
 		Debugger.Log("Register lua type cost time: {0}", Time.realtimeSinceStartup - t);
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Callback_UnityEngine_GameObject(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(Callback<UnityEngine.GameObject>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(Callback<UnityEngine.GameObject>), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -318,6 +374,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UnityEngine.AudioClip.PCMSetPositionCallback), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UnityEngine_GUI_WindowFunction(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UnityEngine.GUI.WindowFunction), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UnityEngine.GUI.WindowFunction), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -626,87 +709,6 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int UIPanel_OnGeometryUpdated(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnGeometryUpdated), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnGeometryUpdated), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int UIPanel_OnClippingMoved(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnClippingMoved), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnClippingMoved), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int UIScrollView_OnDragNotification(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int UIEventListener_VoidDelegate(IntPtr L)
 	{
 		try
@@ -858,6 +860,87 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIEventListener.KeyCodeDelegate), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIPanel_OnGeometryUpdated(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnGeometryUpdated), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnGeometryUpdated), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIPanel_OnClippingMoved(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnClippingMoved), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIPanel.OnClippingMoved), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIScrollView_OnDragNotification(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIScrollView.OnDragNotification), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -1398,6 +1481,60 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIDrawCall.OnRenderCallback), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int EventDelegate_Callback(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventDelegate.Callback), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventDelegate.Callback), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int EventManager_EventHandler(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventManager.EventHandler), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventManager.EventHandler), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

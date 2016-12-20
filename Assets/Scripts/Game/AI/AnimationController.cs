@@ -10,8 +10,6 @@ public class AnimationController :MonoBehaviour {
 
     private UnitController mUnitController;
 
-    private int mUnitID;
-
     void Awake()
     {
     }
@@ -44,7 +42,6 @@ public class AnimationController :MonoBehaviour {
     {
         mAnimation = GetComponent<Animation>();
         mUnitController = transform.parent.GetComponent<UnitController>();
-        mUnitID = mUnitController.GetUnitData().GetID();
 
         foreach (var item in TableManager.GetAnimationEvent())
         {
@@ -53,26 +50,18 @@ public class AnimationController :MonoBehaviour {
                 SetAnimationClipCallBack(item.Value[0].AnimationClipName, item.Value[0].FunctionName, item.Value[0].Time);
             }
         }
-        //SetAnimationClips();
-
-    }
-    void SetAnimationClips()
-    {
-        SetAnimationClipCallBack(AnimationTags.mAttack, "AttackEnd");
-        SetAnimationClipCallBack(AnimationTags.mDie, "DieEnd");
-        SetAnimationClipCallBack(AnimationTags.mAttack, "AttackEffect", 0.8f);
     }
     public void AttackEnd()
     {
-        EventManager.GetInstance().SendEvent(EventId.AttackAnimationEnd + mUnitID, mUnitID);
+        mUnitController.UnitAttackEnd();
     }
     public void DieEnd()
     {
-        EventManager.GetInstance().SendEvent(EventId.DieAnimationEnd + mUnitID, mUnitID);
+        mUnitController.UnitDieEnd();
     }
     public void AttackEffect()
     {
-        EventManager.GetInstance().SendEvent(EventId.AttackAnimationEffect + mUnitID, mUnitID);
+        mUnitController.UnitAttackEffect();
     }
 }
 

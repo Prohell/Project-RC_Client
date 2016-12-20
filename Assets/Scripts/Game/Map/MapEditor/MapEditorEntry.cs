@@ -13,12 +13,13 @@ public class MapEditorEntry : MonoBehaviour
     #region UI ref
     public Text coord;
     public Text curEdit;
-    public GameObject texLayout;
+    public ToggleGroup texGroup;
     public GameObject heightLayout;
     public GameObject campLayout;
     public GameObject levelLayout;
     public GameObject tileTypeLayout;
     public GameObject blockTypeLayout;
+    public List<Dropdown> sprLists;
     // 区域操作
     public InputField[] recCoords;
     public Toggle recToggle;
@@ -29,6 +30,7 @@ public class MapEditorEntry : MonoBehaviour
 
     public Color[] campColors;
     public Color[] levelColors;
+    public Color[] typeColors;
     #endregion
 
     #region Edit params
@@ -39,7 +41,8 @@ public class MapEditorEntry : MonoBehaviour
         EDIT_AREA = 2,
         EDIT_LV = 3,
         EDIT_TILETYPE = 4,
-        EDIT_BLOCKTYPE = 5
+        EDIT_BLOCKTYPE = 5,
+        EDIT_SPRLIST = 6
     }
     Coord mCurLeftClicked;
     Coord mDst;
@@ -53,6 +56,7 @@ public class MapEditorEntry : MonoBehaviour
     byte mLvIndex = 0;
     byte mTypeIndex = 0;
     byte mBlockTypeIndex = 0;
+    List<Coord> mBulkSubmaps = new List<Coord>();
     #endregion
 
     IEnumerator Start()
@@ -67,16 +71,39 @@ public class MapEditorEntry : MonoBehaviour
     void Init()
     {
         mapProxy = GameFacade.GetProxy<MapProxy>();
-        foreach (Button btn in texLayout.GetComponentsInChildren<Button>())
+        foreach(Dropdown dd in sprLists)
         {
-            byte index = byte.Parse(btn.name.Substring(1, 1));
-            btn.onClick.AddListener(() =>
+            dd.ClearOptions();
+            dd.AddOptions(MapView.Current.Lod0.hex.GetSprNames());
+            dd.onValueChanged.AddListener((int sprIndex) => 
             {
                 mIsClickEditArea = true;
-                ChangeCurOp(EDIT_OP.EDIT_TEX);
+                ChangeCurOp(EDIT_OP.EDIT_SPRLIST);
                 blockTypeLayout.transform.parent.gameObject.SetActive(false);
-                mTexIndex = (byte)(index - 1);
-                UpdateCurOpTips("Texture " + mTexIndex);
+                UpdateCurOpTips("Change Spr List " + sprIndex);
+                List<int> sprs = new List<int>(4);
+                for (int i = 0; i < 4; i++)
+                {
+                    sprs.Add(sprLists[i].value);
+                }
+                mapProxy.SeedSprList(mCurLeftClicked.GetSubmapCoord(), sprs);
+                MapView.Current.Lod0.ForceRereshSubMapView(mCurLeftClicked);
+            });
+        }
+
+        foreach (Toggle btn in texGroup.GetComponentsInChildren<Toggle>())
+        {
+            byte index = byte.Parse(btn.name.Substring(1, 1));
+            btn.onValueChanged.AddListener((bool isOn) =>
+            {
+                if(isOn)
+                {
+                    mIsClickEditArea = true;
+                    ChangeCurOp(EDIT_OP.EDIT_TEX);
+                    blockTypeLayout.transform.parent.gameObject.SetActive(false);
+                    mTexIndex = (byte)(index - 1);
+                    UpdateCurOpTips("Texture " + mTexIndex);
+                }
             });
         }
 
@@ -194,6 +221,11 @@ public class MapEditorEntry : MonoBehaviour
             {
                 mCurLeftClicked = MapView.Current.Layout.ScreenPos2Coord(MapView.Current.MapCamera, Input.mousePosition.xy());
                 coord.text = mCurLeftClicked.ToString();
+                List<int> sprs = mapProxy.GetSprLists(mCurLeftClicked.GetSubmapCoord());
+                for (int i = 0; i < sprs.Count; i++)
+                {
+                    sprLists[i].value = sprs[i];
+                }
             }
         }
 
@@ -279,6 +311,20 @@ public class MapEditorEntry : MonoBehaviour
                 tile.blockType = newBType;
                 tile.type = MapTileType.Block;
                 break;
+
+            case EDIT_OP.EDIT_SPRLIST:
+                List<int> sprs = new List<int>(4);
+                for (int i = 0; i < 4; i++)
+                {
+                    sprs.Add(sprLists[i].value);
+                }
+                Coord submap = tile.coord.GetSubmapCoord();
+                if (!mBulkSubmaps.Contains(submap))
+                {
+                    mapProxy.SeedSprList(submap, sprs);
+                    mBulkSubmaps.Add(submap);
+                }
+                break;
         }
     }
 
@@ -297,12 +343,17 @@ public class MapEditorEntry : MonoBehaviour
             int y = int.Parse(recCoords[1].text);
             int w = int.Parse(recCoords[2].text);
             int h = int.Parse(recCoords[3].text);
+
             for (int i = y; i <= y + h; i++)
             {
                 for(int j = x; j <= x + w; j++)
                 {
                     ModifyVOByOp(mapProxy.EditorTiles[i,j]);
                 }
+            }
+            if (curOp == EDIT_OP.EDIT_SPRLIST)
+            {
+                mBulkSubmaps.Clear();
             }
             MapView.Current.Lod0.ForceRereshSubMapView(new Coord(x, y));
         }

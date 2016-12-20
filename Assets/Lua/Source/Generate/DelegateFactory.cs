@@ -27,20 +27,22 @@ public static class DelegateFactory
 		dict.Add(typeof(DelegateUtil.FloatDelegate), DelegateUtil_FloatDelegate);
 		dict.Add(typeof(DelegateUtil.StringDelegate), DelegateUtil_StringDelegate);
 		dict.Add(typeof(DelegateUtil.TableDelegate), DelegateUtil_TableDelegate);
-		dict.Add(typeof(UnityEngine.Camera.CameraCallback), UnityEngine_Camera_CameraCallback);
-		dict.Add(typeof(UnityEngine.Application.LogCallback), UnityEngine_Application_LogCallback);
-		dict.Add(typeof(UnityEngine.Application.AdvertisingIdentifierCallback), UnityEngine_Application_AdvertisingIdentifierCallback);
-		dict.Add(typeof(UnityEngine.AudioClip.PCMReaderCallback), UnityEngine_AudioClip_PCMReaderCallback);
-		dict.Add(typeof(UnityEngine.AudioClip.PCMSetPositionCallback), UnityEngine_AudioClip_PCMSetPositionCallback);
-		dict.Add(typeof(UIPanel.OnGeometryUpdated), UIPanel_OnGeometryUpdated);
-		dict.Add(typeof(UIPanel.OnClippingMoved), UIPanel_OnClippingMoved);
-		dict.Add(typeof(UIScrollView.OnDragNotification), UIScrollView_OnDragNotification);
 		dict.Add(typeof(UIEventListener.VoidDelegate), UIEventListener_VoidDelegate);
 		dict.Add(typeof(UIEventListener.BoolDelegate), UIEventListener_BoolDelegate);
 		dict.Add(typeof(UIEventListener.FloatDelegate), UIEventListener_FloatDelegate);
 		dict.Add(typeof(UIEventListener.VectorDelegate), UIEventListener_VectorDelegate);
 		dict.Add(typeof(UIEventListener.ObjectDelegate), UIEventListener_ObjectDelegate);
 		dict.Add(typeof(UIEventListener.KeyCodeDelegate), UIEventListener_KeyCodeDelegate);
+		dict.Add(typeof(Callback<UnityEngine.GameObject>), Callback_UnityEngine_GameObject);
+		dict.Add(typeof(UnityEngine.Camera.CameraCallback), UnityEngine_Camera_CameraCallback);
+		dict.Add(typeof(UnityEngine.Application.LogCallback), UnityEngine_Application_LogCallback);
+		dict.Add(typeof(UnityEngine.Application.AdvertisingIdentifierCallback), UnityEngine_Application_AdvertisingIdentifierCallback);
+		dict.Add(typeof(UnityEngine.AudioClip.PCMReaderCallback), UnityEngine_AudioClip_PCMReaderCallback);
+		dict.Add(typeof(UnityEngine.AudioClip.PCMSetPositionCallback), UnityEngine_AudioClip_PCMSetPositionCallback);
+		dict.Add(typeof(UnityEngine.GUI.WindowFunction), UnityEngine_GUI_WindowFunction);
+		dict.Add(typeof(UIPanel.OnGeometryUpdated), UIPanel_OnGeometryUpdated);
+		dict.Add(typeof(UIPanel.OnClippingMoved), UIPanel_OnClippingMoved);
+		dict.Add(typeof(UIScrollView.OnDragNotification), UIScrollView_OnDragNotification);
 		dict.Add(typeof(UICamera.GetKeyStateFunc), UICamera_GetKeyStateFunc);
 		dict.Add(typeof(UICamera.GetAxisFunc), UICamera_GetAxisFunc);
 		dict.Add(typeof(UICamera.GetAnyKeyFunc), UICamera_GetAnyKeyFunc);
@@ -63,6 +65,8 @@ public static class DelegateFactory
 		dict.Add(typeof(UIWidget.HitCheck), UIWidget_HitCheck);
 		dict.Add(typeof(UIGrid.OnReposition), UIGrid_OnReposition);
 		dict.Add(typeof(System.Comparison<UnityEngine.Transform>), System_Comparison_UnityEngine_Transform);
+		dict.Add(typeof(EventDelegate.Callback), EventDelegate_Callback);
+		dict.Add(typeof(EventManager.EventHandler), EventManager_EventHandler);
 	}
 
     [NoToLuaAttribute]
@@ -646,382 +650,6 @@ public static class DelegateFactory
 		}
 	}
 
-	class UnityEngine_Camera_CameraCallback_Event : LuaDelegate
-	{
-		public UnityEngine_Camera_CameraCallback_Event(LuaFunction func) : base(func) { }
-		public UnityEngine_Camera_CameraCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(UnityEngine.Camera param0)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(UnityEngine.Camera param0)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UnityEngine_Camera_CameraCallback(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UnityEngine.Camera.CameraCallback fn = delegate(UnityEngine.Camera param0) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UnityEngine_Camera_CameraCallback_Event target = new UnityEngine_Camera_CameraCallback_Event(func);
-			UnityEngine.Camera.CameraCallback d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UnityEngine_Camera_CameraCallback_Event target = new UnityEngine_Camera_CameraCallback_Event(func, self);
-			UnityEngine.Camera.CameraCallback d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UnityEngine_Application_LogCallback_Event : LuaDelegate
-	{
-		public UnityEngine_Application_LogCallback_Event(LuaFunction func) : base(func) { }
-		public UnityEngine_Application_LogCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(string param0, string param1, UnityEngine.LogType param2)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.Push(param1);
-			func.Push(param2);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(string param0, string param1, UnityEngine.LogType param2)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.Push(param1);
-			func.Push(param2);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UnityEngine_Application_LogCallback(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UnityEngine.Application.LogCallback fn = delegate(string param0, string param1, UnityEngine.LogType param2) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UnityEngine_Application_LogCallback_Event target = new UnityEngine_Application_LogCallback_Event(func);
-			UnityEngine.Application.LogCallback d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UnityEngine_Application_LogCallback_Event target = new UnityEngine_Application_LogCallback_Event(func, self);
-			UnityEngine.Application.LogCallback d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UnityEngine_Application_AdvertisingIdentifierCallback_Event : LuaDelegate
-	{
-		public UnityEngine_Application_AdvertisingIdentifierCallback_Event(LuaFunction func) : base(func) { }
-		public UnityEngine_Application_AdvertisingIdentifierCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(string param0, bool param1, string param2)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.Push(param1);
-			func.Push(param2);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(string param0, bool param1, string param2)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.Push(param1);
-			func.Push(param2);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UnityEngine_Application_AdvertisingIdentifierCallback(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UnityEngine.Application.AdvertisingIdentifierCallback fn = delegate(string param0, bool param1, string param2) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UnityEngine_Application_AdvertisingIdentifierCallback_Event target = new UnityEngine_Application_AdvertisingIdentifierCallback_Event(func);
-			UnityEngine.Application.AdvertisingIdentifierCallback d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UnityEngine_Application_AdvertisingIdentifierCallback_Event target = new UnityEngine_Application_AdvertisingIdentifierCallback_Event(func, self);
-			UnityEngine.Application.AdvertisingIdentifierCallback d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UnityEngine_AudioClip_PCMReaderCallback_Event : LuaDelegate
-	{
-		public UnityEngine_AudioClip_PCMReaderCallback_Event(LuaFunction func) : base(func) { }
-		public UnityEngine_AudioClip_PCMReaderCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(float[] param0)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(float[] param0)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UnityEngine_AudioClip_PCMReaderCallback(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UnityEngine.AudioClip.PCMReaderCallback fn = delegate(float[] param0) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UnityEngine_AudioClip_PCMReaderCallback_Event target = new UnityEngine_AudioClip_PCMReaderCallback_Event(func);
-			UnityEngine.AudioClip.PCMReaderCallback d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UnityEngine_AudioClip_PCMReaderCallback_Event target = new UnityEngine_AudioClip_PCMReaderCallback_Event(func, self);
-			UnityEngine.AudioClip.PCMReaderCallback d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UnityEngine_AudioClip_PCMSetPositionCallback_Event : LuaDelegate
-	{
-		public UnityEngine_AudioClip_PCMSetPositionCallback_Event(LuaFunction func) : base(func) { }
-		public UnityEngine_AudioClip_PCMSetPositionCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(int param0)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(int param0)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UnityEngine_AudioClip_PCMSetPositionCallback(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UnityEngine.AudioClip.PCMSetPositionCallback fn = delegate(int param0) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UnityEngine_AudioClip_PCMSetPositionCallback_Event target = new UnityEngine_AudioClip_PCMSetPositionCallback_Event(func);
-			UnityEngine.AudioClip.PCMSetPositionCallback d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UnityEngine_AudioClip_PCMSetPositionCallback_Event target = new UnityEngine_AudioClip_PCMSetPositionCallback_Event(func, self);
-			UnityEngine.AudioClip.PCMSetPositionCallback d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UIPanel_OnGeometryUpdated_Event : LuaDelegate
-	{
-		public UIPanel_OnGeometryUpdated_Event(LuaFunction func) : base(func) { }
-		public UIPanel_OnGeometryUpdated_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call()
-		{
-			func.Call();
-		}
-
-		public void CallWithSelf()
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UIPanel_OnGeometryUpdated(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UIPanel.OnGeometryUpdated fn = delegate() { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UIPanel_OnGeometryUpdated_Event target = new UIPanel_OnGeometryUpdated_Event(func);
-			UIPanel.OnGeometryUpdated d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UIPanel_OnGeometryUpdated_Event target = new UIPanel_OnGeometryUpdated_Event(func, self);
-			UIPanel.OnGeometryUpdated d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UIPanel_OnClippingMoved_Event : LuaDelegate
-	{
-		public UIPanel_OnClippingMoved_Event(LuaFunction func) : base(func) { }
-		public UIPanel_OnClippingMoved_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call(UIPanel param0)
-		{
-			func.BeginPCall();
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-
-		public void CallWithSelf(UIPanel param0)
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.Push(param0);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UIPanel_OnClippingMoved(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UIPanel.OnClippingMoved fn = delegate(UIPanel param0) { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UIPanel_OnClippingMoved_Event target = new UIPanel_OnClippingMoved_Event(func);
-			UIPanel.OnClippingMoved d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UIPanel_OnClippingMoved_Event target = new UIPanel_OnClippingMoved_Event(func, self);
-			UIPanel.OnClippingMoved d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
-	class UIScrollView_OnDragNotification_Event : LuaDelegate
-	{
-		public UIScrollView_OnDragNotification_Event(LuaFunction func) : base(func) { }
-		public UIScrollView_OnDragNotification_Event(LuaFunction func, LuaTable self) : base(func, self) { }
-
-		public void Call()
-		{
-			func.Call();
-		}
-
-		public void CallWithSelf()
-		{
-			func.BeginPCall();
-			func.Push(self);
-			func.PCall();
-			func.EndPCall();
-		}
-	}
-
-	public static Delegate UIScrollView_OnDragNotification(LuaFunction func, LuaTable self, bool flag)
-	{
-		if (func == null)
-		{
-			UIScrollView.OnDragNotification fn = delegate() { };
-			return fn;
-		}
-
-		if(!flag)
-		{
-			UIScrollView_OnDragNotification_Event target = new UIScrollView_OnDragNotification_Event(func);
-			UIScrollView.OnDragNotification d = target.Call;
-			target.method = d.Method;
-			return d;
-		}
-		else
-		{
-			UIScrollView_OnDragNotification_Event target = new UIScrollView_OnDragNotification_Event(func, self);
-			UIScrollView.OnDragNotification d = target.CallWithSelf;
-			target.method = d.Method;
-			return d;
-		}
-	}
-
 	class UIEventListener_VoidDelegate_Event : LuaDelegate
 	{
 		public UIEventListener_VoidDelegate_Event(LuaFunction func) : base(func) { }
@@ -1309,6 +937,476 @@ public static class DelegateFactory
 		{
 			UIEventListener_KeyCodeDelegate_Event target = new UIEventListener_KeyCodeDelegate_Event(func, self);
 			UIEventListener.KeyCodeDelegate d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class Callback_UnityEngine_GameObject_Event : LuaDelegate
+	{
+		public Callback_UnityEngine_GameObject_Event(LuaFunction func) : base(func) { }
+		public Callback_UnityEngine_GameObject_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UnityEngine.GameObject param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UnityEngine.GameObject param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate Callback_UnityEngine_GameObject(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			Callback<UnityEngine.GameObject> fn = delegate(UnityEngine.GameObject param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			Callback_UnityEngine_GameObject_Event target = new Callback_UnityEngine_GameObject_Event(func);
+			Callback<UnityEngine.GameObject> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			Callback_UnityEngine_GameObject_Event target = new Callback_UnityEngine_GameObject_Event(func, self);
+			Callback<UnityEngine.GameObject> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_Camera_CameraCallback_Event : LuaDelegate
+	{
+		public UnityEngine_Camera_CameraCallback_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_Camera_CameraCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UnityEngine.Camera param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UnityEngine.Camera param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_Camera_CameraCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.Camera.CameraCallback fn = delegate(UnityEngine.Camera param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_Camera_CameraCallback_Event target = new UnityEngine_Camera_CameraCallback_Event(func);
+			UnityEngine.Camera.CameraCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_Camera_CameraCallback_Event target = new UnityEngine_Camera_CameraCallback_Event(func, self);
+			UnityEngine.Camera.CameraCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_Application_LogCallback_Event : LuaDelegate
+	{
+		public UnityEngine_Application_LogCallback_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_Application_LogCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(string param0, string param1, UnityEngine.LogType param2)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(string param0, string param1, UnityEngine.LogType param2)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_Application_LogCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.Application.LogCallback fn = delegate(string param0, string param1, UnityEngine.LogType param2) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_Application_LogCallback_Event target = new UnityEngine_Application_LogCallback_Event(func);
+			UnityEngine.Application.LogCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_Application_LogCallback_Event target = new UnityEngine_Application_LogCallback_Event(func, self);
+			UnityEngine.Application.LogCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_Application_AdvertisingIdentifierCallback_Event : LuaDelegate
+	{
+		public UnityEngine_Application_AdvertisingIdentifierCallback_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_Application_AdvertisingIdentifierCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(string param0, bool param1, string param2)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(string param0, bool param1, string param2)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_Application_AdvertisingIdentifierCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.Application.AdvertisingIdentifierCallback fn = delegate(string param0, bool param1, string param2) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_Application_AdvertisingIdentifierCallback_Event target = new UnityEngine_Application_AdvertisingIdentifierCallback_Event(func);
+			UnityEngine.Application.AdvertisingIdentifierCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_Application_AdvertisingIdentifierCallback_Event target = new UnityEngine_Application_AdvertisingIdentifierCallback_Event(func, self);
+			UnityEngine.Application.AdvertisingIdentifierCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_AudioClip_PCMReaderCallback_Event : LuaDelegate
+	{
+		public UnityEngine_AudioClip_PCMReaderCallback_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_AudioClip_PCMReaderCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(float[] param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(float[] param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_AudioClip_PCMReaderCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.AudioClip.PCMReaderCallback fn = delegate(float[] param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_AudioClip_PCMReaderCallback_Event target = new UnityEngine_AudioClip_PCMReaderCallback_Event(func);
+			UnityEngine.AudioClip.PCMReaderCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_AudioClip_PCMReaderCallback_Event target = new UnityEngine_AudioClip_PCMReaderCallback_Event(func, self);
+			UnityEngine.AudioClip.PCMReaderCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_AudioClip_PCMSetPositionCallback_Event : LuaDelegate
+	{
+		public UnityEngine_AudioClip_PCMSetPositionCallback_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_AudioClip_PCMSetPositionCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(int param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(int param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_AudioClip_PCMSetPositionCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.AudioClip.PCMSetPositionCallback fn = delegate(int param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_AudioClip_PCMSetPositionCallback_Event target = new UnityEngine_AudioClip_PCMSetPositionCallback_Event(func);
+			UnityEngine.AudioClip.PCMSetPositionCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_AudioClip_PCMSetPositionCallback_Event target = new UnityEngine_AudioClip_PCMSetPositionCallback_Event(func, self);
+			UnityEngine.AudioClip.PCMSetPositionCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_GUI_WindowFunction_Event : LuaDelegate
+	{
+		public UnityEngine_GUI_WindowFunction_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_GUI_WindowFunction_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(int param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(int param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_GUI_WindowFunction(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.GUI.WindowFunction fn = delegate(int param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_GUI_WindowFunction_Event target = new UnityEngine_GUI_WindowFunction_Event(func);
+			UnityEngine.GUI.WindowFunction d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_GUI_WindowFunction_Event target = new UnityEngine_GUI_WindowFunction_Event(func, self);
+			UnityEngine.GUI.WindowFunction d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIPanel_OnGeometryUpdated_Event : LuaDelegate
+	{
+		public UIPanel_OnGeometryUpdated_Event(LuaFunction func) : base(func) { }
+		public UIPanel_OnGeometryUpdated_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIPanel_OnGeometryUpdated(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIPanel.OnGeometryUpdated fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIPanel_OnGeometryUpdated_Event target = new UIPanel_OnGeometryUpdated_Event(func);
+			UIPanel.OnGeometryUpdated d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIPanel_OnGeometryUpdated_Event target = new UIPanel_OnGeometryUpdated_Event(func, self);
+			UIPanel.OnGeometryUpdated d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIPanel_OnClippingMoved_Event : LuaDelegate
+	{
+		public UIPanel_OnClippingMoved_Event(LuaFunction func) : base(func) { }
+		public UIPanel_OnClippingMoved_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UIPanel param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UIPanel param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIPanel_OnClippingMoved(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIPanel.OnClippingMoved fn = delegate(UIPanel param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIPanel_OnClippingMoved_Event target = new UIPanel_OnClippingMoved_Event(func);
+			UIPanel.OnClippingMoved d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIPanel_OnClippingMoved_Event target = new UIPanel_OnClippingMoved_Event(func, self);
+			UIPanel.OnClippingMoved d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIScrollView_OnDragNotification_Event : LuaDelegate
+	{
+		public UIScrollView_OnDragNotification_Event(LuaFunction func) : base(func) { }
+		public UIScrollView_OnDragNotification_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UIScrollView_OnDragNotification(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIScrollView.OnDragNotification fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIScrollView_OnDragNotification_Event target = new UIScrollView_OnDragNotification_Event(func);
+			UIScrollView.OnDragNotification d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIScrollView_OnDragNotification_Event target = new UIScrollView_OnDragNotification_Event(func, self);
+			UIScrollView.OnDragNotification d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -2371,6 +2469,96 @@ public static class DelegateFactory
 		{
 			System_Comparison_UnityEngine_Transform_Event target = new System_Comparison_UnityEngine_Transform_Event(func, self);
 			System.Comparison<UnityEngine.Transform> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class EventDelegate_Callback_Event : LuaDelegate
+	{
+		public EventDelegate_Callback_Event(LuaFunction func) : base(func) { }
+		public EventDelegate_Callback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate EventDelegate_Callback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			EventDelegate.Callback fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			EventDelegate_Callback_Event target = new EventDelegate_Callback_Event(func);
+			EventDelegate.Callback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			EventDelegate_Callback_Event target = new EventDelegate_Callback_Event(func, self);
+			EventDelegate.Callback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class EventManager_EventHandler_Event : LuaDelegate
+	{
+		public EventManager_EventHandler_Event(LuaFunction func) : base(func) { }
+		public EventManager_EventHandler_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(object param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(object param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate EventManager_EventHandler(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			EventManager.EventHandler fn = delegate(object param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			EventManager_EventHandler_Event target = new EventManager_EventHandler_Event(func);
+			EventManager.EventHandler d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			EventManager_EventHandler_Event target = new EventManager_EventHandler_Event(func, self);
+			EventManager.EventHandler d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

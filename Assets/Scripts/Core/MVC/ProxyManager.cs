@@ -13,10 +13,10 @@ public class ProxyManager : Singleton<ProxyManager>, IInit, IReset
 
     public void Add(IProxy p)
     {
-        lock(mLock)
+        lock (mLock)
         {
             Type type = p.GetType();
-            if(mProxies.ContainsKey(type))
+            if (mProxies.ContainsKey(type))
             {
                 throw new Exception(type + "already exists in ProxyManager.");
             }
@@ -27,7 +27,7 @@ public class ProxyManager : Singleton<ProxyManager>, IInit, IReset
 
     public void Remove(Type t)
     {
-        lock(mLock)
+        lock (mLock)
         {
             IProxy p;
             if (!mProxies.TryGetValue(t, out p))
@@ -49,9 +49,19 @@ public class ProxyManager : Singleton<ProxyManager>, IInit, IReset
         return (T)p;
     }
 
+    public object Get(string typeName)
+    {
+        IProxy p;
+        if (mProxies.TryGetValue(Type.GetType(typeName), out p))
+        {
+            return Convert.ChangeType(p, Type.GetType(typeName));
+        }
+        return Convert.ChangeType(p, Type.GetType(typeName));
+    }
+
     public void OnReset()
     {
-        lock(mLock)
+        lock (mLock)
         {
             foreach (IProxy p in mProxies.Values)
             {

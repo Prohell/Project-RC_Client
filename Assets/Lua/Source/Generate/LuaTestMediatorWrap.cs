@@ -9,10 +9,12 @@ public class LuaTestMediatorWrap
 		L.BeginClass(typeof(LuaTestMediator), typeof(System.Object));
 		L.RegFunction("UpdateItems", UpdateItems);
 		L.RegFunction("OnInit", OnInit);
+		L.RegFunction("GetBagItemData", GetBagItemData);
+		L.RegFunction("UseItem", UseItem);
+		L.RegFunction("UseAllItems", UseAllItems);
 		L.RegFunction("OnDestroy", OnDestroy);
 		L.RegFunction("New", _CreateLuaTestMediator);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("m_LuaTestView", get_m_LuaTestView, set_m_LuaTestView);
 		L.EndClass();
 	}
 
@@ -45,9 +47,10 @@ public class LuaTestMediatorWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
+			ToLua.CheckArgsCount(L, 2);
 			LuaTestMediator obj = (LuaTestMediator)ToLua.CheckObject(L, 1, typeof(LuaTestMediator));
-			obj.UpdateItems();
+			object arg0 = ToLua.ToVarObject(L, 2);
+			obj.UpdateItems(arg0);
 			return 0;
 		}
 		catch(Exception e)
@@ -73,6 +76,56 @@ public class LuaTestMediatorWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetBagItemData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			LuaTestMediator obj = (LuaTestMediator)ToLua.CheckObject(L, 1, typeof(LuaTestMediator));
+			LuaInterface.LuaTable o = obj.GetBagItemData();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UseItem(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			LuaTestMediator obj = (LuaTestMediator)ToLua.CheckObject(L, 1, typeof(LuaTestMediator));
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.UseItem(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UseAllItems(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			LuaTestMediator obj = (LuaTestMediator)ToLua.CheckObject(L, 1, typeof(LuaTestMediator));
+			obj.UseAllItems();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int OnDestroy(IntPtr L)
 	{
 		try
@@ -85,44 +138,6 @@ public class LuaTestMediatorWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_m_LuaTestView(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			LuaTestMediator obj = (LuaTestMediator)o;
-			LuaOutlet ret = obj.m_LuaTestView;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_LuaTestView on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_m_LuaTestView(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			LuaTestMediator obj = (LuaTestMediator)o;
-			LuaOutlet arg0 = (LuaOutlet)ToLua.CheckUnityObject(L, 2, typeof(LuaOutlet));
-			obj.m_LuaTestView = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_LuaTestView on a nil value" : e.Message);
 		}
 	}
 }

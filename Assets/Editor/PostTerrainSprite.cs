@@ -19,6 +19,6 @@ public class PostTerrainSprite : AssetPostprocessor
         TextureImporter textureImporter = assetImporter as TextureImporter;
         textureImporter.textureType = TextureImporterType.Sprite;
         textureImporter.spritePackingTag = AtlasName;
-        textureImporter.mipmapEnabled = false;
+        textureImporter.mipmapEnabled = true;
     }
 }

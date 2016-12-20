@@ -14,9 +14,10 @@ public class HexSubMapView : MonoBehaviour
     public Transform blockRoot;
 
     THEXGON mHexBg = null;
-    THEXGON mHexWater = null;
+    THEXWATER mHexWater = null;
     Dictionary<Coord, MapTile> mTiles = new Dictionary<Coord, MapTile>();
     Dictionary<Coord, SpriteRenderer> mBlocks = new Dictionary<Coord, SpriteRenderer>();
+    MapProxy mapProxy;
 
     void OnDestory()
     {
@@ -40,39 +41,46 @@ public class HexSubMapView : MonoBehaviour
         mapWaterBg.transform.localPosition = new Vector3(0f, 8f, 0f);
     }
 
+    void UpdateSprList()
+    {
+        mHexBg.spriteId.Clear();
+        if (mapProxy == null)
+        {
+            mapProxy = GameFacade.GetProxy<MapProxy>();
+        }
+        List<int> sprs = mapProxy.GetSprLists(xIdx, yIdx);
+        mHexBg.spriteId.AddRange(sprs);
+        mHexWater.spriteId.Clear();
+        mHexWater.spriteId.AddRange(sprs);
+    }
+
     public void InitBg(bool isGenheight = true)
     {
         if(mHexBg == null)
         {
             mHexBg = mapHexBg.AddComponent<THEXGON>();
-            mHexBg.land = true;
             mHexBg.isGenHeight = isGenheight;
             mHexBg.SetBounds(
             new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
             new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
-            mHexBg.Init(hex, xIdx, yIdx);
-        }
-        else
-        {
-            mHexBg.isGenHeight = isGenheight;
-            mHexBg.ReInit(xIdx, yIdx);
-        } 
-    }
-    public void InitWater()
-    {
-        if (mHexWater == null)
-        {
-            mHexWater = mapWaterBg.AddComponent<THEXGON>();
-            mHexWater.land = false;
+
+            mHexWater = mapWaterBg.AddComponent<THEXWATER>();
             mHexWater.SetBounds(
-            new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
-            new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+                new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+
+            UpdateSprList();
+
+            mHexBg.Init(hex, xIdx, yIdx);
             mHexWater.Init(hex, xIdx, yIdx);
         }
         else
         {
+            mHexBg.isGenHeight = isGenheight;
+            UpdateSprList();
+            mHexBg.ReInit(xIdx, yIdx);
             mHexWater.ReInit(xIdx, yIdx);
-        }
+        } 
     }
 
 #if UNITY_EDITOR
@@ -94,7 +102,11 @@ public class HexSubMapView : MonoBehaviour
             for (int y = 0; y < hex.yTile; ++y)
             {
                 Coord c = new Coord(x + hex.xTile * xIdx, y + hex.yTile * yIdx);
-                MapTileVO tileVo = GameFacade.GetProxy<MapProxy>().GetTile(c);
+                if (mapProxy == null)
+                {
+                    mapProxy = GameFacade.GetProxy<MapProxy>();
+                }
+                MapTileVO tileVo = mapProxy.GetTile(c);
                 if (tileVo != null)
                 {
                     int index;
@@ -105,6 +117,10 @@ public class HexSubMapView : MonoBehaviour
                     else if(op == MapEditorEntry.EDIT_OP.EDIT_LV)
                     {
                         index = tileVo.level;
+                    }
+                    else if (op == MapEditorEntry.EDIT_OP.EDIT_TILETYPE)
+                    {
+                        index = (int)tileVo.type;
                     }
                     else
                     {

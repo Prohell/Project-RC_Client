@@ -24,11 +24,15 @@ public class MySceneManager : MonoBehaviour, IInit, IReset
 
     public void OnInit()
     {
+		SceneManager.sceneLoaded += OnLevelFinishedLoading;
+
         mCurrentSceneId = Parse(SceneManager.GetActiveScene().name);
         // add new scene here.
+		RegisterScene(SceneId.Loading, typeof(SceneLoading));
         RegisterScene(SceneId.MapEditor, typeof(SceneMapEditor));
         RegisterScene(SceneId.Map, typeof(SceneMap));
         RegisterScene(SceneId.LuaTest, typeof(SceneLuaTest));
+		RegisterScene(SceneId.Castle, typeof(SceneCastle));
     }
 
     public void SwitchToScene(SceneId sceneId, object param = null)
@@ -62,27 +66,25 @@ public class MySceneManager : MonoBehaviour, IInit, IReset
 
         SceneManager.LoadScene(sceneId.ToString());
     }
+		
+	void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+	{
+		mCurrentSceneId = Parse(SceneManager.GetActiveScene().name);
 
-    // API function
-    void OnLevelWasLoaded(int level)
-    {
-        mCurrentSceneId = Parse(SceneManager.GetActiveScene().name);
+		if (mCurScene != null)
+		{
+			mCurScene.OnExited();
+		}
 
-        if (mCurScene != null)
-        {
-            mCurScene.OnExited();
-        }
+		if (mNextScene != null)
+		{
+			mNextScene.OnEntered(mParam);
+		}
 
-        if (mNextScene != null)
-        {
-            mNextScene.OnEntered(mParam);
-        }
+		mCurScene = mNextScene;
+		mNextScene = null;
+	}
 
-        mCurScene = mNextScene;
-        mNextScene = null;
-
-        //GameFacade.SendEvent(EventId.SceneSwitched, new Tupple<SceneId, System.Object>(mCurrentSceneId, _param));
-    }
 
     SceneId Parse(string levelName)
     {

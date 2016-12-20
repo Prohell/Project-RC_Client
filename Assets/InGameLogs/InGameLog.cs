@@ -140,7 +140,8 @@ public class InGameLog : MonoBehaviour {
 		if( !created )
 		{
 			DontDestroyOnLoad( gameObject );
-			Application.RegisterLogCallback (new Application.LogCallback (CaptureLog));
+			Application.logMessageReceived += new Application.LogCallback (CaptureLog);
+//			Application.RegisterLogCallback (new Application.LogCallback (CaptureLog));
 			created = true ;
 		}
 		else 
@@ -148,6 +149,8 @@ public class InGameLog : MonoBehaviour {
 			LogModule.WarningLog("tow manager is exists delete the second");
 			DestroyImmediate( gameObject );
 		}
+
+		UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnLevelFinishedLoading;
 	}
 	
 	void OnEnable()
@@ -659,8 +662,9 @@ public class InGameLog : MonoBehaviour {
 		if( elapsed > 1)
 		{
 			elapsed = 0;
-			//be sure no body else take control of log 
-			Application.RegisterLogCallback (new Application.LogCallback (CaptureLog));
+			//be sure no body else take control of log
+			Application.logMessageReceived += new Application.LogCallback (CaptureLog);
+//			Application.RegisterLogCallback (new Application.LogCallback (CaptureLog));
 		}
 	}
 	void CaptureLog (string condition, string stacktrace, LogType type)
@@ -770,7 +774,7 @@ public class InGameLog : MonoBehaviour {
 	}
 	
 	//new scene is loaded
-	void OnLevelWasLoaded()
+	void OnLevelFinishedLoading(UnityEngine.SceneManagement.Scene scene,UnityEngine.SceneManagement.LoadSceneMode mode)
 	{
 		if( clearOnNewSceneLoaded )
 			clear();

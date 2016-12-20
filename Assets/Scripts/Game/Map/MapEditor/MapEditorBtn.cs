@@ -24,9 +24,14 @@ public class MapEditorBtn : MonoBehaviour
         Game.SceneManager.SwitchToScene(SceneId.Map);
     }
 
+	public void SwitchToCastle(){
+		Game.SceneManager.SwitchToScene(SceneId.Loading, SceneId.Castle);
+	}
+
     public void ConnectToServer()
     {
-        NetManager.GetInstance().ConnectToServer(ip.text, int.Parse(port.text), OnConnectResult);
+        //NetManager.GetInstance().ConnectToServer(ip.text, int.Parse(port.text), OnConnectResult);
+        OnConnectResult(true, "");
     }
 
     void OnConnectResult(bool bSuccess, string result)

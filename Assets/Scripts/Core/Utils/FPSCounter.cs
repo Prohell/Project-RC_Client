@@ -18,10 +18,8 @@ public class FPSCounter : MonoBehaviour
         m_FpsNextPeriod = Time.realtimeSinceStartup + fpsMeasurePeriod;
     }
 
-
-    void OnGUI()
+    void Update()
     {
-        // measure average frames per second
         m_FpsAccumulator++;
         if (Time.realtimeSinceStartup > m_FpsNextPeriod)
         {
@@ -29,6 +27,11 @@ public class FPSCounter : MonoBehaviour
             m_FpsAccumulator = 0;
             m_FpsNextPeriod += fpsMeasurePeriod;
         }
+    }
+
+    void OnGUI()
+    {
+        // measure average frames per second
 
         GUI.Label(new Rect(Screen.width - 160, Screen.height - 50, 120, 64), string.Format(display, m_CurrentFps));
     }

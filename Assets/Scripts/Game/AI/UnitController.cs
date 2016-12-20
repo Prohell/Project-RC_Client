@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using Pathfinding.RVO;
 using Pathfinding;
@@ -18,7 +19,7 @@ public class UnitController : BaseController
 
     //the Unit Brain Thinking Time
     private float mThinkTime;
-    private const float mThinkTimeSpace = 0.05f;
+    private const float mThinkTimeSpace = 0.03f;
     // the Unit Date
     private UnitData mUnitDate;
     // Enemy List
@@ -38,24 +39,39 @@ public class UnitController : BaseController
     private Animation mUnitAnimation;
 
     //if the distance between A,B larger than mMinDistance they can search Each other 
-    private float mMinDistance = 0.5f;
-    // the SquadLeader of the Squad;
-    public Transform mSquadLeader { get; set; }
+    private float mMinDistance = 1f;
 
     //Arrow
     private Transform mArrow;
     private Arrow mArrowController;
     //the prefab of the Arrow
     private Object mArrowAsset;
+    //Skill
+    private Transform mSkill;
+    private SkillEffect mSkillController;
+    //the prefab of the Skill
+    private Object mSkillAsset;
+
+    //private float mAttackChaseTimer;
+    //private float mAttackChaseTimeSpace = 2f;
 
     // if one Unit can sender a Arrow the Arrow start transformPos is the mSenderTrans Pos
     public Transform mSenderTrans;
     // if one was shoted by the Arrow the mReceverTrans Pos is the Arrow's end point
     public Transform mReceverTrans;
+    //
+    //public List<Transform> mForceAttackList;
+
+    public bool MKillOrder { get; set; }
+    public bool MWillDie { get; set; }
+
+    public Vector3 RelativePosition { get; set; }
+    public Transform SquadTransform { get; set; }
     // Use this for initialization
-	void Awake()
+    void Awake()
     {
         mEnemyTrans = new List<Transform>();
+        //mForceAttackList = new List<Transform>();
         mUnitDate = new UnitData();
 
         mRVOController = transform.GetComponent<RVOController>();
@@ -93,20 +109,12 @@ public class UnitController : BaseController
         SetUpEventHandlers();
 
     }
+    void Start()
+    {
+    }
     void SetUpEventHandlers()
     {
-        EventManager.GetInstance().AddEventListener(EventId.EventConcentratedFire, EventConcentratedFire);
-
-        EventManager.GetInstance().AddEventListener(EventId.AttackAnimationEnd + mUnitDate.GetID(), UnitAttackEnd);
-        EventManager.GetInstance().AddEventListener(EventId.AttackAnimationEffect + mUnitDate.GetID(), UnitAttackEffect);
-        EventManager.GetInstance().AddEventListener(EventId.DieAnimationEnd + mUnitDate.GetID(), UnitDieEnd);
-
         EventManager.GetInstance().AddEventListener(EventId.SomeOneDie, SomeOneDie);
-        EventManager.GetInstance().AddEventListener(EventId.RefreshEnemyList + mUnitDate.GetID(), RefreshEnemyList);
-        EventManager.GetInstance().AddEventListener(EventId.FindAndAttackEnemy + mUnitDate.GetID(), FindAndAttackEnemy);
-        EventManager.GetInstance().AddEventListener(EventId.UnitMarching + mUnitDate.GetID(), UnitMarching);
-
-        EventManager.GetInstance().AddEventListener(EventId.ArrowDamageEffect + mUnitDate.GetID(), ArrowDamageEffect);
     }
     public void SetmArrow(Transform tArrow)
     {
@@ -117,6 +125,11 @@ public class UnitController : BaseController
     {
         mArrowAsset = tAsset;
     }
+    public void SetmSkillAsset(Object tAsset)
+    {
+        mSkillAsset = tAsset;
+    }
+
     public void ChangeMoving(bool RichAIEnable,bool RVOControllerEnable)
     {
         mRichAI.enabled = RichAIEnable;
@@ -135,7 +148,7 @@ public class UnitController : BaseController
 
         mRichAI.target = tTarget;
         mOriginalAim = mRichAI.target;
-        mRichAI.UpdatePath();
+        //mRichAI.UpdatePath();
     }
 
     //serach Attack Aim;
@@ -145,6 +158,7 @@ public class UnitController : BaseController
         {
             for (int i = 0; i < mEnemyTrans.Count; i++)
             {
+
                float temDistance = Vector3.Distance(transform.position, mEnemyTrans[i].position);
                if(temDistance<= mUnitDate.GetUnitView())
                 {
@@ -171,7 +185,18 @@ public class UnitController : BaseController
                     break;
                 }
             }
+            //float temDistance = Vector3.Distance(transform.position, mSearchAim.position);
+            //if (temDistance <= mUnitDate.GetUnitAttackRange())
+            //{
+            //    mAttackAim = mSearchAim;
+            //    TryOperState(StateEnum.Prepare, StateOper.Enter);
+            //}
         }
+    }
+
+    public void SetAttackAim(Transform tAttackAim)
+    {
+        mAttackAim = tAttackAim;
     }
 
     public StateMachine GetStateMachine()
@@ -187,14 +212,25 @@ public class UnitController : BaseController
     {
         mUnitDate = tUnitDate;
     }
+    public Transform GetAttackAim()
+    {
+        return mAttackAim;
+    }
+    public Transform GetSearchAim()
+    {
+        return mSearchAim;
+    }
 
     public void SetUnitHP(float tHP)
     {
         mUnitDate.SetUnitHP(tHP);
-        if (tHP <= 0&&mStateMachine.GetCurrentState().StateType!=StateEnum.Die)
+        if (mStateMachine.GetCurrentState().StateType != StateEnum.Die&& MWillDie == true)
+
+        //if (mStateMachine.GetCurrentState().StateType != StateEnum.Die)
         {
+            MWillDie = false;
             TryOperState(StateEnum.Die, StateOper.Switch);
-            EventManager.GetInstance().SendEvent(EventId.SomeOneDie,transform);
+            EventManager.GetInstance().SendEvent(EventId.SomeOneDie, transform);
         }
     }
 
@@ -247,7 +283,7 @@ public class UnitController : BaseController
             mAttackSpaceTimer += Time.deltaTime;
 
 
-        if (mRVOController.enabled && mRVOController.velocity.sqrMagnitude>0.01f)
+        if (mRichAI.enabled == true && mRVOController.enabled && mRVOController.velocity.sqrMagnitude>0.01f)
         {
             TryOperState(StateEnum.Walk, StateOper.Enter);
         }
@@ -270,10 +306,10 @@ public class UnitController : BaseController
         if (mAttackSpaceTimer >= mUnitDate.GetAttackSpaceTime())
             mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
         else
-            mAttackSpaceTimer += Time.deltaTime;;
+            mAttackSpaceTimer += Time.deltaTime;
 
         //if arrive the target Pos change the state
-        if (mAttackAim == null&& mAttackAim == null)
+        if (mAttackAim == null&& mSearchAim == null)
         {
             //if arrive the target Pos change the state
             if (Vector3.Distance(transform.position, mRichAI.target.transform.position) < mMinDistance)
@@ -288,9 +324,23 @@ public class UnitController : BaseController
             TryOperState(StateEnum.Walk, StateOper.Exit);
             return;
         }
+
+        //if (mSearchAim != null && mSearchAim.GetComponent<UnitController>().mStateMachine.GetCurrentState().StateType == StateEnum.Walk)
+        //{
+        //    if (mAttackChaseTimer >= mAttackChaseTimeSpace)
+        //    {
+        //        mAttackChaseTimer = 0f;
+        //        ReFindEnemy();
+        //    }
+        //    else
+        //    {
+        //        mAttackChaseTimer += Time.deltaTime;
+        //    }
+        //}
     }
     void UnitWalkGetOutFunc()
     {
+        //mAttackChaseTimer = 0f;
         mSearchAim = null;
         ChangeMoving(false, false);
     }
@@ -342,7 +392,6 @@ public class UnitController : BaseController
     }
     void UnitPrepareGetOutFunc()
     {
-
     }
 
     /******************
@@ -363,16 +412,11 @@ public class UnitController : BaseController
     /******************
     Event From the AnimationController
     *******************/
-
-    void EventConcentratedFire(object param)
-    {
-
-    }
-    void UnitAttackEnd(object param)
+    public void UnitAttackEnd()
     {
         TryOperState(StateEnum.Attack, StateOper.Exit);
     }
-    void UnitAttackEffect(object param)
+    public void UnitAttackEffect()
     {
         if(mAttackAim != null)
         {
@@ -380,17 +424,31 @@ public class UnitController : BaseController
             {
                 UnitController mAttackAimController = mAttackAim.GetComponent<UnitController>();
                 mAttackAimController.SetUnitHP(mAttackAimController.GetUnitData().GetUnitHP() - mAttackAimController.GetUnitData().GetAttack());
+                return;
             }
 
             if((mUnitDate.GetAttackType() & UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
             {
+                //Transform tFinalTrans;
+                //if (mForceAttackList.Count != 0)
+                //{
+                //    tFinalTrans = mForceAttackList[0];
+                //}else
+                //{
+                //    tFinalTrans = mAttackAim;
+                //}
+                if (Vector3.Distance(transform.position, mAttackAim.position) < 10f)
+                {
+                    UnitController tAttackAimController = mAttackAim.GetComponent<UnitController>();
+                    tAttackAimController.SetUnitHP(tAttackAimController.GetUnitData().GetUnitHP() - tAttackAimController.GetUnitData().GetAttack());
+                    return;
+                }
 
                 mArrow = GameObjectPool.GetInstance().SpawnGo((GameObject)mArrowAsset).transform;
                 mArrow.parent = null;
                 mArrow.gameObject.SetActive(true);
                 UnitController mAttackAimController = mAttackAim.GetComponent<UnitController>();
                 mArrow.position = transform.position;
-                mArrowController = mArrow.GetComponent<Arrow>();
                 SetmArrow(mArrow);
                 mArrowController.MReceiver = mAttackAimController.mReceverTrans;
                 mArrowController.MScender = mSenderTrans;
@@ -400,12 +458,12 @@ public class UnitController : BaseController
         }
     }
 
-    void ArrowDamageEffect(object param)
+    public void ArrowDamageEffect(float param)
     {
-        SetUnitHP(mUnitDate.GetUnitHP() - (float)param);
+        SetUnitHP(mUnitDate.GetUnitHP() - param);
     }
 
-    void UnitDieEnd(object param)
+    public void UnitDieEnd()
     {
         transform.gameObject.SetActive(false);
     }
@@ -417,35 +475,138 @@ public class UnitController : BaseController
         {
             mEnemyTrans.Remove(diedTrans);
             if (mAttackAim == diedTrans)
+            {
                 mAttackAim = null;
+                MKillOrder = false;
+            }
             if (mSearchAim == diedTrans)
+            {
                 mSearchAim = null;
+                MKillOrder = false;
+            }
+
+            if(mEnemyTrans.Count==0)
+                UnitMarching(SquadTransform.position);
+
+        }
+        //if(mForceAttackList.Contains(diedTrans))
+        //{
+        //    mForceAttackList.Remove(diedTrans);
+        //}
+    }
+    //public void SetDiedState()
+    //{
+    //    MWillDie = true;
+    //    if (mStateMachine.GetCurrentState().StateType != StateEnum.Die)
+    //    {
+    //        TryOperState(StateEnum.Die, StateOper.Switch);
+    //        EventManager.GetInstance().SendEvent(EventId.SomeOneDie, transform);
+    //    }
+
+    //    StartCoroutine(DieLag(0.3f));
+
+    //    AttemptSuicide();
+    //}
+    //void AttemptSuicide()
+    //{
+    //    MWillDie = true;
+    //    int count = Random.Range(0, mEnemyTrans.Count);
+    //    mEnemyTrans[count].GetComponent<UnitController>().DoForceAttack(transform);
+    //}
+    //public void DoForceAttack(Transform param)
+    //{
+    //    mForceAttackList.Add(param);
+    //    mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
+    //}
+    public void SetAttackSpaceTimer(float tSpaceTimer)
+    {
+        mAttackSpaceTimer = tSpaceTimer;
+    }
+    IEnumerator DieLag(float time)
+    {
+        yield return new WaitForSeconds(time);
+        if(mStateMachine.GetCurrentState().StateType != StateEnum.Die)
+        {
+            TryOperState(StateEnum.Die, StateOper.Switch);
+            EventManager.GetInstance().SendEvent(EventId.SomeOneDie, transform);
         }
     }
+
     // refresh EnemyList
-    void RefreshEnemyList(object tEnemy)
+    public void RefreshEnemyList(Transform tAimEnemy)
     {
-        Transform tAimEnemy = (Transform)tEnemy;
         mEnemyTrans.Clear();
         mEnemyTrans.AddRange(tAimEnemy.GetComponent<SquadController>().GetUnitControllerList());
     }
-
-    void FindAndAttackEnemy(object tEnemy)
+    public void FindAndAttackEnemy(Transform tAimEnemy)
     {
-        RefreshEnemyList(tEnemy);
+        RefreshEnemyList(tAimEnemy);
         //Select the Enemy in the EnemyList;
         int tId = Random.Range(0, mEnemyTrans.Count);
+        mAttackAim = null;
         mSearchAim = mEnemyTrans[tId];
-        ChangeTarget(mSearchAim);
+        ChangeTarget(mSearchAim);;
         ChangeMoving(true, true);
     }
-    void UnitMarching(object tPos)
+    public void UnitMarching(Vector3 tPos,float tAngle=0f)
     {
-        Vector3 tAimPos = transform.position - mSquadLeader.position + (Vector3)tPos;
+        //Vector3 tAimPos = transform.position - mSquadLeader.position + (Vector3)tPos;
+        Vector3 tAimPos = RelativePosition + tPos;
         mRichAI.target = mOriginalAim;
         mRichAI.target.position = tAimPos;
-        mRichAI.UpdatePath();
-        TryOperState(StateEnum.Walk, StateOper.Enter);
+
+        mRichAI.target.RotateAround(tPos, Vector3.up, tAngle);
+        mRichAI.UpdatePath(); 
+        if(mStateMachine.GetCurrentState().StateType ==StateEnum.Idle)      
+            TryOperState(StateEnum.Walk, StateOper.Enter);
         mIsMarching = true;
+    }
+    public void EmbattingSetPos(Vector3 tPos)
+    {
+        Vector3 tAimPos = RelativePosition + tPos;
+        transform.position = tAimPos;
+        mRichAI.target.position = tAimPos;
+    }
+    public void MoveForce(Vector3 tPos)
+    {
+        mRichAI.target = mOriginalAim;
+        mRichAI.target.position = tPos;
+        if (mStateMachine.GetCurrentState().StateType == StateEnum.Idle)
+            TryOperState(StateEnum.Walk, StateOper.Enter);
+        mIsMarching = true;
+    }
+
+    //Re find Enemy
+    void ReFindEnemy()
+    {
+        //float tDistanceFinal = 100f;
+        //Transform tTransfrom = mEnemyTrans[0];
+        //for (int i = 0; i < mEnemyTrans.Count; i++)
+        //{
+        //    if (mEnemyTrans[i].GetComponent<UnitController>().mStateMachine.GetCurrentState().StateType == StateEnum.Walk)
+        //    {
+        //        continue;
+        //    }
+        //    float tDistance = Vector3.Distance(transform.position, mEnemyTrans[i].position);
+        //    if (tDistance <= mUnitDate.GetUnitAttackRange())
+        //    {
+        //        mAttackAim = tTransfrom;
+        //        TryOperState(StateEnum.Prepare, StateOper.Enter);
+        //        break;
+        //    }
+        //    else
+        //    {
+        //        if (tDistanceFinal > tDistance)
+        //        {
+        //            tDistanceFinal = tDistance;
+        //            tTransfrom = mEnemyTrans[i];
+        //        }
+        //    }
+        //}
+        //if (mAttackAim == null)
+        //{
+        //    mSearchAim = tTransfrom;
+        //    ChangeTarget(mSearchAim);
+        //}
     }
 }

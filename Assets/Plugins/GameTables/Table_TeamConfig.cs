@@ -10,11 +10,8 @@ public class Tab_TeamConfig
  {
  INVLAID_INDEX=-1,
 ID_ID,
-ID_SQUADSPACE=2,
-ID_UNITSPACE,
-ID_UNITNUMBERS,
-ID_SQUADROWCOUNT,
-ID_SQUADNUMBERS,
+ID_SQUADL=2,
+ID_SQUADH,
 MAX_RECORD
  }
  public static string GetInstanceFile(){return TAB_FILE_DATA; }
@@ -22,20 +19,11 @@ MAX_RECORD
 private int m_Id;
  public int Id { get{ return m_Id;}}
 
-private int m_SquadNumbers;
- public int SquadNumbers { get{ return m_SquadNumbers;}}
+private float m_SquadH;
+ public float SquadH { get{ return m_SquadH;}}
 
-private int m_SquadRowCount;
- public int SquadRowCount { get{ return m_SquadRowCount;}}
-
-private float m_SquadSpace;
- public float SquadSpace { get{ return m_SquadSpace;}}
-
-private int m_UnitNumbers;
- public int UnitNumbers { get{ return m_UnitNumbers;}}
-
-private float m_UnitSpace;
- public float UnitSpace { get{ return m_UnitSpace;}}
+private float m_SquadL;
+ public float SquadL { get{ return m_SquadL;}}
 
 public static bool LoadTable(Dictionary<int, List<object> > _tab)
  {
@@ -53,11 +41,8 @@ public static bool LoadTable(Dictionary<int, List<object> > _tab)
  }
  Tab_TeamConfig _values = new Tab_TeamConfig();
  _values.m_Id =  Convert.ToInt32(valuesList[(int)_ID.ID_ID] as string);
-_values.m_SquadNumbers =  Convert.ToInt32(valuesList[(int)_ID.ID_SQUADNUMBERS] as string);
-_values.m_SquadRowCount =  Convert.ToInt32(valuesList[(int)_ID.ID_SQUADROWCOUNT] as string);
-_values.m_SquadSpace =  Convert.ToSingle(valuesList[(int)_ID.ID_SQUADSPACE] as string );
-_values.m_UnitNumbers =  Convert.ToInt32(valuesList[(int)_ID.ID_UNITNUMBERS] as string);
-_values.m_UnitSpace =  Convert.ToSingle(valuesList[(int)_ID.ID_UNITSPACE] as string );
+_values.m_SquadH =  Convert.ToSingle(valuesList[(int)_ID.ID_SQUADH] as string );
+_values.m_SquadL =  Convert.ToSingle(valuesList[(int)_ID.ID_SQUADL] as string );
 
  if (_hash.ContainsKey(skey))
  {

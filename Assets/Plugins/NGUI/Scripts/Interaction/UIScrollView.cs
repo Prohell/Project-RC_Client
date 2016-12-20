@@ -149,8 +149,12 @@ public class UIScrollView : MonoBehaviour
 
 	public OnDragNotification onStoppedMoving;
 
-	// Deprecated functionality. Use 'movement' instead.
-	[HideInInspector][SerializeField] Vector3 scale = new Vector3(1f, 0f, 0f);
+    public OnDragNotification onDragEndFromTop;
+
+    public OnDragNotification onDragEndFromBottom;
+
+    // Deprecated functionality. Use 'movement' instead.
+    [HideInInspector][SerializeField] Vector3 scale = new Vector3(1f, 0f, 0f);
 
 	// Deprecated functionality. Use 'contentPivot' instead.
 	[SerializeField][HideInInspector] Vector2 relativePositionOnReset = Vector2.zero;
@@ -198,7 +202,11 @@ public class UIScrollView : MonoBehaviour
 			}
 			return mBounds;
 		}
-	}
+        set
+        {
+            bounds = value;
+        }
+    }
 
 	/// <summary>
 	/// Whether the scroll view can move horizontally.
@@ -776,7 +784,30 @@ public class UIScrollView : MonoBehaviour
 			}
 			else
 			{
-				if (mDragStarted && restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+                // check should trigger the drag end handle, to request server data
+                Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
+
+                if (movement == Movement.Vertical && constraint.magnitude > 1f)
+                {
+                    if (constraint.y > 0)
+                    {
+                        // drag end from top
+                        if (onDragEndFromTop != null)
+                        {
+                            onDragEndFromTop();
+                        }
+                    }
+                    else
+                    {
+                        // drag end from bottom
+                        if (onDragEndFromBottom != null)
+                        {
+                            onDragEndFromBottom();
+                        }
+                    }
+                }
+
+                if (mDragStarted && restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
 					RestrictWithinBounds(dragEffect == DragEffect.None, canMoveHorizontally, canMoveVertically);
 
 				if (mDragStarted && onDragFinished != null) onDragFinished();

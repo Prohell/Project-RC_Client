@@ -6,7 +6,7 @@
 /// <typeparam name="T"></typeparam>
 public class Singleton<T> where T : class, new()
 {
-    private static T mInstance;
+    protected static T mInstance;
     private static readonly object mSyslock = new object();
 
     public static T GetInstance()

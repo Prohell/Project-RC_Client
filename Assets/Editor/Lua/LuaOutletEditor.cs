@@ -99,7 +99,7 @@ public class LuaOutletEditor : Editor
 						typesOptions = new string[components.Length];
 						for (var i = 0; i < components.Length; i++) {
 							var com = components [i];
-							var typeName = typesOptions [i] = com.GetType ().FullName;
+							var typeName = typesOptions [i] = com.GetType ().Name;
 							if (typeName == outletInfo.ComponentType) {
 								currentTypeIndex = i;
 							}
@@ -126,7 +126,7 @@ public class LuaOutletEditor : Editor
 				EditorGUILayout.EndHorizontal ();
 
 				outletInfo.Name = EditorGUILayout.TextField ("Name:", outletInfo.Name);
-				outletInfo.Object = EditorGUILayout.ObjectField ("Object:", outletInfo.Object, typeof(UnityEngine.Object), true);
+				outletInfo.Object = (GameObject)EditorGUILayout.ObjectField ("GameObject:", outletInfo.Object, typeof(UnityEngine.GameObject), true);
 
 				if (currentTypeIndex >= 0) {
 					var typeIndex = EditorGUILayout.Popup ("Component:", currentTypeIndex, typesOptions);

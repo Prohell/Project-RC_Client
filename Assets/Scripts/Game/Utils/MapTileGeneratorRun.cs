@@ -83,10 +83,10 @@ public class MapTileGeneratorRun : EditorWindow
     //	return tileVOs;
     //}
 
-    public static void GenerateMapTilesLocal(MapTileVO[,] tileVOs, List<MapTileVO> wayPoints)
+    public static void GenerateMapTilesLocal(MapTileVO[,] tileVOs, List<MapTileVO> wayPoints, uint[,] sprs)
     {
         // Rewrite Source Map Binary
-        FileStream fs = File.Open(Application.dataPath + "/Resources/mapsource.bytes", FileMode.OpenOrCreate, FileAccess.Write);
+        FileStream fs = File.Open(Application.dataPath + "/Resources/" + MapPrefabDef.MapSource + ".bytes", FileMode.OpenOrCreate, FileAccess.Write);
         BinaryWriter bw = new BinaryWriter(fs, System.Text.Encoding.BigEndianUnicode);
 
         for (int y = 0; y < MapConst.MAP_HEIGHT; ++y)
@@ -130,7 +130,7 @@ public class MapTileGeneratorRun : EditorWindow
         // Rewrite Map Binary with PvE Tiles
         //tileVOs = GeneratePVETiles(tileVOs);
 
-        fs = File.Open(Application.dataPath + "/Resources/mapuint16.bytes", FileMode.OpenOrCreate, FileAccess.Write);
+        fs = File.Open(Application.dataPath + "/Resources/" + MapPrefabDef.MapUint16 + ".bytes", FileMode.OpenOrCreate, FileAccess.Write);
         bw = new BinaryWriter(fs, System.Text.Encoding.BigEndianUnicode);
 
         for (int y = 0; y < MapConst.MAP_HEIGHT; ++y)
@@ -165,6 +165,28 @@ public class MapTileGeneratorRun : EditorWindow
                 catch (Exception e)
                 {
                     Debug.Log("writing waypoint error: " + wayPoint.coord.x + ", " + wayPoint.coord.y);
+                    throw e;
+                }
+            }
+        }
+        bw.Close();
+
+        // sprite list
+        fs = File.Open(Application.dataPath + "/Resources/" + MapPrefabDef.MapSprData + ".bytes", FileMode.OpenOrCreate, FileAccess.Write);
+        bw = new BinaryWriter(fs, System.Text.Encoding.BigEndianUnicode);
+
+        for (int y = 0; y < MapConst.MAP_SUBMAPS; ++y)
+        {
+            for (int x = 0; x < MapConst.MAP_SUBMAPS; ++x)
+            {
+                try
+                {
+                    uint sprInfo = sprs[y, x];
+                    bw.Write(sprInfo);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e.ToString());
                     throw e;
                 }
             }

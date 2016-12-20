@@ -17,6 +17,8 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
 
     public static LuaManager LuaManager { get; private set; }
 
+    public static UIManager UIManager { get; set; }
+
     /// <summary>
     /// 游戏初始化完成
     /// </summary>
@@ -28,34 +30,55 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
 	public void OnInit()
     {
         GameSettings.InitGame();
-        
+
         Application.logMessageReceived += OnLog;
         Application.logMessageReceivedThreaded += OnLog;
-
-        // Task系统
-        mTaskManager = GameObjectCreater.CreateComponent<TaskManager>("TaskManager", Main.DontDestroyRoot);
-        // 表格管理
-        mTableManager = new TableManager();
-        tableManager.InitTable();
-        // MVC
-        GameFacade.GetInstance().OnInit();
-        // 场景管理
-        mSceneManager = GameObjectCreater.CreateComponent<MySceneManager>("MySceneManager", Main.DontDestroyRoot);
-        mSceneManager.OnInit();
-        // 对象池管理
-        GameObject invisibleGoPoolRoot = GameObjectCreater.CreateGo("GoPoolRoot", Main.DontDestroyRoot);
-        GameObjectPool.GetInstance().root = invisibleGoPoolRoot;
-
-        //FPS
-        GameObjectCreater.CreateComponent<FPSCounter>("FPSCounter", Main.DontDestroyRoot);
 
         //Start lua VM.
         LuaManager = GameObjectCreater.CreateComponent<LuaManager>("LuaManager", Main.DontDestroyRoot);
         LuaManager.OnInit();
+        LoadingController.GetInstance().UpdateProgress(1,LoadingController.initText);
 
+        //UI framework.
+        UIManager = UIManager.GetInstance();
+        UIManager.OnInit();
+        LoadingController.GetInstance().UpdateProgress();
+
+        // Task系统
+        mTaskManager = GameObjectCreater.CreateComponent<TaskManager>("TaskManager", Main.DontDestroyRoot);
+        LoadingController.GetInstance().UpdateProgress();
+
+        // 表格管理
+        mTableManager = new TableManager();
+        tableManager.InitTable();
+        LoadingController.GetInstance().UpdateProgress();
+
+        // MVC
+        GameFacade.GetInstance().OnInit();
+        LoadingController.GetInstance().UpdateProgress();
+
+        // 场景管理
+        mSceneManager = GameObjectCreater.CreateComponent<MySceneManager>("MySceneManager", Main.DontDestroyRoot);
+        mSceneManager.OnInit();
+        LoadingController.GetInstance().UpdateProgress();
+
+        // 对象池管理
+        GameObject invisibleGoPoolRoot = GameObjectCreater.CreateGo("GoPoolRoot", Main.DontDestroyRoot);
+        GameObjectPool.GetInstance().root = invisibleGoPoolRoot;
+        LoadingController.GetInstance().UpdateProgress();
+
+        //FPS
+        GameObjectCreater.CreateComponent<ShowFPS>("ShowFPS", Main.DontDestroyRoot);
+
+        //Network
         NetManager.GetInstance().OnInit();
+        LoadingController.GetInstance().UpdateProgress();
+
         // 游戏初始化完成
         IsInit = true;
+
+        //show test entrance.
+        var temp = TempEntrance.Instance;
     }
 
     public void OnUpdate()

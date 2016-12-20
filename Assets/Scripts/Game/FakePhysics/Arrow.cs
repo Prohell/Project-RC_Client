@@ -142,7 +142,6 @@ public class Arrow : MonoBehaviour {
     //    return tStartVeclocity;
     //}
     void Start() {
-
     }
 
     // Update is called once per frame
@@ -163,7 +162,7 @@ public class Arrow : MonoBehaviour {
         {
             if (Vector3.Distance(transform.position, MReceiver.position) < mEffectDistance && gameObject.activeSelf == true)
             {
-                EventManager.GetInstance().SendEvent(EventId.ArrowDamageEffect + mReceriveController.GetUnitData().GetID(), MDamage);
+                mReceriveController.ArrowDamageEffect(MDamage);
                 gameObject.transform.position = MScender.position;
                 mLifeTime = mLifeTimeMax;
                 GameObjectPool.GetInstance().RecycleGo(mPrefabName, gameObject);

@@ -6,12 +6,34 @@ using System.Collections.Generic;
 
 public class GameAssets {
 	
-	static private List<LoadPolicy> policys;
 	static public IEnumerator Init(){
 		//初始化 资源加载器
 		yield return AssetLoadManager.Init ();
+		//加载资源信息文件
+		yield return GameUtility.LoadAssetsInfo ();
+		//加载Bundle信息文件
+		if(Configs.clientConfig.isReleaseBundle){
+			yield return GameUtility.LoadBundlesInfo ();
+		}
+		//加载所有配置文件
+		yield return Configs.LoadAllConfigs ();
+		//加载 热更策略文件
+		yield return LoadAllPolicys();
 
-		yield return LoadPolicys ();
+
+		//加载 所有后续需要处理的资源
+		yield return DownloadAllAssets ();
+	}
+
+	static private IEnumerator LoadAllPolicys(){
+		yield return AssetLoadManager.LoadAssetAsync<LoadPolicys> ("load_first$loadfirst.assetbundle","LoadPolicys",(asset)=>{
+			Configs.loadPolicys  = asset;
+		});
+
+		SubBundleRef("load_first$loadfirst.assetbundle");
+	}
+
+	static public IEnumerator DownloadAllAssets(){
 		//下载 所有预加载资源
 		yield return DownloadBundlesByPolicy ("load_preload");
 		//加载 所有表文件并缓存
@@ -20,15 +42,6 @@ public class GameAssets {
 		yield return LoadAndSaveLuaScripts ();
 	}
 
-	//加载 加载策略文件
-	static private IEnumerator LoadPolicys(){
-		yield return AssetLoadManager.LoadAssetAsync<TextAsset> ("load_first$loadpolicy.assetbundle","LoadPolicy",(TextAsset textAsset)=>{
-			LoadPolicyJson lp = JsonUtility.FromJson<LoadPolicyJson>(textAsset.text);
-			if(lp != null){
-				policys = lp.policys;
-			}
-		});
-	}
 
 	//加载 并转存所有表格
 	static private IEnumerator LoadAndSaveTables(){
@@ -39,8 +52,7 @@ public class GameAssets {
 				System.IO.Directory.CreateDirectory (filePath);
 			}
 			//正式版 和Develop模式表的分别处理
-			if (GameUtility.bundleConfig.isReleaseBundle) {
-				AssetInfo info = null;
+			if (Configs.clientConfig.isReleaseBundle) {
 				for (int i = 0; i < policy.list.Count; i++) {
 					//表是没有依赖的 所以只取第一个
 					yield return AssetLoadManager.LoadAssetBundle (policy.list[i], (bundle) => {
@@ -71,7 +83,7 @@ public class GameAssets {
 		string filePath = string.Format ("{0}/{1}/",Application.persistentDataPath, GameUtility.GetPlatformName());
 		string bundleName = "load_preload$g_lua$lua.assetbundle";
 		//正式版 和Develop模式表的分别处理
-		if (GameUtility.bundleConfig.isReleaseBundle) {
+		if (Configs.clientConfig.isReleaseBundle) {
 			yield return AssetLoadManager.LoadAssetBundle (bundleName, (bundle) => {
 				TextAsset[] textAssets = bundle.LoadAllAssets<TextAsset> ();
 				for(int i = 0;i < textAssets.Length;i++){
@@ -107,9 +119,9 @@ public class GameAssets {
 	//获取指定名称的 加载策略文件
 	static private LoadPolicy GetPolicy(string str){
 		LoadPolicy ip = null;
-		for(int i = 0;i < policys.Count;i++){
-			if(policys [i].policyName == str){
-				ip = policys [i];
+		for(int i = 0;i < Configs.loadPolicys.policys.Count;i++){
+			if(Configs.loadPolicys.policys [i].policyName == str){
+				ip = Configs.loadPolicys.policys [i];
 				break;
 			}
 		}
@@ -186,13 +198,50 @@ public class GameAssets {
 	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T : Object{
 		yield return AssetLoadManager.LoadAssetAsync<T> (assetBundleName, assetName, callback);
 	}
-	static public void UnloadBundleRef(string bundleName){
-		AssetLoadManager.UnloadBundleRef(bundleName);
+	static public void AddBundleRef(string bundleName){
+		AssetLoadManager.AddBundleRef(bundleName);
+	}
+	static public void SubBundleRef(string bundleName){
+		AssetLoadManager.SubBundleRef(bundleName);
 	}
 	static public void UnloadAll(bool unloadAllLoadedObject = true){
 		AssetLoadManager.UnloadAll (unloadAllLoadedObject);
 	}
 	static public void Unload(string bundleName, bool unloadAllLoadedObject = true){
 		AssetLoadManager.Unload (bundleName, unloadAllLoadedObject);
+	}
+
+	//反向查找资源并缓存加载
+	static public IEnumerator LoadAssetAsyncByFileName<T>(string fileName, Callback<T> callback)where T : Object{
+		List<AssetInfo> infos = new List<AssetInfo>();
+
+		StringBuilder strBuilder = new StringBuilder();
+		for(int i = 0;i < GameUtility.assetsInfo.assetList.Count;i++){
+			strBuilder.Remove(0,strBuilder.Length);
+			strBuilder.Append(GameUtility.assetsInfo.assetList[i].name);
+			strBuilder.Append(".");
+			strBuilder.Append(GameUtility.assetsInfo.assetList[i].suffix);
+			if(strBuilder.ToString() == fileName){
+				//冗余资源的反向查找未支持,找到一个Bundle就直接Break
+				infos.Add(GameUtility.assetsInfo.assetList[i]);
+				fileName = GameUtility.assetsInfo.assetList[i].name;
+				if(!GameUtility.assetsInfo.assetList[i].multiple){
+					break;
+				}
+			}
+		}
+
+		if(infos.Count == 0){
+			#if UNITY_EDITOR
+			Debug.LogError("Not find file from AssetsInfo ：" + fileName);
+			#endif
+		} else if (infos.Count == 1){
+			yield return AssetLoadManager.LoadAssetAsync<T> (infos[0].bundleName, fileName, callback);
+		} else if (infos.Count > 1){
+			#if UNITY_EDITOR
+			Debug.LogError("冗余资源的反向查找未支持!");
+			#endif
+		}
+		yield break;
 	}
 }

@@ -5,7 +5,9 @@ using System.Collections;
 
 public class GameUtility {
 	static public string resURL = @"file://E:/Resources/";
-	static public string configPath = "Assets/Resources/Configs";
+
+	static public string buildPath = "Build";
+
 
 
 	static private string _streamingHotfixPathApp;
@@ -13,7 +15,7 @@ public class GameUtility {
 		get{ 
 			if(string.IsNullOrEmpty(_streamingHotfixPathApp)){
 				StringBuilder streamingPathStr = new StringBuilder ();
-				streamingPathStr.Append (Application.streamingAssetsPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (GameUtility.bundleConfig.hotfixFile);
+				streamingPathStr.Append (Application.streamingAssetsPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (Configs.clientConfig.hotfixFile);
 				_streamingHotfixPathApp = streamingPathStr.ToString ();
 				streamingPathStr = null;
 			}
@@ -26,7 +28,7 @@ public class GameUtility {
 		get{ 
 			if(string.IsNullOrEmpty(_streamingHotfixPathFull)){
 				StringBuilder streamingPathStr = new StringBuilder ();
-				streamingPathStr.Append (WWWStreamPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (GameUtility.bundleConfig.hotfixFile);
+				streamingPathStr.Append (WWWStreamPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (Configs.clientConfig.hotfixFile);
 				_streamingHotfixPathFull = streamingPathStr.ToString ();
 				streamingPathStr = null;
 			}
@@ -39,58 +41,13 @@ public class GameUtility {
 		get{ 
 			if(string.IsNullOrEmpty(_persistentHotfixPath)){
 				StringBuilder persistentPathStr = new StringBuilder ();
-				persistentPathStr.Append (Application.persistentDataPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (GameUtility.bundleConfig.hotfixFile);
+				persistentPathStr.Append (Application.persistentDataPath).Append ("/").Append (GameUtility.GetPlatformName()).Append ("/").Append (Configs.clientConfig.hotfixFile);
 				_persistentHotfixPath = persistentPathStr.ToString ();
 				persistentPathStr = null;
 			}
 			return _persistentHotfixPath;
 		}
 	}
-
-
-
-
-	static private AssetbundleConfig _bundleConfig;
-	static public AssetbundleConfig bundleConfig{
-		get{ 
-			if(_bundleConfig == null){
-				_bundleConfig = (AssetbundleConfig)Resources.Load ("Configs/AssetbundleConfig");
-			}
-
-			return _bundleConfig;
-		}
-	}
-
-
-
-	static public AssetsInfo assetsInfo;
-	static public IEnumerator LoadAssetsInfo(Callback<AssetsInfo> callback = null){
-		if (assetsInfo == null) {
-			yield return GameLoader.LoadText (StreamingHotfixPathFull + "/" + "AssetsInfo.txt", (str) => {
-				assetsInfo = JsonUtility.FromJson<AssetsInfo> (str);
-
-			});
-		}
-
-		if (callback != null) {
-			callback (assetsInfo);
-		}
-		yield break;
-	}
-
-	static public BundlesInfo bundlesInfo;
-	static public IEnumerator LoadBundlesInfo(Callback<BundlesInfo> callback = null){
-		if (bundlesInfo == null) {
-			yield return GameLoader.LoadText (StreamingHotfixPathFull + "/" + "BundlesInfo.txt", (str) => {
-				bundlesInfo = JsonUtility.FromJson<BundlesInfo> (str);
-			});
-		}
-		if (callback != null) {
-			callback (bundlesInfo);
-		}
-		yield break;
-	}
-
 
 	static public string WWWStreamPath{
 		get{
@@ -105,7 +62,6 @@ public class GameUtility {
 			return path;
 		}
 	}
-
 
 	static public string GetPlatformName()
 	{
@@ -161,5 +117,39 @@ public class GameUtility {
 		default:
 			return null;
 		}
+	}
+
+
+	static public AssetsInfo assetsInfo;
+	static public IEnumerator LoadAssetsInfo(Callback<AssetsInfo> callback = null){
+		if (assetsInfo == null) {
+			yield return LoadFromJson<AssetsInfo> (GameUtility.StreamingHotfixPathFull, "AssetsInfo", (config) => {
+				assetsInfo = config;
+				if (callback != null) {
+					callback (assetsInfo);
+				}
+			});
+		}
+	}
+
+	static public BundlesInfo bundlesInfo;
+	static public IEnumerator LoadBundlesInfo(Callback<BundlesInfo> callback = null){
+		if (bundlesInfo == null) {
+			yield return LoadFromJson<BundlesInfo> (GameUtility.StreamingHotfixPathFull, "BundlesInfo", (config) => {
+				bundlesInfo = config;
+				if (callback != null) {
+					callback (bundlesInfo);
+				}
+			});
+		}
+	}
+
+	static public IEnumerator LoadFromJson<T>(string path, string name, Callback<T> callback = null){
+		yield return GameLoader.LoadText (path + "/" + name + ".txt", (str) => {
+			T config = JsonUtility.FromJson<T> (str);
+			if (callback != null) {
+				callback (config);
+			}
+		});
 	}
 }

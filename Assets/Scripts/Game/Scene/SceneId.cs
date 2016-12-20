@@ -3,8 +3,11 @@
 /// </summary>
 public enum SceneId
 {
+	Loading,
 	Start,
 	MapEditor,
     Map,
-    LuaTest
+    LuaTest,
+    BattleTest,
+	Castle
 }

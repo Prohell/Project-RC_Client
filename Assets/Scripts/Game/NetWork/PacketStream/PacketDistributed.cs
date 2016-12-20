@@ -16,25 +16,35 @@ public abstract class PacketDistributed
  switch (packetID)
  {
  case MessageID.PACKET_CG_ASSIGN_HERO: { packet = new CG_ASSIGN_HERO(); } break;
+case MessageID.PACKET_CG_BATTLEINFOR: { packet = new CG_BATTLEINFOR(); } break;
 case MessageID.PACKET_CG_CHAT: { packet = new CG_CHAT(); } break;
 case MessageID.PACKET_CG_CONNECTED_HEARTBEAT: { packet = new CG_CONNECTED_HEARTBEAT(); } break;
+case MessageID.PACKET_CG_CREATEROLE: { packet = new CG_CREATEROLE(); } break;
 case MessageID.PACKET_CG_FIGHT: { packet = new CG_FIGHT(); } break;
 case MessageID.PACKET_CG_LEAVE_COPYSCENE: { packet = new CG_LEAVE_COPYSCENE(); } break;
 case MessageID.PACKET_CG_LOGIN: { packet = new CG_LOGIN(); } break;
 case MessageID.PACKET_CG_MOVE: { packet = new CG_MOVE(); } break;
+case MessageID.PACKET_CG_OBJPOSLIST: { packet = new CG_OBJPOSLIST(); } break;
 case MessageID.PACKET_CG_REQ_NEAR_LIST: { packet = new CG_REQ_NEAR_LIST(); } break;
 case MessageID.PACKET_CG_ROBOT_OPEN: { packet = new CG_ROBOT_OPEN(); } break;
 case MessageID.PACKET_CG_SEND_MARCH: { packet = new CG_SEND_MARCH(); } break;
 case MessageID.PACKET_GC_ASSIGN_HERO: { packet = new GC_ASSIGN_HERO(); } break;
 case MessageID.PACKET_GC_ATTACKFLY: { packet = new GC_ATTACKFLY(); } break;
+case MessageID.PACKET_GC_BATTLEINFOR: { packet = new GC_BATTLEINFOR(); } break;
 case MessageID.PACKET_GC_CHAT: { packet = new GC_CHAT(); } break;
 case MessageID.PACKET_GC_CONNECTED_HEARTBEAT: { packet = new GC_CONNECTED_HEARTBEAT(); } break;
+case MessageID.PACKET_GC_CREATEROLE_RET: { packet = new GC_CREATEROLE_RET(); } break;
 case MessageID.PACKET_GC_DELETE_OBJ: { packet = new GC_DELETE_OBJ(); } break;
 case MessageID.PACKET_GC_FORCE_SETPOS: { packet = new GC_FORCE_SETPOS(); } break;
+case MessageID.PACKET_GC_LOGIN_QUEUE_STATUS: { packet = new GC_LOGIN_QUEUE_STATUS(); } break;
 case MessageID.PACKET_GC_LOGIN_RET: { packet = new GC_LOGIN_RET(); } break;
 case MessageID.PACKET_GC_MOVE: { packet = new GC_MOVE(); } break;
 case MessageID.PACKET_GC_NEAR_MARCHLIST: { packet = new GC_NEAR_MARCHLIST(); } break;
 case MessageID.PACKET_GC_NOTICE: { packet = new GC_NOTICE(); } break;
+case MessageID.PACKET_GC_OBJCOMMANDPURSUE: { packet = new GC_OBJCOMMANDPURSUE(); } break;
+case MessageID.PACKET_GC_OBJINFOR: { packet = new GC_OBJINFOR(); } break;
+case MessageID.PACKET_GC_OBJPOS: { packet = new GC_OBJPOS(); } break;
+case MessageID.PACKET_GC_OBJPOSLIST: { packet = new GC_OBJPOSLIST(); } break;
 case MessageID.PACKET_GC_PLAY_EFFECT: { packet = new GC_PLAY_EFFECT(); } break;
 case MessageID.PACKET_GC_REMOVEEFFECT: { packet = new GC_REMOVEEFFECT(); } break;
 case MessageID.PACKET_GC_RET_USE_SKILL: { packet = new GC_RET_USE_SKILL(); } break;

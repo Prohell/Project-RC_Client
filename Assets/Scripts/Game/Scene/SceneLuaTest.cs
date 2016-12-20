@@ -1,19 +1,30 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using Object = UnityEngine.Object;
 
 public class SceneLuaTest : SceneBase
 {
     public override SceneId Id { get { return SceneId.LuaTest; } }
 
+    public override void OnWillEnter(object param)
+    {
+
+    }
+
     public override void OnEntered(object param)
     {
+        //Create proxy
         ProxyManager.GetInstance().Add(new LuaTestProxy());
-        MediatorManager.GetInstance().Add(new LuaTestMediator());
     }
 
     public override void OnWillExit()
     {
-        
+        UIManager.GetInstance().OnDestroy();
+    }
+
+    public override void OnExited()
+    {
+
     }
 }

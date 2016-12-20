@@ -1,19 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class HEX : MonoBehaviour
 {
+    public struct SprVO
+    {
+        public int id;
+        public string name;
+        public Vector4 info;
+    }
     //在THEXGON.cs中的THEXGON.GenHexMesh中被引用
     public Vector4 fvHex = new Vector4(0.5f, 0.0f, 0.0f, 0.0f);
     public int xMax, yMax, xTile, yTile;
 
     //在THEXGON.cs中的THEXGON.GenMeshWithBound中被引用
-    public Material HexMaterial;
+	public List<Material> HexTerrainMaterials;
+    public List<Material> HexWaterMaterials;
 
-    public Material HexWaterMaterial;
-
-    //在THEXGON.cs中的THEXGON.UpdateBlock中被引用
-    public List<Sprite> HexSprites;
+    private Dictionary<int, SprVO> spritePosList = null;
+    struct TextureInfo
+    {
+        public string name;
+        public Vector2 size;
+        public int format;
+        public int length;
+        public int mipmapCount;
+    };
+    //private Dictionary<string, Vector4> spritePosList = new Dictionary<string, Vector4>();
+    private TextureInfo textureInfo;
+    public Texture2D altasTexture;
 
     //Unity3D回调
     void Start()
@@ -22,19 +38,144 @@ public class HEX : MonoBehaviour
         //Hexing(true);
     }
 
+    public List<string> GetSprNames()
+    {
+        List<string> ret = new List<string>();
+        foreach (SprVO vo in spritePosList.Values)
+        {
+            ret.Add(vo.name);
+        }
+        return ret;
+    }
+    public Vector4 GetSpritePosInfoByName(int spriteName)
+    {
+        if (spritePosList.Count <= 0 || !spritePosList.ContainsKey(spriteName))
+        {
+            return Vector4.zero;
+        }
+        else
+        {
+            Vector4 posInfo = spritePosList[spriteName].info;
+            return posInfo;
+        }
+    }
+
+
+
+    private Texture2D LoadAltasAsTexture()
+    {
+        bool mipmap = textureInfo.mipmapCount > 1 ? true : false;
+        altasTexture = new Texture2D((int)textureInfo.size.x, (int)textureInfo.size.y, (TextureFormat)textureInfo.format, mipmap);
+        TextAsset ta = Resources.Load(MapPrefabDef.MapAtlas, typeof(TextAsset)) as TextAsset;
+        altasTexture.LoadRawTextureData(ta.bytes);
+        altasTexture.Apply();
+        altasTexture.anisoLevel = 3;
+        altasTexture.filterMode = FilterMode.Trilinear;
+        altasTexture.wrapMode = TextureWrapMode.Clamp;
+        return altasTexture;
+    }
+
+    private void IniSpritePosListAndTextureInfo()
+    {
+        if (spritePosList == null)
+        {
+            spritePosList = new Dictionary<int, SprVO>();
+        }
+        TextAsset ta = Resources.Load(MapPrefabDef.MapTerrainSprData, typeof(TextAsset)) as TextAsset;
+        string[] alldataRow;
+        alldataRow = ta.text.Split('\n');
+        int index = 0;
+        foreach (string line in alldataRow)
+        {
+            if (line == "" || line == "\r") continue;
+            if(index == 0)
+            {
+                string[] atlasInfo = line.Split(' ');
+                textureInfo.name = atlasInfo[0];
+                textureInfo.size = new Vector2(int.Parse(atlasInfo[1]), int.Parse(atlasInfo[2]));
+                textureInfo.format = int.Parse(atlasInfo[3]);
+                textureInfo.length = int.Parse(atlasInfo[4]);
+                textureInfo.mipmapCount = int.Parse(atlasInfo[5]);
+            }
+            else
+            {
+                string[] info = line.Split(' ');
+                string spriteName = info[0];
+                float v1 = float.Parse(info[1]);
+                float v2 = float.Parse(info[2]);
+                float v3 = float.Parse(info[3]);
+                float v4 = float.Parse(info[4]);
+
+                SprVO vo;
+                vo.id = int.Parse(spriteName.Split('_')[0]);
+                vo.name = spriteName;
+                vo.info = new Vector4(v1, v2, v3, v4);
+                spritePosList.Add(vo.id, vo);
+            }
+            index++;
+        }
+        LoadAltasAsTexture();
+    }
+
+    private string MyReadLine(StreamReader sr)
+    {
+        string strLine = sr.ReadLine();
+        if (strLine == null)
+        {
+            return string.Empty;
+        }
+        else
+        {
+            if (strLine == "")
+            {
+                strLine = sr.ReadLine();
+            }
+            return strLine;
+        }
+
+
+    }
+
     private void Init()
     {
-        //Uber Shader(宏着色器)
-        //HexMaterial.DisableKeyword("DEPTH_ON");
-        //HexMaterial.EnableKeyword("DEPTH_OFF");
-        
         //Unity3D中世界坐标系 Y轴向上 左手系
         gameObject.transform.localScale = new Vector3(1.0f, MapConst.MAP_HEIGHT_UNIT, 1.0f);
-        
+        IniSpritePosListAndTextureInfo();
         //transform.Rotate(90, 0, 0);
-
         return;
     }
+
+	bool ModiRq = false;
+	public Material[] GetWaterMats()
+	{
+		if (HexWaterMaterials.Count < 2)
+			return new Material[2];
+
+		if (ModiRq == false ){
+			if (HexWaterMaterials [0] != null && HexWaterMaterials [1] != null) {
+				HexWaterMaterials [0].renderQueue = HexWaterMaterials [0].shader.renderQueue;
+				HexWaterMaterials [1].renderQueue = HexWaterMaterials [0].renderQueue + 1;
+			}
+			ModiRq = true;
+		}
+		return HexWaterMaterials.ToArray ();
+	}
+
+	bool ModiRq2 = false;
+	public Material[] GetTerrainMats()
+	{
+		if (HexTerrainMaterials.Count < 2)
+			return new Material[2];
+
+		if (ModiRq2 == false ){
+			if (HexTerrainMaterials [0] != null && HexTerrainMaterials [1] != null) {
+				HexTerrainMaterials [0].renderQueue = HexTerrainMaterials [0].shader.renderQueue;
+				HexTerrainMaterials [1].renderQueue = HexTerrainMaterials [0].renderQueue + 1;
+			}
+			ModiRq2 = true;
+		}
+		return HexTerrainMaterials.ToArray ();
+	}
 
     //未被使用
     //private HexData[][] _hexdata = null;

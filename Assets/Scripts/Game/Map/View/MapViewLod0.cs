@@ -84,7 +84,6 @@ public class MapViewLod0 : MonoBehaviour
         sub.transform.parent = transform;
         sub.InitPos();
         sub.InitBg();
-        sub.InitWater();
         return sub;
     }
 
@@ -263,9 +262,13 @@ public class MapViewLod0 : MonoBehaviour
                     sub.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_LV, MapEditorEntry.Instance.levelColors);
                     break;
 
+                case MapEditorEntry.EDIT_OP.EDIT_TILETYPE:
+                    sub.InitBg(false);
+                    sub.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_TILETYPE, MapEditorEntry.Instance.typeColors);
+                    break;
+
                 default:
                     sub.InitBg(true);
-                    sub.InitWater();
                     sub.HideMarks();
                     sub.InitBlocks();
                     break;
@@ -320,9 +323,13 @@ public class MapViewLod0 : MonoBehaviour
                             submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_LV, MapEditorEntry.Instance.levelColors);
                             return;
 
+                        case MapEditorEntry.EDIT_OP.EDIT_TILETYPE:
+                            submap.InitBg(false);
+                            submap.ShowMarks(MapEditorEntry.EDIT_OP.EDIT_TILETYPE, MapEditorEntry.Instance.typeColors);
+                            break;
+
                         default:
                             submap.InitBg();
-                            submap.InitWater();
                             submap.InitBlocks();
                             submap.HideMarks();
                             break;

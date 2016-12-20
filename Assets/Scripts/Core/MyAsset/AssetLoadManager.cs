@@ -8,7 +8,7 @@ public class AssetLoadManager{
 	static private IAssetAsyncLoader loader{
 		get{ 
 			if(_loader == null){
-				if(GameUtility.bundleConfig.isReleaseBundle){
+				if(Configs.clientConfig.isReleaseBundle){
 					_loader = new ReleaseLoader();
 				}else{
 					_loader = new ResourceLoader();
@@ -22,12 +22,6 @@ public class AssetLoadManager{
 		AddListeners ();
 
 		yield return loader.Init ();
-
-		yield return GameUtility.LoadAssetsInfo ();
-
-		if(GameUtility.bundleConfig.isReleaseBundle){
-			yield return GameUtility.LoadBundlesInfo ();
-		}
 	}
 
 	static public void AddListeners(){
@@ -46,43 +40,12 @@ public class AssetLoadManager{
 	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T : Object{
 		yield return loader.LoadAssetAsync<T> (assetBundleName, assetName, callback);
 	}
-		
-	//反向查找资源并缓存加载
-	static public IEnumerator LoadAssetAsyncByFileName<T>(string fileName, Callback<T> callback)where T : Object{
-		List<AssetInfo> infos = new List<AssetInfo>();
-		yield return GameUtility.LoadAssetsInfo ((info)=>{
-			StringBuilder strBuilder = new StringBuilder();
-			for(int i = 0;i < info.assetList.Count;i++){
-				strBuilder.Remove(0,strBuilder.Length);
-				strBuilder.Append(info.assetList[i].name);
-				strBuilder.Append(".");
-				strBuilder.Append(info.assetList[i].suffix);
-				if(strBuilder.ToString() == fileName){
-					//冗余资源的反向查找未支持,找到一个Bundle就直接Break
-					infos.Add(info.assetList[i]);
-					fileName = info.assetList[i].name;
-					if(!info.assetList[i].multiple){
-						break;
-					}
-				}
-			}
-		});
 
-		if(infos.Count == 0){
-			#if UNITY_EDITOR
-			Debug.LogError("Not find file from AssetsInfo ：" + fileName);
-			#endif
-		} else if (infos.Count == 1){
-			yield return AssetLoadManager.LoadAssetAsync<T> (infos[0].bundleName, fileName, callback);
-		} else if (infos.Count > 1){
-			#if UNITY_EDITOR
-			Debug.LogError("冗余资源的反向查找未支持!");
-			#endif
-		}
-		yield break;
+	static public void AddBundleRef(string bundleName){
+		loader.AddBundleReference (bundleName);
 	}
 
-	static public void UnloadBundleRef(string bundleName){
+	static public void SubBundleRef(string bundleName){
 		loader.SubBundleReference (bundleName);
 	}
 

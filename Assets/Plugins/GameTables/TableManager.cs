@@ -184,20 +184,88 @@ private static Dictionary<int, List<Tab_AnimationEvent> > g_AnimationEvent = new
  }
  return true;
  }
-private static Dictionary<int, List<Tab_BattleSceneConfig> > g_BattleSceneConfig = new Dictionary<int, List<Tab_BattleSceneConfig> >(); 
- public static bool InitTable_BattleSceneConfig()
+private static Dictionary<int, List<Tab_BuildBarracks> > g_BuildBarracks = new Dictionary<int, List<Tab_BuildBarracks> >(); 
+ public static bool InitTable_BuildBarracks()
  {
- g_BattleSceneConfig.Clear();
+ g_BuildBarracks.Clear();
  Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
- if (!Tab_BattleSceneConfig.LoadTable(tmps)) return false;
+ if (!Tab_BuildBarracks.LoadTable(tmps)) return false;
  foreach (KeyValuePair<int, List<object> > kv in tmps)
  {
- List<Tab_BattleSceneConfig> values = new List<Tab_BattleSceneConfig>();
+ List<Tab_BuildBarracks> values = new List<Tab_BuildBarracks>();
  foreach (object subit in kv.Value)
  {
- values.Add((Tab_BattleSceneConfig)subit);
+ values.Add((Tab_BuildBarracks)subit);
  }
- g_BattleSceneConfig.Add(kv.Key, values);
+ g_BuildBarracks.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_CityBuilding> > g_CityBuilding = new Dictionary<int, List<Tab_CityBuilding> >(); 
+ public static bool InitTable_CityBuilding()
+ {
+ g_CityBuilding.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_CityBuilding.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_CityBuilding> values = new List<Tab_CityBuilding>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_CityBuilding)subit);
+ }
+ g_CityBuilding.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_CityBuildingDefault> > g_CityBuildingDefault = new Dictionary<int, List<Tab_CityBuildingDefault> >(); 
+ public static bool InitTable_CityBuildingDefault()
+ {
+ g_CityBuildingDefault.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_CityBuildingDefault.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_CityBuildingDefault> values = new List<Tab_CityBuildingDefault>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_CityBuildingDefault)subit);
+ }
+ g_CityBuildingDefault.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_CityBuildingLevel> > g_CityBuildingLevel = new Dictionary<int, List<Tab_CityBuildingLevel> >(); 
+ public static bool InitTable_CityBuildingLevel()
+ {
+ g_CityBuildingLevel.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_CityBuildingLevel.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_CityBuildingLevel> values = new List<Tab_CityBuildingLevel>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_CityBuildingLevel)subit);
+ }
+ g_CityBuildingLevel.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_CityBuildingSlot> > g_CityBuildingSlot = new Dictionary<int, List<Tab_CityBuildingSlot> >(); 
+ public static bool InitTable_CityBuildingSlot()
+ {
+ g_CityBuildingSlot.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_CityBuildingSlot.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_CityBuildingSlot> values = new List<Tab_CityBuildingSlot>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_CityBuildingSlot)subit);
+ }
+ g_CityBuildingSlot.Add(kv.Key, values);
  }
  return true;
  }
@@ -215,6 +283,23 @@ private static Dictionary<int, List<Tab_PVETile> > g_PVETile = new Dictionary<in
  values.Add((Tab_PVETile)subit);
  }
  g_PVETile.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_SceneClass> > g_SceneClass = new Dictionary<int, List<Tab_SceneClass> >(); 
+ public static bool InitTable_SceneClass()
+ {
+ g_SceneClass.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_SceneClass.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_SceneClass> values = new List<Tab_SceneClass>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_SceneClass)subit);
+ }
+ g_SceneClass.Add(kv.Key, values);
  }
  return true;
  }
@@ -257,9 +342,19 @@ public bool InitTable()
  bool bRet=true;
  bRet &= InitTable_AnimationEvent();
 
-bRet &= InitTable_BattleSceneConfig();
+bRet &= InitTable_BuildBarracks();
+
+bRet &= InitTable_CityBuilding();
+
+bRet &= InitTable_CityBuildingDefault();
+
+bRet &= InitTable_CityBuildingLevel();
+
+bRet &= InitTable_CityBuildingSlot();
 
 bRet &= InitTable_PVETile();
+
+bRet &= InitTable_SceneClass();
 
 bRet &= InitTable_TeamConfig();
 
@@ -303,38 +398,174 @@ public static List<Tab_AnimationEvent> GetAnimationEventByID(int nKey)
  return g_AnimationEvent;
  }
 
-public static List<Tab_BattleSceneConfig> GetBattleSceneConfigByID(int nKey)
+public static List<Tab_BuildBarracks> GetBuildBarracksByID(int nKey)
  {
- if(g_BattleSceneConfig.Count==0)
+ if(g_BuildBarracks.Count==0)
  {
- InitTable_BattleSceneConfig();
+ InitTable_BuildBarracks();
  }
- if( g_BattleSceneConfig.ContainsKey(nKey))
+ if( g_BuildBarracks.ContainsKey(nKey))
  {
- return g_BattleSceneConfig[nKey];
- }
- return null;
- }
- public static Tab_BattleSceneConfig GetBattleSceneConfigByID(int nKey, int nIndex)
- {
- if(g_BattleSceneConfig.Count==0)
- {
- InitTable_BattleSceneConfig();
- }
- if( g_BattleSceneConfig.ContainsKey(nKey))
- {
- if(nIndex>=0 && nIndex<g_BattleSceneConfig[nKey].Count)
- return g_BattleSceneConfig[nKey][nIndex];
+ return g_BuildBarracks[nKey];
  }
  return null;
  }
- public static Dictionary<int, List<Tab_BattleSceneConfig> > GetBattleSceneConfig()
+ public static Tab_BuildBarracks GetBuildBarracksByID(int nKey, int nIndex)
  {
- if(g_BattleSceneConfig.Count==0)
+ if(g_BuildBarracks.Count==0)
  {
- InitTable_BattleSceneConfig();
+ InitTable_BuildBarracks();
  }
- return g_BattleSceneConfig;
+ if( g_BuildBarracks.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_BuildBarracks[nKey].Count)
+ return g_BuildBarracks[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_BuildBarracks> > GetBuildBarracks()
+ {
+ if(g_BuildBarracks.Count==0)
+ {
+ InitTable_BuildBarracks();
+ }
+ return g_BuildBarracks;
+ }
+
+public static List<Tab_CityBuilding> GetCityBuildingByID(int nKey)
+ {
+ if(g_CityBuilding.Count==0)
+ {
+ InitTable_CityBuilding();
+ }
+ if( g_CityBuilding.ContainsKey(nKey))
+ {
+ return g_CityBuilding[nKey];
+ }
+ return null;
+ }
+ public static Tab_CityBuilding GetCityBuildingByID(int nKey, int nIndex)
+ {
+ if(g_CityBuilding.Count==0)
+ {
+ InitTable_CityBuilding();
+ }
+ if( g_CityBuilding.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_CityBuilding[nKey].Count)
+ return g_CityBuilding[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_CityBuilding> > GetCityBuilding()
+ {
+ if(g_CityBuilding.Count==0)
+ {
+ InitTable_CityBuilding();
+ }
+ return g_CityBuilding;
+ }
+
+public static List<Tab_CityBuildingDefault> GetCityBuildingDefaultByID(int nKey)
+ {
+ if(g_CityBuildingDefault.Count==0)
+ {
+ InitTable_CityBuildingDefault();
+ }
+ if( g_CityBuildingDefault.ContainsKey(nKey))
+ {
+ return g_CityBuildingDefault[nKey];
+ }
+ return null;
+ }
+ public static Tab_CityBuildingDefault GetCityBuildingDefaultByID(int nKey, int nIndex)
+ {
+ if(g_CityBuildingDefault.Count==0)
+ {
+ InitTable_CityBuildingDefault();
+ }
+ if( g_CityBuildingDefault.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_CityBuildingDefault[nKey].Count)
+ return g_CityBuildingDefault[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_CityBuildingDefault> > GetCityBuildingDefault()
+ {
+ if(g_CityBuildingDefault.Count==0)
+ {
+ InitTable_CityBuildingDefault();
+ }
+ return g_CityBuildingDefault;
+ }
+
+public static List<Tab_CityBuildingLevel> GetCityBuildingLevelByID(int nKey)
+ {
+ if(g_CityBuildingLevel.Count==0)
+ {
+ InitTable_CityBuildingLevel();
+ }
+ if( g_CityBuildingLevel.ContainsKey(nKey))
+ {
+ return g_CityBuildingLevel[nKey];
+ }
+ return null;
+ }
+ public static Tab_CityBuildingLevel GetCityBuildingLevelByID(int nKey, int nIndex)
+ {
+ if(g_CityBuildingLevel.Count==0)
+ {
+ InitTable_CityBuildingLevel();
+ }
+ if( g_CityBuildingLevel.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_CityBuildingLevel[nKey].Count)
+ return g_CityBuildingLevel[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_CityBuildingLevel> > GetCityBuildingLevel()
+ {
+ if(g_CityBuildingLevel.Count==0)
+ {
+ InitTable_CityBuildingLevel();
+ }
+ return g_CityBuildingLevel;
+ }
+
+public static List<Tab_CityBuildingSlot> GetCityBuildingSlotByID(int nKey)
+ {
+ if(g_CityBuildingSlot.Count==0)
+ {
+ InitTable_CityBuildingSlot();
+ }
+ if( g_CityBuildingSlot.ContainsKey(nKey))
+ {
+ return g_CityBuildingSlot[nKey];
+ }
+ return null;
+ }
+ public static Tab_CityBuildingSlot GetCityBuildingSlotByID(int nKey, int nIndex)
+ {
+ if(g_CityBuildingSlot.Count==0)
+ {
+ InitTable_CityBuildingSlot();
+ }
+ if( g_CityBuildingSlot.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_CityBuildingSlot[nKey].Count)
+ return g_CityBuildingSlot[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_CityBuildingSlot> > GetCityBuildingSlot()
+ {
+ if(g_CityBuildingSlot.Count==0)
+ {
+ InitTable_CityBuildingSlot();
+ }
+ return g_CityBuildingSlot;
  }
 
 public static List<Tab_PVETile> GetPVETileByID(int nKey)
@@ -369,6 +600,40 @@ public static List<Tab_PVETile> GetPVETileByID(int nKey)
  InitTable_PVETile();
  }
  return g_PVETile;
+ }
+
+public static List<Tab_SceneClass> GetSceneClassByID(int nKey)
+ {
+ if(g_SceneClass.Count==0)
+ {
+ InitTable_SceneClass();
+ }
+ if( g_SceneClass.ContainsKey(nKey))
+ {
+ return g_SceneClass[nKey];
+ }
+ return null;
+ }
+ public static Tab_SceneClass GetSceneClassByID(int nKey, int nIndex)
+ {
+ if(g_SceneClass.Count==0)
+ {
+ InitTable_SceneClass();
+ }
+ if( g_SceneClass.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_SceneClass[nKey].Count)
+ return g_SceneClass[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_SceneClass> > GetSceneClass()
+ {
+ if(g_SceneClass.Count==0)
+ {
+ InitTable_SceneClass();
+ }
+ return g_SceneClass;
  }
 
 public static List<Tab_TeamConfig> GetTeamConfigByID(int nKey)

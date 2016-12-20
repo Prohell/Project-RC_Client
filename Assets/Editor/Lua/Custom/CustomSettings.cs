@@ -41,24 +41,31 @@ public static class CustomSettings
         _DT(typeof(DelegateUtil.FloatDelegate)),
         _DT(typeof(DelegateUtil.StringDelegate)),
         _DT(typeof(DelegateUtil.TableDelegate)),
+        _DT(typeof(UIEventListener.VoidDelegate)),
+        _DT(typeof(UIEventListener.BoolDelegate)),
+        _DT(typeof(UIEventListener.FloatDelegate)),
+        _DT(typeof(UIEventListener.VectorDelegate)),
+        _DT(typeof(UIEventListener.ObjectDelegate)),
+        _DT(typeof(UIEventListener.KeyCodeDelegate)),
+        _DT(typeof(Callback<GameObject>)),
     };
 
     //在这里添加你要导出注册到lua的类型列表
     public static BindType[] customTypeList =
     {
-            //------------------------为例子导出--------------------------------
-            //_GT(typeof(TestEventListener)),
-            //_GT(typeof(TestProtol)),
-            //_GT(typeof(TestAccount)),
-            //_GT(typeof(Dictionary<int, TestAccount>)).SetLibName("AccountMap"),
-            //_GT(typeof(KeyValuePair<int, TestAccount>)),    
-            //_GT(typeof(TestExport)),
-            //_GT(typeof(TestExport.Space)),
-            //-------------------------------------------------------------------        
+        //------------------------为例子导出--------------------------------
+        //_GT(typeof(TestEventListener)),
+        //_GT(typeof(TestProtol)),
+        //_GT(typeof(TestAccount)),
+        //_GT(typeof(Dictionary<int, TestAccount>)).SetLibName("AccountMap"),
+        //_GT(typeof(KeyValuePair<int, TestAccount>)),    
+        //_GT(typeof(TestExport)),
+        //_GT(typeof(TestExport.Space)),
+        //-------------------------------------------------------------------        
 
-            _GT(typeof(Debugger)).SetNameSpace(null),
+        _GT(typeof(Debugger)).SetNameSpace(null),
 
-    #if USING_DOTWEENING
+#if USING_DOTWEENING
             _GT(typeof(DG.Tweening.DOTween)),
             _GT(typeof(DG.Tweening.Tween)).SetBaseType(typeof(System.Object)).AddExtendType(typeof(DG.Tweening.TweenExtensions)),
             _GT(typeof(DG.Tweening.Sequence)).AddExtendType(typeof(DG.Tweening.TweenSettingsExtensions)),
@@ -78,89 +85,105 @@ public static class CustomSettings
             //_GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),    
     #else
 
-            _GT(typeof(Component)),
-            _GT(typeof(Transform)),
-            _GT(typeof(Material)),
-            _GT(typeof(Light)),
-            _GT(typeof(Rigidbody)),
-            _GT(typeof(Camera)),
-            _GT(typeof(AudioSource)),
-            _GT(typeof(Resources)),
-            //_GT(typeof(LineRenderer))
-            //_GT(typeof(TrailRenderer))
-    #endif
+        _GT(typeof(Component)),
+        _GT(typeof(Transform)),
+        _GT(typeof(Material)),
+        _GT(typeof(Light)),
+        _GT(typeof(Rigidbody)),
+        _GT(typeof(Camera)),
+        _GT(typeof(AudioSource)),
+        _GT(typeof(Resources)),
+        //_GT(typeof(LineRenderer))
+        //_GT(typeof(TrailRenderer))
+#endif
 
-            _GT(typeof(Behaviour)),
-            _GT(typeof(MonoBehaviour)),
-            _GT(typeof(GameObject)),
-            _GT(typeof(TrackedReference)),
-            _GT(typeof(Application)),
-            _GT(typeof(Physics)),
-            _GT(typeof(Collider)),
-            _GT(typeof(Time)),
-            _GT(typeof(Texture)),
-            _GT(typeof(Texture2D)),
-            _GT(typeof(Shader)),
-            _GT(typeof(Renderer)),
-            _GT(typeof(WWW)),
-            _GT(typeof(Screen)),
-            _GT(typeof(CameraClearFlags)),
-            _GT(typeof(AudioClip)),
-            _GT(typeof(AssetBundle)),
-            _GT(typeof(ParticleSystem)),
-            _GT(typeof(AsyncOperation)).SetBaseType(typeof(System.Object)),
-            _GT(typeof(LightType)),
-            _GT(typeof(SleepTimeout)),
-            _GT(typeof(Animator)),
-            _GT(typeof(Input)),
-            _GT(typeof(KeyCode)),
-            _GT(typeof(SkinnedMeshRenderer)),
-            _GT(typeof(Space)),
+        _GT(typeof(Behaviour)),
+        _GT(typeof(MonoBehaviour)),
+        _GT(typeof(GameObject)),
+        _GT(typeof(TrackedReference)),
+        _GT(typeof(Application)),
+        _GT(typeof(Physics)),
+        _GT(typeof(Collider)),
+        _GT(typeof(Time)),
+        _GT(typeof(Texture)),
+        _GT(typeof(Texture2D)),
+        _GT(typeof(Shader)),
+        _GT(typeof(Renderer)),
+        _GT(typeof(WWW)),
+        _GT(typeof(Screen)),
+        _GT(typeof(CameraClearFlags)),
+        _GT(typeof(AudioClip)),
+        _GT(typeof(AssetBundle)),
+        _GT(typeof(ParticleSystem)),
+        _GT(typeof(AsyncOperation)).SetBaseType(typeof(System.Object)),
+        _GT(typeof(LightType)),
+        _GT(typeof(SleepTimeout)),
+        _GT(typeof(Animator)),
+        _GT(typeof(Input)),
+        _GT(typeof(KeyCode)),
+        _GT(typeof(SkinnedMeshRenderer)),
+        _GT(typeof(Space)),
 
+        _GT(typeof(MeshRenderer)),
+        _GT(typeof(ParticleEmitter)),
+        _GT(typeof(ParticleRenderer)),
+        _GT(typeof(ParticleAnimator)),
 
-            _GT(typeof(MeshRenderer)),
-            _GT(typeof(ParticleEmitter)),
-            _GT(typeof(ParticleRenderer)),
-            _GT(typeof(ParticleAnimator)),
+        _GT(typeof(BoxCollider)),
+        _GT(typeof(MeshCollider)),
+        _GT(typeof(SphereCollider)),
+        _GT(typeof(CharacterController)),
+        _GT(typeof(CapsuleCollider)),
 
-            _GT(typeof(BoxCollider)),
-            _GT(typeof(MeshCollider)),
-            _GT(typeof(SphereCollider)),
-            _GT(typeof(CharacterController)),
-            _GT(typeof(CapsuleCollider)),
+        _GT(typeof(Animation)),
+        _GT(typeof(AnimationClip)).SetBaseType(typeof(UnityEngine.Object)),
+        _GT(typeof(AnimationState)),
+        _GT(typeof(AnimationBlendMode)),
+        _GT(typeof(QueueMode)),
+        _GT(typeof(PlayMode)),
+        _GT(typeof(WrapMode)),
 
-            _GT(typeof(Animation)),
-            _GT(typeof(AnimationClip)).SetBaseType(typeof(UnityEngine.Object)),
-            _GT(typeof(AnimationState)),
-            _GT(typeof(AnimationBlendMode)),
-            _GT(typeof(QueueMode)),
-            _GT(typeof(PlayMode)),
-            _GT(typeof(WrapMode)),
+        _GT(typeof(QualitySettings)),
+        _GT(typeof(RenderSettings)),
+        _GT(typeof(BlendWeights)),
+        _GT(typeof(RenderTexture)),
 
-            _GT(typeof(QualitySettings)),
-            _GT(typeof(RenderSettings)),
-            _GT(typeof(BlendWeights)),
-            _GT(typeof(RenderTexture)),
+        //GUI
+        _GT(typeof(GUILayout)),
+        _GT(typeof(GUILayoutOption)),
+        _GT(typeof(GUIStyle)),
+        _GT(typeof(GUIContent)),
 
-            _GT(typeof(UIPanel)),
-            _GT(typeof(UIScrollView)),
-            _GT(typeof(UIEventListener)),
-            _GT(typeof(UICamera)),
-            _GT(typeof(UILabel)),
-            _GT(typeof(UIGrid)),
-            _GT(typeof(UIGrid.Arrangement)),
-            _GT(typeof(NGUITools)),
+        //NGUI
+        _GT(typeof(UIPanel)),
+        _GT(typeof(UIScrollView)),
+        _GT(typeof(UIEventListener)),
+        _GT(typeof(UICamera)),
+        _GT(typeof(UILabel)),
+        _GT(typeof(UIGrid)),
+        _GT(typeof(UIButton)),
+        _GT(typeof(UIGrid.Arrangement)),
+        _GT(typeof(NGUITools)),
+        _GT(typeof(EventDelegate)),
 
-            //Lua framework
-            _GT(typeof(LuaOutlet)),
-            _GT(typeof(LuaHelper)),
+        //Lua framework
+        _GT(typeof(LuaOutlet)),
+        _GT(typeof(LuaHelper)),
 
-            //Utils
+        //Utils
+        _GT(typeof(ProxyManager)),
+        _GT(typeof(MediatorManager)),
+        _GT(typeof(EventManager)),
+        _GT(typeof(UIManager)),
+        _GT(typeof(UIItem)),
 
-            //Game module
-            _GT(typeof(LuaTestProxy)),
-            _GT(typeof(LuaTestMediator))
-        };
+        //Game module
+        _GT(typeof(LuaTestProxy)),
+        _GT(typeof(LuaTestMediator)),
+        _GT(typeof(LuaTestMediator2)),
+        _GT(typeof(LuaTestMediator3)),
+        _GT(typeof(LuaTestMediator4))
+    };
 
     //public static BindType[] customTypeList
     //{

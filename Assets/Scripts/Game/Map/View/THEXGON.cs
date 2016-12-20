@@ -3,26 +3,23 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class THEXGON : MonoBehaviour
 {
-    /// <summary>
-    /// 是否是陆地
-    /// </summary>
-    public bool land = true;
-
+    public List<int> spriteId = new List<int>();
     /// <summary>
     /// 是否有高度
     /// </summary>
     public bool isGenHeight = true;
-
+    
     //Unity3D中包围盒
     private Bounds _bound;
     private Mesh mPlan;
 
-	//在HexSubMapView.cs中的HexSubMapView.InitBg中被引用
+    //在HexSubMapView.cs中的HexSubMapView.InitBg中被引用
     //初始化 _bound
-	public void SetBounds(Vector3 min, Vector3 max)
+    public void SetBounds(Vector3 min, Vector3 max)
     {
         Vector3 e = (max - min) * 0.5f;
         Vector3 c = e + min;
@@ -64,8 +61,6 @@ public class THEXGON : MonoBehaviour
         GenMeshWithBound(hex);
         GenHexMesh(hex);
     }
-
-
 
     public void ReplaceMesh()
     {
@@ -109,39 +104,24 @@ public class THEXGON : MonoBehaviour
     }
 
     private MaterialPropertyBlock _block = null;
-    private void UpdateBlock()
+    private MaterialPropertyBlock UpdateBlock()
     {
         if (_block == null)
         {
             _block = new MaterialPropertyBlock();   // make it lazy
         }
-
         HEX hex = _weak_hex.Target as HEX;
         Dictionary<int, int> TSet = new Dictionary<int, int>();
         List<Vector4> TArray = new List<Vector4>();
-        for (int i = 0; i < hex.HexSprites.Count; i++)
+        for (int i = 0; i < spriteId.Count; i++)
         {
-            Sprite s = hex.HexSprites[i];
-            int val, id = s.texture.GetInstanceID();
-            if (!s.packed)
-                continue;
-
-            if (TSet.TryGetValue(id, out val) == false)
-                TSet.Add(id, 1);
-
-            var ms = new Vector2(s.texture.width, s.texture.height);
-            var sp = s.textureRect.position;
-            var ss = s.textureRect.size;
-
-            TArray.Add(new Vector4(sp.x / ms.x, sp.y / ms.y, ss.x / ms.x, ss.y / ms.y));
+            Vector4 pos = hex.GetSpritePosInfoByName(spriteId[i]);
+            TArray.Add(pos);
         }
-
-        hex.HexSprites[0].texture.anisoLevel = 3;
-        hex.HexSprites[0].texture.filterMode = FilterMode.Trilinear;
-        _block.SetTexture("_ATLAS", hex.HexSprites[0].texture);
+        _block.SetTexture("_ATLAS", hex.altasTexture);
         _block.SetVectorArray("_ARRAY", TArray.ToArray());
+        return _block;
     }
-
 
     static private Vector3[] tri_ver;
     static private int[] tri_idx = new int[] { 0, 3, 2, 3, 0, 1 };
@@ -165,7 +145,7 @@ public class THEXGON : MonoBehaviour
         mf.sharedMesh = mPlan;
 
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-        mr.sharedMaterial = land?_hex.HexMaterial:_hex.HexWaterMaterial;
+		mr.sharedMaterials = _hex.GetTerrainMats();
         UpdateBlock();
         mr.SetPropertyBlock(_block);
 
@@ -181,18 +161,16 @@ public class THEXGON : MonoBehaviour
     class element
     {
         public List<Vector3> vHex = new List<Vector3>();
+		public List<Vector3> vNor = new List<Vector3>();
         public List<Color> vClr = new List<Color>();
         public List<Vector4> vTan = new List<Vector4>();
         public List<Vector2> vTex = new List<Vector2>();
-
-        public List<Vector2> vWater = new List<Vector2>();
-
-        public List<Vector2> hasFoam = new List<Vector2>();
     };
 	private static float Tx = Mathf.Sin(Mathf.PI / 3.0f);
 	private static float Ty = Mathf.Cos(Mathf.PI / 3.0f);
 	private static int[] lst = null;
-	private delegate int _reindex(ref element e, int ver, int col, int row);
+
+    private delegate int _reindex(ref element e, int ver, int col, int row);
 	private delegate bool _recheck(int ver, int col, int row);
     void GenHexMesh(HEX _hex)
     {
@@ -250,32 +228,30 @@ public class THEXGON : MonoBehaviour
             idx = _elm.vHex.Count;
             lst[loc] = idx;
 
-            Vector3 _v = Vector3.zero;
-            Vector4 _g;
-            Vector2 _u = Vector2.zero;
-            Color _f;
-            Vector2 _waterColor ;
-
+			Vector3 _v = Vector3.zero;
+			Vector3 _n = Vector3.zero;
+			Vector4 _t = Vector4.zero;
+			Vector2 _u = Vector2.zero;
+			Color _c;
             float _R = Tx * 2.0f + _hex.fvHex.x;
 
             int m = tileVo.mat;
             int n = isGenHeight ? tileVo.height : MapConst.MAP_HEIGHT_HORIZON;
             if (m == 8)
             {
-                _waterColor = water[1];
-                _f = sc[0];
-                _g = vc[0];
+				_c = sc[0];
+                _t = vc[0];
             }
             else
             {
-                _waterColor = water[0];
-                _f = sc[m <= 3 ? m + 1 : 0];
-                _g = vc[m >= 4 ? m - 3 : 0];
+				_c = sc[m <= 3 ? m + 1 : 0];
+                _t = vc[m >= 4 ? m - 3 : 0];
             }
             
             _v.x = _R * _col;
             _v.y = _R * Tx * _row;
             _v.z = n;
+			_n.z = m;
             if (_row % 2 == 0)
             {
                 _v.x += 0.0f;
@@ -286,11 +262,10 @@ public class THEXGON : MonoBehaviour
             }
 
             _elm.vHex.Add(hexgon[_ver] + _v);
-            _elm.vClr.Add(_f);
-            _elm.vTan.Add(_g);
+			_elm.vNor.Add (_n);
+            _elm.vClr.Add(_c);
+            _elm.vTan.Add(_t);
             _elm.vTex.Add(_u);
-            _elm.vWater.Add(_waterColor);
-            _elm.hasFoam.Add(new Vector2(tileVo.camp == 0 ? 0 : 1, 0));
             return idx;
         };
 
@@ -298,7 +273,7 @@ public class THEXGON : MonoBehaviour
         {
             MapTileVO tileVo = mapProxy.GetTile(_col + _hex.xTile * _x, _row + _hex.yTile * _y);
             //if (tileVo.mat < 1)
-            if(tileVo.type == MapTileType.Block && tileVo.blockType == MapBlockType.Water)
+            if(tileVo.IsWater())
             {
                 return false;
             }
@@ -332,15 +307,16 @@ public class THEXGON : MonoBehaviour
         };
 
         List<int> vIdx = new List<int>();
+		List<int> vSub = new List<int>();
         bool pass = true;
         for (int y = 0; y < _yTile; y++)
         {
             for (int x = 0; x < _xTile; x++)
             {
-                for (int i = 0; i < nHexIndices; i++)
+				for (int i = 0; i < nHexIndices; i++)
                 {
-                    if (recheck(tdx[i], x, y) == land)
-                        vIdx.Add(reindex(ref e, tdx[i], x, y));
+					if( recheck(tdx[i], x, y) == true )
+						vIdx.Add( reindex(ref e, tdx[i], x, y) );
                 }
 
                 // west -> x-1
@@ -359,54 +335,49 @@ public class THEXGON : MonoBehaviour
                     pass &= recheck(edx[0][1] - nIndexOffset, x, y);
                     pass &= recheck(edx[0][2] - nIndexOffset, ww, y);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[0][0] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[0][1] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[0][2] - nIndexOffset, ww, y));
-                    }
-
+					if( pass == true ){
+						vSub.Add( reindex(ref e, edx[0][0] - nIndexOffset, x, y) );
+						vSub.Add( reindex(ref e, edx[0][1] - nIndexOffset, x, y) );
+						vSub.Add( reindex(ref e, edx[0][2] - nIndexOffset, ww, y) );
+					}
+					
                     pass = true;
                     pass &= recheck(edx[0][3] - nIndexOffset, ww, y);
                     pass &= recheck(edx[0][4] - nIndexOffset, ww, y);
                     pass &= recheck(edx[0][5] - nIndexOffset, x, y);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y));
-                        vIdx.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y));
-                        vIdx.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y));
-                    }
+					if( pass == true ){
+						vSub.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y));
+						vSub.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y));
+						vSub.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y));
+					}
 
+					if ( IsValid(nw, y+1) )
+					{
+						pass = true;
+						pass &= recheck(edx[3][0] - nIndexOffset, x, y);
+						pass &= recheck(edx[3][1] - nIndexOffset, ww, y);
+						pass &= recheck(edx[3][2] - nIndexOffset, nw, y+1);
 
-                    if (IsValid(nw, y + 1))
-                    {
-                        pass = true;
-                        pass &= recheck(edx[3][0] - nIndexOffset, x, y);
-                        pass &= recheck(edx[3][1] - nIndexOffset, ww, y);
-                        pass &= recheck(edx[3][2] - nIndexOffset, nw, y + 1);
-
-                        if (pass == land)
-                        {
-                            vIdx.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y));
-                            vIdx.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y));
-                            vIdx.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y + 1));
-                        }
-                    }
+						if ( pass == true ){
+							vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y));
+							vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y));
+							vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y+1));
+						}
+					}
 
                     if (IsValid(sw, y - 1))
                     {
                         pass = true;
                         pass &= recheck(edx[3][3] - nIndexOffset, x, y);
                         pass &= recheck(edx[3][4] - nIndexOffset, sw, y - 1);
-                        pass &= recheck(edx[3][5] - nIndexOffset, ww, y);
+                        pass &= recheck(edx[3][5] - nIndexOffset, ww, y);            
 
-                        if (pass == land)
-                        {
-                            vIdx.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y));
-                            vIdx.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y - 1));
-                            vIdx.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y));
-                        }
+						if ( pass == true ){
+							vSub.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y));
+							vSub.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y-1));
+							vSub.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y));
+						}
                     }
                 }
 
@@ -417,24 +388,22 @@ public class THEXGON : MonoBehaviour
                     pass &= recheck(edx[1][1] - nIndexOffset, x, y);
                     pass &= recheck(edx[1][2] - nIndexOffset, sw, y - 1);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[1][0] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[1][1] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[1][2] - nIndexOffset, sw, y - 1));
-                    }
+					if ( pass == true ){
+						vSub.Add(reindex(ref e, edx[1][0] - nIndexOffset, x, y));
+						vSub.Add(reindex(ref e, edx[1][1] - nIndexOffset, x, y));
+						vSub.Add(reindex(ref e, edx[1][2] - nIndexOffset, sw, y-1));
+					}
 
-                    pass = true;
-                    pass &= recheck(edx[1][3] - nIndexOffset, sw, y - 1);
-                    pass &= recheck(edx[1][4] - nIndexOffset, sw, y - 1);
-                    pass &= recheck(edx[1][5] - nIndexOffset, x, y);
+					pass = true;
+					pass &= recheck(edx[1][3] - nIndexOffset, sw, y-1);
+					pass &= recheck(edx[1][4] - nIndexOffset, sw, y-1);
+					pass &= recheck(edx[1][5] - nIndexOffset, x, y);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[1][3] - nIndexOffset, sw, y - 1));
-                        vIdx.Add(reindex(ref e, edx[1][4] - nIndexOffset, sw, y - 1));
-                        vIdx.Add(reindex(ref e, edx[1][5] - nIndexOffset, x, y));
-                    }
+					if ( pass == true ){
+						vSub.Add(reindex(ref e, edx[1][3] - nIndexOffset, sw, y-1));
+						vSub.Add(reindex(ref e, edx[1][4] - nIndexOffset, sw, y-1));
+						vSub.Add(reindex(ref e, edx[1][5] - nIndexOffset, x, y));
+					}
                 }
 
                 if (IsValid(nw, y + 1))
@@ -444,24 +413,22 @@ public class THEXGON : MonoBehaviour
                     pass &= recheck(edx[2][1] - nIndexOffset, x, y);
                     pass &= recheck(edx[2][2] - nIndexOffset, nw, y + 1);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y));
-                        vIdx.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y + 1));
-                    }
+					if( pass == true ){
+						vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y));
+						vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y));
+						vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y+1));
+					}
 
-                    pass = true;
-                    pass &= recheck(edx[2][3] - nIndexOffset, nw, y + 1);
-                    pass &= recheck(edx[2][4] - nIndexOffset, nw, y + 1);
-                    pass &= recheck(edx[2][5] - nIndexOffset, x, y);
+					pass = true;
+					pass &= recheck(edx[2][3] - nIndexOffset, nw, y+1);
+					pass &= recheck(edx[2][4] - nIndexOffset, nw, y+1);
+					pass &= recheck(edx[2][5] - nIndexOffset, x, y);
 
-                    if (pass == land)
-                    {
-                        vIdx.Add(reindex(ref e, edx[2][3] - nIndexOffset, nw, y + 1));
-                        vIdx.Add(reindex(ref e, edx[2][4] - nIndexOffset, nw, y + 1));
-                        vIdx.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y));
-                    }
+					if( pass == true ){
+						vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, nw, y+1));
+						vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, nw, y+1));
+						vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y));
+					}
                 }
 
                 if (y == 0)
@@ -474,93 +441,68 @@ public class THEXGON : MonoBehaviour
                         pass &= recheck(edx[2][4] - nIndexOffset, x, y);
                         pass &= recheck(edx[2][5] - nIndexOffset, x, y - 1);
 
-                        if (pass == land)
-                        {
-                            vIdx.Add(reindex(ref e, edx[2][3] - nIndexOffset, x, y));
-                            vIdx.Add(reindex(ref e, edx[2][4] - nIndexOffset, x, y));
-                            vIdx.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y - 1));
-                        }
+						if( pass == true ){
+							vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, x, y));
+							vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, x, y));
+							vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y-1));
+						}
 
-                        pass = true;
-                        pass &= recheck(edx[2][0] - nIndexOffset, x, y - 1);
-                        pass &= recheck(edx[2][1] - nIndexOffset, x, y - 1);
-                        pass &= recheck(edx[2][2] - nIndexOffset, x, y);
+						pass = true;
+						pass &= recheck(edx[2][0] - nIndexOffset, x, y-1);
+						pass &= recheck(edx[2][1] - nIndexOffset, x, y-1);
+						pass &= recheck(edx[2][2] - nIndexOffset, x, y);
 
-                        if (pass == land)
-                        {
-                            vIdx.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y - 1));
-                            vIdx.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y - 1));
-                            vIdx.Add(reindex(ref e, edx[2][2] - nIndexOffset, x, y));
-                        }
+						if ( pass == true ){
+							vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y-1));
+							vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y-1));
+							vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, x, y));
+						}
 
-                        if (IsValid(x - 1, y - 1))
-                        {
-                            pass = true;
-                            pass &= recheck(edx[3][0] - nIndexOffset, x, y - 1);
-                            pass &= recheck(edx[3][1] - nIndexOffset, x - 1, y - 1);
-                            pass &= recheck(edx[3][2] - nIndexOffset, x, y);
-                            if (pass == land)
-                            {
-                                vIdx.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y - 1));
-                                vIdx.Add(reindex(ref e, edx[3][1] - nIndexOffset, x - 1, y - 1));
-                                vIdx.Add(reindex(ref e, edx[3][2] - nIndexOffset, x, y));
-                            }
-                        }
-                    }
-                }
-            }
+						if( IsValid( x-1, y-1 ) ){
+							pass = true;
+							pass &= recheck(edx[3][0] - nIndexOffset, x, y-1);
+							pass &= recheck(edx[3][1] - nIndexOffset, x-1, y-1);
+							pass &= recheck(edx[3][2] - nIndexOffset, x, y);
+
+							if ( pass == true ){
+								vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y-1));
+								vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, x-1, y-1));
+								vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, x, y));
+							}
+						}
+					}
+				}
+			}
         }
 
-        //if( bDynamic ){
-        	Mesh me = new Mesh();
-        	me.vertices = e.vHex.ToArray();
-            me.triangles = vIdx.ToArray();
-            me.RecalculateNormals();
+		Mesh me = new Mesh(); 
+		me.subMeshCount = 2;
+		me.vertices = e.vHex.ToArray();
+		me.SetTriangles(vIdx.ToArray(), 0);
+		me.SetTriangles(vSub.ToArray(),1);
+		me.normals = e.vNor.ToArray();
+		me.colors = e.vClr.ToArray();
+		me.tangents = e.vTan.ToArray(); 
+		me.uv = e.vTex.ToArray();
+		me.bounds = _bound;
 
-            me.colors = e.vClr.ToArray();
-        	me.tangents = e.vTan.ToArray();
-        	me.uv = e.vTex.ToArray();
-            me.uv2 = e.vWater.ToArray();
-            me.uv3 = e.hasFoam.ToArray();
+		var mf = gameObject.GetComponent<MeshFilter>();
+		if(mf == null)
+		{
+			mf = gameObject.AddComponent<MeshFilter>();
+		}
+		mf.sharedMesh = me;
 
-            me.bounds = _bound;
-
-            MeshFilter mf = gameObject.GetComponent<MeshFilter>();
-            mf.sharedMesh = me;
-
-            MeshRenderer mr = gameObject.GetComponent<MeshRenderer>();
-            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        	mr.sharedMaterial = land ? _hex.HexMaterial : _hex.HexWaterMaterial; ;
-            UpdateBlock();
-
-            mr.SetPropertyBlock(_block);
-
-        /*}else{
-        var mf = gameObject.GetComponent<MeshFilter>();
-        if(mf == null)
-        {
-            mf = gameObject.AddComponent<MeshFilter>();
-        }
-        var mr = gameObject.GetComponent<MeshRenderer>();
-        if (mr == null)
-        {
-            mr = gameObject.AddComponent<MeshRenderer>();
-        }
-
-        Mesh me = new Mesh();
-        me.vertices = e.vHex.ToArray();
-        me.colors = e.vClr.ToArray();
-        me.tangents = e.vTan.ToArray();
-        me.uv = e.vTex.ToArray();
-        me.triangles = vIdx.ToArray();
-        me.bounds = _bound;
-
-        mf.sharedMesh = me;
-        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        mr.sharedMaterial = _hex.HexMaterial;
-        mr.SetPropertyBlock(UpdateBlock());*/
-        //}
+		var mr = gameObject.GetComponent<MeshRenderer>();
+		if (mr == null)
+		{
+			mr = gameObject.AddComponent<MeshRenderer>();
+		}
+		mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		mr.sharedMaterials =  _hex.GetTerrainMats();
+		mr.SetPropertyBlock(UpdateBlock());
     }
+
     private void OnDrawGizmos()
     {
         Bounds bound = gameObject.GetComponent<MeshRenderer>().bounds;

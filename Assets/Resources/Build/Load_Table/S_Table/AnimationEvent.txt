@@ -5,3 +5,6 @@ INT	STRING	STRING	STRING	STRING	FLOAT
 100001		AttackEnd	Attack2B_01	Gongjianshou_01	99.9
 100002		DieEnd	Die	Gongjianshou_01	99.9
 100003		AttackEffect	Attack2B_01	Gongjianshou_01	0.8
+100004		AttackEnd	Attack2B_01	Kuangzhanshi_01	99.9
+100005		DieEnd	Die	Kuangzhanshi_01	99.9
+100006		AttackEffect	Attack2B_01	Kuangzhanshi_01	0.8

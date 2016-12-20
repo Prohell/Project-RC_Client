@@ -4,6 +4,7 @@ using System.Collections;
 public class GameLoader {
 
 	static public IEnumerator LoadFromFileAsync(string url, Callback<AssetBundle> callback){
+		Debug.Log ("LoadFromFileAsync : " + url);
 		if(!System.IO.File.Exists (url)){
 			Debug.LogError ("Not find file from : " + url);
 			yield break;
@@ -39,6 +40,7 @@ public class GameLoader {
 	}
 
 	static public IEnumerator LoadFromCacheOrDownload(string url, int version, uint crc, Callback<AssetBundle> callback){
+		Debug.Log ("LoadFromCacheOrDownload : " + url);
 		WWW www = WWW.LoadFromCacheOrDownload (url, version, crc);
 		yield return www;
 		if (www.error != null) {
