@@ -78,18 +78,21 @@ public class MouseWrapper : IInputDevice
             else
             {
                 _axis = Input.GetAxis("Mouse ScrollWheel");
-                if (_axis != 0)
-                {
-                    _pichSimState = PinchSimState.kBegin;
-                    _touchCount = 2;
-                    Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
-                    _curTouchPosition[0] = screenCenter - new Vector2(oriDis, 0);
-                    _curTouchPosition[1] = screenCenter + new Vector2(oriDis, 0);
-                    _preTouchPosition[0] = _curTouchPosition[0];
-                    _preTouchPosition[1] = _curTouchPosition[1];
-                    _touchPhase[0] = TouchPhase.Began;
-                    _touchPhase[1] = TouchPhase.Began;
-                }
+				if (_axis != 0) {
+					_pichSimState = PinchSimState.kBegin;
+					_touchCount = 2;
+					Vector2 screenCenter = new Vector2 (Screen.width / 2f, Screen.height / 2f);
+					_curTouchPosition [0] = screenCenter - new Vector2 (oriDis, 0);
+					_curTouchPosition [1] = screenCenter + new Vector2 (oriDis, 0);
+					_preTouchPosition [0] = _curTouchPosition [0];
+					_preTouchPosition [1] = _curTouchPosition [1];
+					_touchPhase [0] = TouchPhase.Began;
+					_touchPhase [1] = TouchPhase.Began;
+				} else {
+					_touchCount = 0;
+					_touchPhase [0] = TouchPhase.Ended;
+					_touchPhase [1] = TouchPhase.Ended;
+				}
             }
         }
         else

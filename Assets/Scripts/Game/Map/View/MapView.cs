@@ -191,7 +191,9 @@ public partial class MapView : MonoBehaviour
         Vector3 lookPos = Layout.HexCenter(c);
         lookPos.y = MapView.CameraHeightInit;
         lookPos.z -= 8f;
-        Game.TaskManager.Exec(Lod1to0(lookPos, 30, successCallBack));
+
+		Game.StartCoroutine (Lod1to0(lookPos, 30, successCallBack));
+//        Game.TaskManager.Exec(Lod1to0(lookPos, 30, successCallBack));
 
     }
 

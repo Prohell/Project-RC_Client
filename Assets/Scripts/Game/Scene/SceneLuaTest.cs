@@ -20,7 +20,7 @@ public class SceneLuaTest : SceneBase
 
     public override void OnWillExit()
     {
-        UIManager.GetInstance().OnDestroy();
+        UIManager.GetInstance().OnReset();
     }
 
     public override void OnExited()

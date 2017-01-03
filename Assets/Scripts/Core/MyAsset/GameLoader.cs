@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public class GameLoader {
 
-	static public IEnumerator LoadFromFileAsync(string url, Callback<AssetBundle> callback){
+	static public IEnumerator LoadFromFileAsync(string url, Action<AssetBundle> callback){
 		Debug.Log ("LoadFromFileAsync : " + url);
 		if(!System.IO.File.Exists (url)){
 			Debug.LogError ("Not find file from : " + url);
@@ -21,7 +22,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadAssetBundle(string url, Callback<AssetBundle> callback){
+	static public IEnumerator LoadAssetBundle(string url, Action<AssetBundle> callback){
 		WWW www = new WWW (url);
 		yield return www;
 		if (www.error != null) {
@@ -39,7 +40,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadFromCacheOrDownload(string url, int version, uint crc, Callback<AssetBundle> callback){
+	static public IEnumerator LoadFromCacheOrDownload(string url, int version, uint crc, Action<AssetBundle> callback){
 		Debug.Log ("LoadFromCacheOrDownload : " + url);
 		WWW www = WWW.LoadFromCacheOrDownload (url, version, crc);
 		yield return www;
@@ -60,7 +61,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadBytes(string url,Callback<byte[]> callback){
+	static public IEnumerator LoadBytes(string url,Action<byte[]> callback){
 		WWW www = new WWW (url);
 		yield return www;
 		if(www.error != null){
@@ -78,7 +79,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadText(string url,Callback<string> callback){
+	static public IEnumerator LoadText(string url,Action<string> callback){
 		WWW www = new WWW (url);
 		yield return www;
 		if(www.error != null){
@@ -96,7 +97,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadAudioClip(string url,Callback<AudioClip> callback){
+	static public IEnumerator LoadAudioClip(string url,Action<AudioClip> callback){
 		WWW www = new WWW (url);
 		yield return www;
 		if(www.error != null){
@@ -114,7 +115,7 @@ public class GameLoader {
 		}
 	}
 
-	static public IEnumerator LoadTexture2D(string url,Callback<Texture2D> callback){
+	static public IEnumerator LoadTexture2D(string url,Action<Texture2D> callback){
 		WWW www = new WWW (url);
 		yield return www;
 		if (www.error != null) {
@@ -132,7 +133,7 @@ public class GameLoader {
 		}
 	}
 		
-//	static public IEnumerator LoadMovieTexture(string url,Callback<MovieTexture> callback){
+	//	static public IEnumerator LoadMovieTexture(string url,Action<MovieTexture> callback){
 //		WWW www = new WWW (url);
 //		yield return www;
 //		if(www.error != null){

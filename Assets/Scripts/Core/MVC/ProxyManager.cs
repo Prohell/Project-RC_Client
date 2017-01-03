@@ -74,7 +74,9 @@ public class ProxyManager : Singleton<ProxyManager>, IInit, IReset
     public void OnInit()
     {
         // add new proxy here.
+		Add(new PlayerProxy());
         Add(new CityProxy());
+        Add(new BattleProxy());
         //Add(new MapProxy());
         IsInit = true;
     }

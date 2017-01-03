@@ -596,6 +596,7 @@ namespace LuaInterface
 
             if (LuaConst.openZbsDebugger)
             {
+                //Change file name to full path to indentify file when debugging.
                 fileName = LuaResLoader.Instance.FindFile(fileName);
             }
 

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Mono_Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
@@ -11,6 +10,8 @@ public class Mono_Singleton<T> : MonoBehaviour where T : MonoBehaviour
     private static bool m_applicationIsQuitting;
 
     private static readonly object temp = new object();
+
+
 
     private static T m_instance;
 
@@ -52,13 +53,18 @@ public class Mono_Singleton<T> : MonoBehaviour where T : MonoBehaviour
                                     " - there should never be more than 1 singleton!" +
                                     " Reopenning the scene might fix it.");
                             }
-                            m_instance = (T)tempList.First();
+                            m_instance = (T)tempList[0];
                         }
 
                         if (m_instance == null)
                         {
-                            var singleton = Main.DontDestroyRoot.gameObject ?? new GameObject(typeof(T).Name);
-                            m_instance = singleton.AddComponent<T>();
+							
+							GameObject main = GameObject.Find ("Main");
+							if (main == null) {
+								main = new GameObject ("Main");
+							}
+
+							m_instance = main.AddComponent<T>();
 
                             LogModule.DebugLog("[Singleton]Add singleton:" + typeof(T) + " in DontDestroyOnLoad.");
                         }
@@ -96,4 +102,16 @@ public class Mono_Singleton<T> : MonoBehaviour where T : MonoBehaviour
         m_instance = null;
         Destroy(gameObject);
     }
+
+	public void Awake(){
+		GameObject main = GameObject.Find ("Main");
+		if (main != null) {
+			if (main != this.gameObject) {
+				Debug.LogError ("Mono_Singleton Gameobject has Created!");
+			}
+		} else {
+			gameObject.name = "Main";
+		}
+
+	}
 }

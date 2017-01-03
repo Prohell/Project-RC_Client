@@ -17,6 +17,7 @@ public class HEX : MonoBehaviour
     //在THEXGON.cs中的THEXGON.GenMeshWithBound中被引用
 	public List<Material> HexTerrainMaterials;
     public List<Material> HexWaterMaterials;
+	public Material HexTerrainBlendMaterial;
 
     private Dictionary<int, SprVO> spritePosList = null;
     struct TextureInfo
@@ -47,6 +48,7 @@ public class HEX : MonoBehaviour
         }
         return ret;
     }
+
     public Vector4 GetSpritePosInfoByName(int spriteName)
     {
         if (spritePosList.Count <= 0 || !spritePosList.ContainsKey(spriteName))
@@ -59,8 +61,6 @@ public class HEX : MonoBehaviour
             return posInfo;
         }
     }
-
-
 
     private Texture2D LoadAltasAsTexture()
     {
@@ -175,6 +175,16 @@ public class HEX : MonoBehaviour
 			ModiRq2 = true;
 		}
 		return HexTerrainMaterials.ToArray ();
+	}
+
+	bool ModiRq3 = false;
+	public Material GetTerrainBlendMat()
+	{
+		if (ModiRq3 == false ){
+			HexTerrainBlendMaterial.renderQueue = HexTerrainBlendMaterial.shader.renderQueue;
+			ModiRq3 = true;
+		}
+		return HexTerrainBlendMaterial;
 	}
 
     //未被使用

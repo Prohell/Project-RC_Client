@@ -1,31 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TempEntrance : Mono_Singleton<TempEntrance>
+public class TempEntrance : MonoBehaviour
 {
     public void SwitchToEditScene()
     {
-        Game.SceneManager.SwitchToScene(SceneId.MapEditor);
+        MySceneManager.GetInstance().SwitchToScene(SceneId.MapEditor);
     }
 
     public void SwitchToMapScene()
     {
-        Game.SceneManager.SwitchToScene(SceneId.Map);
+        MySceneManager.GetInstance().SwitchToScene(SceneId.Map);
     }
 
     public void SwitchToCastle()
     {
-        Game.SceneManager.SwitchToScene(SceneId.Loading, SceneId.Castle);
+        MySceneManager.GetInstance().SwitchToScene(SceneId.Loading, SceneId.Castle);
     }
 
     public void StartLua()
     {
-        Game.SceneManager.SwitchToScene(SceneId.LuaTest);
+        MySceneManager.GetInstance().SwitchToScene(SceneId.LuaTest);
     }
 
     public void StartBattle()
     {
-        Game.SceneManager.SwitchToScene(SceneId.BattleTest);
+        MySceneManager.GetInstance().SwitchToScene(SceneId.BattleTest);
+    }
+
+    public void ShowMainUI()
+    {
+        UIManager.GetInstance().OpenUI("MainUI", view =>
+        {
+            LuaHelper.CallFunctionWithSelf(view, "MainUIView.Init");
+        }, null, false);
+        UIManager.GetInstance().OpenUI("MainResource", null, null, false);
     }
 
     void OnGUI()
@@ -49,10 +58,15 @@ public class TempEntrance : Mono_Singleton<TempEntrance>
         {
             SwitchToCastle();
         }
-    }
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
+        if (GUILayout.Button("ShowMainUI"))
+        {
+            ShowMainUI();
+        }
+
+        if (GUILayout.Button("StartLuaDebugger"))
+        {
+            LuaHelper.CallFunction("LuaScriptHelper.StartDebugger");
+        }
     }
 }

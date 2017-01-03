@@ -10,12 +10,12 @@ public class Tab_CityBuildingLevel
  {
  INVLAID_INDEX=-1,
 ID_ID,
-ID_BUILDINGTYPE=2,
+ID_NUMBER=2,
 ID_NAME,
 ID_LEVEL,
 ID_DESCRIPTION,
-ID_ICON,
-ID_RES,
+ID_ASSET,
+ID_BUNDLE,
 ID_PROSPERITY,
 ID_NEEDBUILDING1,
 ID_NEEDBUILDING2,
@@ -30,14 +30,14 @@ MAX_RECORD
  }
  public static string GetInstanceFile(){return TAB_FILE_DATA; }
 
-private int m_BuildingType;
- public int BuildingType { get{ return m_BuildingType;}}
+private string m_Asset;
+ public string Asset { get{ return m_Asset;}}
+
+private string m_Bundle;
+ public string Bundle { get{ return m_Bundle;}}
 
 private string m_Description;
  public string Description { get{ return m_Description;}}
-
-private string m_Icon;
- public string Icon { get{ return m_Icon;}}
 
 private int m_Id;
  public int Id { get{ return m_Id;}}
@@ -73,11 +73,11 @@ private int m_NeedStone;
 private int m_NeedTime;
  public int NeedTime { get{ return m_NeedTime;}}
 
+private int m_Number;
+ public int Number { get{ return m_Number;}}
+
 private int m_Prosperity;
  public int Prosperity { get{ return m_Prosperity;}}
-
-private string m_Res;
- public string Res { get{ return m_Res;}}
 
 public static bool LoadTable(Dictionary<int, List<object> > _tab)
  {
@@ -94,9 +94,9 @@ public static bool LoadTable(Dictionary<int, List<object> > _tab)
  throw TableException.ErrorReader("Load {0} error as CodeSize:{1} not Equal DataSize:{2}", GetInstanceFile(),_ID.MAX_RECORD,valuesList.Length);
  }
  Tab_CityBuildingLevel _values = new Tab_CityBuildingLevel();
- _values.m_BuildingType =  Convert.ToInt32(valuesList[(int)_ID.ID_BUILDINGTYPE] as string);
+ _values.m_Asset =  valuesList[(int)_ID.ID_ASSET] as string;
+_values.m_Bundle =  valuesList[(int)_ID.ID_BUNDLE] as string;
 _values.m_Description =  valuesList[(int)_ID.ID_DESCRIPTION] as string;
-_values.m_Icon =  valuesList[(int)_ID.ID_ICON] as string;
 _values.m_Id =  Convert.ToInt32(valuesList[(int)_ID.ID_ID] as string);
 _values.m_Level =  Convert.ToInt32(valuesList[(int)_ID.ID_LEVEL] as string);
 _values.m_Name =  valuesList[(int)_ID.ID_NAME] as string;
@@ -109,8 +109,8 @@ _values.m_NeedIron =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDIRON] as string
 _values.m_NeedProsperity =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDPROSPERITY] as string);
 _values.m_NeedStone =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDSTONE] as string);
 _values.m_NeedTime =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDTIME] as string);
+_values.m_Number =  Convert.ToInt32(valuesList[(int)_ID.ID_NUMBER] as string);
 _values.m_Prosperity =  Convert.ToInt32(valuesList[(int)_ID.ID_PROSPERITY] as string);
-_values.m_Res =  valuesList[(int)_ID.ID_RES] as string;
 
  if (_hash.ContainsKey(skey))
  {

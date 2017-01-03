@@ -7,7 +7,7 @@ public class LuaTestMediator4 : IUIMediator, IMediator
 {
     public void UpdateItems(object paras)
     {
-        LuaHelper.CallFunction(((IUIMediator)this).m_View, "LuaTestView:UpdateItems");
+        LuaHelper.CallFunctionWithSelf(((IUIMediator)this).m_View, "LuaTestView:UpdateItems");
     }
 
     public void OnInit()

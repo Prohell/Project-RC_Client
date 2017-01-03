@@ -10,7 +10,9 @@ public class SceneMapEditor : SceneBase
     public override void OnEntered(object param)
     {
         GameFacade.AddMediator(new MapMediator(), MapView.Current.gameObject);
-        Game.TaskManager.Exec(MapView.Current.Init());
+		Game.StartCoroutine (MapView.Current.Init());
+
+        UIManager.GetInstance().OnReset();
     }
 
     public override void OnWillExit()

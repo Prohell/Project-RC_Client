@@ -29,6 +29,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using LuaInterface;
+using Object = UnityEngine.Object;
 
 public class LuaOutlet : MonoBehaviour
 {
@@ -60,10 +61,12 @@ public class LuaOutlet : MonoBehaviour
     public LuaTable m_LuaTable { get; private set; }
 
     public string m_LuaName;
+    public Object m_LuaFile;
 
     private void BindLuaInternal()
     {
-        LuaHelper.CallStaticFunction(m_LuaName + ".BindLua", this);
+        LuaHelper.LoadFile(m_LuaName);
+        LuaHelper.CallFunction("LuaOutLetHelper.BindLua", this, LuaManager.Instance.LuaState[m_LuaName]);
     }
 
     public void BindLua(string p_name)
@@ -78,17 +81,19 @@ public class LuaOutlet : MonoBehaviour
     /// <param name="table"></param>
     public void BindFromLua(LuaTable table)
     {
-        if (gameObject.name != "LuaTestItem (Clone)")
-        {
-            ;
-        }
-
         m_LuaTable = table;
 
         foreach (var item in OutletInfos)
         {
-            var temp = item.Object.GetComponent(item.ComponentType);
-            m_LuaTable[item.Name] = temp;
+            if (item.ComponentType != "GameObject")
+            {
+                var temp = item.Object.GetComponent(item.ComponentType);
+                m_LuaTable[item.Name] = temp;
+            }
+            else
+            {
+                m_LuaTable[item.Name] = item.Object;
+            }
         }
 
         m_LuaTable["LuaOutLet"] = this;
@@ -100,7 +105,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaClick)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":OnClick");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":OnClick");
         }
     }
 
@@ -108,7 +113,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaMono && m_LuaTable.Exist("OnDestroy") && m_LuaTable["OnDestroy"].GetType() == typeof(LuaFunction))
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":OnDestroy");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":OnDestroy");
         }
     }
 
@@ -116,7 +121,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaEnable)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":OnEnable");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":OnEnable");
         }
     }
 
@@ -124,7 +129,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaDisable)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":OnDisable");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":OnDisable");
         }
     }
 
@@ -132,7 +137,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaUpdate)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":Update");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":Update");
         }
     }
 
@@ -140,7 +145,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaLateUpdate)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":LateUpdate");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":LateUpdate");
         }
     }
 
@@ -149,7 +154,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaGUI)
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":OnGUI");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":OnGUI");
         }
     }
 #endif
@@ -158,7 +163,7 @@ public class LuaOutlet : MonoBehaviour
     {
         if (CanExeLuaMono && m_LuaTable.Exist("Start") && m_LuaTable["Start"].GetType() == typeof(LuaFunction))
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":Start");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":Start");
         }
     }
 
@@ -187,7 +192,7 @@ public class LuaOutlet : MonoBehaviour
 
         if (CanExeLuaMono && m_LuaTable.Exist("Awake") && m_LuaTable["Awake"].GetType() == typeof(LuaFunction))
         {
-            LuaHelper.CallFunction(m_LuaTable, m_LuaName + ":Awake");
+            LuaHelper.CallFunctionWithSelf(m_LuaTable, m_LuaName + ":Awake");
         }
     }
 }

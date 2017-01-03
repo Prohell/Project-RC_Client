@@ -21,7 +21,7 @@ public class UnitController : BaseController
     private float mThinkTime;
     private const float mThinkTimeSpace = 0.03f;
     // the Unit Date
-    private UnitData mUnitDate;
+    private UnitData mUnitData;
     // Enemy List
     private List<Transform> mEnemyTrans;
 
@@ -72,7 +72,7 @@ public class UnitController : BaseController
     {
         mEnemyTrans = new List<Transform>();
         //mForceAttackList = new List<Transform>();
-        mUnitDate = new UnitData();
+        mUnitData = new UnitData();
 
         mRVOController = transform.GetComponent<RVOController>();
         mRichAI = transform.GetComponent<RichAI>();
@@ -160,7 +160,7 @@ public class UnitController : BaseController
             {
 
                float temDistance = Vector3.Distance(transform.position, mEnemyTrans[i].position);
-               if(temDistance<= mUnitDate.GetUnitView())
+               if(temDistance<= mUnitData.GetUnitView())
                 {
                     mSearchAim = mEnemyTrans[i];
                     ChangeTarget(mSearchAim);
@@ -178,7 +178,7 @@ public class UnitController : BaseController
             for (int i = 0; i < mEnemyTrans.Count; i++)
             {
                 float temDistance = Vector3.Distance(transform.position, mEnemyTrans[i].position);
-                if (temDistance <= mUnitDate.GetUnitAttackRange())
+                if (temDistance <= mUnitData.GetUnitAttackRange())
                 {
                     mAttackAim = mEnemyTrans[i];
                     TryOperState(StateEnum.Prepare, StateOper.Enter);
@@ -186,7 +186,7 @@ public class UnitController : BaseController
                 }
             }
             //float temDistance = Vector3.Distance(transform.position, mSearchAim.position);
-            //if (temDistance <= mUnitDate.GetUnitAttackRange())
+            //if (temDistance <= mUnitData.GetUnitAttackRange())
             //{
             //    mAttackAim = mSearchAim;
             //    TryOperState(StateEnum.Prepare, StateOper.Enter);
@@ -206,11 +206,11 @@ public class UnitController : BaseController
     
     public UnitData GetUnitData()
     {
-        return mUnitDate;
+        return mUnitData;
     }
     public void SetUnitData(UnitData tUnitDate)
     {
-        mUnitDate = tUnitDate;
+        mUnitData = tUnitDate;
     }
     public Transform GetAttackAim()
     {
@@ -223,11 +223,26 @@ public class UnitController : BaseController
 
     public void SetUnitHP(float tHP)
     {
-        mUnitDate.SetUnitHP(tHP);
+        mUnitData.SetUnitHP(tHP);
         if (mStateMachine.GetCurrentState().StateType != StateEnum.Die&& MWillDie == true)
-
-        //if (mStateMachine.GetCurrentState().StateType != StateEnum.Die)
         {
+            //if ((mUnitData.GetAttackType() & UnitAttackType.ShortAttack) == UnitAttackType.ShortAttack)
+            {
+                //avoid  endless loop death chain
+                if (mAttackAim != null && mAttackAim.GetComponent<UnitController>().MWillDie == true)
+                {
+                    mAttackAim.GetComponent<UnitController>().TryOperState(StateEnum.Die, StateOper.Switch);
+                    EventManager.GetInstance().SendEvent(EventId.SomeOneDie, mAttackAim);
+                    //LogModule.DebugLog("avoid mAttackAim died");
+                }
+                //avoid  endless loop death chain
+                if (mSearchAim != null && mSearchAim.GetComponent<UnitController>().MWillDie == true)
+                {
+                    mSearchAim.GetComponent<UnitController>().TryOperState(StateEnum.Die, StateOper.Switch);
+                    EventManager.GetInstance().SendEvent(EventId.SomeOneDie, mSearchAim);
+                    //LogModule.DebugLog("avoid mSearchAim died");
+                }
+            }
             MWillDie = false;
             TryOperState(StateEnum.Die, StateOper.Switch);
             EventManager.GetInstance().SendEvent(EventId.SomeOneDie, transform);
@@ -254,7 +269,7 @@ public class UnitController : BaseController
     /******************
     Squad order Function 
     *******************/
-    void TryOperState(StateEnum tAimStateEnum, StateOper tOper)
+    public void TryOperState(StateEnum tAimStateEnum, StateOper tOper)
     {
         if (mStateMachine.GetCurrentState().StateType == StateEnum.Die)
         {
@@ -267,8 +282,6 @@ public class UnitController : BaseController
     *******************/
     void UnitIdleGetInFunc()
     {
-        transform.LookAt(new Vector3(transform.forward.x,0.0f,transform.forward.z), Vector3.up);
-
         if(mOriginalAim!=null)
             ChangeTarget(mOriginalAim);
 
@@ -277,8 +290,8 @@ public class UnitController : BaseController
     }
     void UnitIdleExcuteFunc()
     {
-        if (mAttackSpaceTimer >= mUnitDate.GetAttackSpaceTime())
-            mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
+        if (mAttackSpaceTimer >= mUnitData.GetAttackSpaceTime())
+            mAttackSpaceTimer = mUnitData.GetAttackSpaceTime();
         else
             mAttackSpaceTimer += Time.deltaTime;
 
@@ -303,8 +316,8 @@ public class UnitController : BaseController
     void UnitWalkExcuteFunc()
     {
         //calculate  Attack time space
-        if (mAttackSpaceTimer >= mUnitDate.GetAttackSpaceTime())
-            mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
+        if (mAttackSpaceTimer >= mUnitData.GetAttackSpaceTime())
+            mAttackSpaceTimer = mUnitData.GetAttackSpaceTime();
         else
             mAttackSpaceTimer += Time.deltaTime;
 
@@ -376,16 +389,17 @@ public class UnitController : BaseController
         if (mAttackAim == null)
             TryOperState(StateEnum.Prepare, StateOper.Exit);
 
-        if (mAttackAim != null && Vector3.Distance(transform.position, mAttackAim.position) > 1.1f * mUnitDate.GetUnitAttackRange())
+        if (mAttackAim != null && Vector3.Distance(transform.position, mAttackAim.position) > 1.1f * mUnitData.GetUnitAttackRange())
         {
             mSearchAim = mAttackAim;
             mAttackAim = null;
             TryOperState(StateEnum.Prepare, StateOper.Exit);
+            //LogModule.DebugLog("HIt and RUN");
         }
 
-        if (mAttackSpaceTimer >= mUnitDate.GetAttackSpaceTime())
+        if (mAttackSpaceTimer >= mUnitData.GetAttackSpaceTime())
         {
-            mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
+            mAttackSpaceTimer = mUnitData.GetAttackSpaceTime();
             TryOperState(StateEnum.Attack, StateOper.Enter);
         }
         mAttackSpaceTimer += Time.deltaTime;
@@ -400,6 +414,7 @@ public class UnitController : BaseController
     void UnitDieGetInFunc()
     {
         mUnitAnimation.Play(AnimationTags.mDie);
+        mOriginalAim.gameObject.SetActive(false);
         ChangeMoving(false, false);
     }
     void UnitDieExcuteFunc()
@@ -420,14 +435,14 @@ public class UnitController : BaseController
     {
         if(mAttackAim != null)
         {
-            if((mUnitDate.GetAttackType() & UnitAttackType.ShortAttack) == UnitAttackType.ShortAttack)
+            if((mUnitData.GetAttackType() & UnitAttackType.ShortAttack) == UnitAttackType.ShortAttack)
             {
                 UnitController mAttackAimController = mAttackAim.GetComponent<UnitController>();
                 mAttackAimController.SetUnitHP(mAttackAimController.GetUnitData().GetUnitHP() - mAttackAimController.GetUnitData().GetAttack());
                 return;
             }
 
-            if((mUnitDate.GetAttackType() & UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
+            if((mUnitData.GetAttackType() & UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
             {
                 //Transform tFinalTrans;
                 //if (mForceAttackList.Count != 0)
@@ -460,7 +475,7 @@ public class UnitController : BaseController
 
     public void ArrowDamageEffect(float param)
     {
-        SetUnitHP(mUnitDate.GetUnitHP() - param);
+        SetUnitHP(mUnitData.GetUnitHP() - param);
     }
 
     public void UnitDieEnd()
@@ -485,9 +500,10 @@ public class UnitController : BaseController
                 MKillOrder = false;
             }
 
-            if(mEnemyTrans.Count==0)
+            if (mEnemyTrans.Count == 0)
+            {
                 UnitMarching(SquadTransform.position);
-
+            }               
         }
         //if(mForceAttackList.Contains(diedTrans))
         //{
@@ -516,7 +532,7 @@ public class UnitController : BaseController
     //public void DoForceAttack(Transform param)
     //{
     //    mForceAttackList.Add(param);
-    //    mAttackSpaceTimer = mUnitDate.GetAttackSpaceTime();
+    //    mAttackSpaceTimer = mUnitData.GetAttackSpaceTime();
     //}
     public void SetAttackSpaceTimer(float tSpaceTimer)
     {
@@ -551,14 +567,17 @@ public class UnitController : BaseController
     public void UnitMarching(Vector3 tPos,float tAngle=0f)
     {
         //Vector3 tAimPos = transform.position - mSquadLeader.position + (Vector3)tPos;
+        if (mStateMachine.GetCurrentState().StateType == StateEnum.Idle)
+            TryOperState(StateEnum.Walk, StateOper.Enter);
+        else
+            return;
+
         Vector3 tAimPos = RelativePosition + tPos;
         mRichAI.target = mOriginalAim;
         mRichAI.target.position = tAimPos;
 
         mRichAI.target.RotateAround(tPos, Vector3.up, tAngle);
         mRichAI.UpdatePath(); 
-        if(mStateMachine.GetCurrentState().StateType ==StateEnum.Idle)      
-            TryOperState(StateEnum.Walk, StateOper.Enter);
         mIsMarching = true;
     }
     public void EmbattingSetPos(Vector3 tPos)
@@ -575,6 +594,21 @@ public class UnitController : BaseController
             TryOperState(StateEnum.Walk, StateOper.Enter);
         mIsMarching = true;
     }
+    public StateEnum GetUnitState()
+    {
+        return mStateMachine.GetCurrentState().StateType;
+    }
+    // Asynchronous back
+    public IEnumerator CheckState()
+    {
+        bool judge=true;
+        while (judge)
+        {
+            yield return new WaitForSeconds(0.5f);
+            judge = mStateMachine.GetCurrentState().StateType != StateEnum.Idle;
+        }
+        //LogModule.DebugLog("Unit Done");
+    }
 
     //Re find Enemy
     void ReFindEnemy()
@@ -588,7 +622,7 @@ public class UnitController : BaseController
         //        continue;
         //    }
         //    float tDistance = Vector3.Distance(transform.position, mEnemyTrans[i].position);
-        //    if (tDistance <= mUnitDate.GetUnitAttackRange())
+        //    if (tDistance <= mUnitData.GetUnitAttackRange())
         //    {
         //        mAttackAim = tTransfrom;
         //        TryOperState(StateEnum.Prepare, StateOper.Enter);

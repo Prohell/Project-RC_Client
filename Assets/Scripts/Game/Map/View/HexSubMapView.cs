@@ -8,13 +8,20 @@ public class HexSubMapView : MonoBehaviour
     public int yIdx = 0;
     public GameObject mapHexBg;
     public GameObject mapWaterBg;
+	public GameObject mapBlendBg;
     public HEX hex = null;
     public HexMapLayout layout = null;
     public Dictionary<string, MapTile> tileTmpDict = null;
     public Transform blockRoot;
 
-    THEXGON mHexBg = null;
-    THEXWATER mHexWater = null;
+    public THEXGON mHexBg = null;
+    public THEXWATER mHexWater = null;
+	public THEXBLEND mBlendBg = null;
+
+	public HexSubMapView left = null;
+	public HexSubMapView prev = null;
+	public HexSubMapView diag = null;
+
     Dictionary<Coord, MapTile> mTiles = new Dictionary<Coord, MapTile>();
     Dictionary<Coord, SpriteRenderer> mBlocks = new Dictionary<Coord, SpriteRenderer>();
     MapProxy mapProxy;
@@ -39,48 +46,155 @@ public class HexSubMapView : MonoBehaviour
         mapHexBg.transform.localPosition = new Vector3(0f, 8f, 0f);
         mapWaterBg.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
         mapWaterBg.transform.localPosition = new Vector3(0f, 8f, 0f);
+
+		if(mapBlendBg==null)
+		{
+			mapBlendBg = new GameObject();
+			mapBlendBg.name = "MapBlendBg";
+			mapBlendBg.transform.parent = mapHexBg.transform.parent;
+			//mapBlendBg = Instantiate (mapHexBg);
+		}
+		mapBlendBg.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+		mapBlendBg.transform.localPosition = new Vector3(0f, 8f, 0f);
+		mapBlendBg.transform.localScale = new Vector3 (1, 1, 1);
     }
 
-    void UpdateSprList()
+	public void UpdateSprList()
     {
-        mHexBg.spriteId.Clear();
         if (mapProxy == null)
         {
             mapProxy = GameFacade.GetProxy<MapProxy>();
         }
         List<int> sprs = mapProxy.GetSprLists(xIdx, yIdx);
-        mHexBg.spriteId.AddRange(sprs);
+
+		mHexBg.spriteId.Clear();
+		mHexBg.spriteId.AddRange(sprs);
+        
         mHexWater.spriteId.Clear();
         mHexWater.spriteId.AddRange(sprs);
+    }
+  
+    public void UpdateInterSprList()
+    {
+        if (mBlendBg)
+        {
+            MapProxy mapProxy = GameFacade.GetProxy<MapProxy>();
+
+            MapTileVO theTile = mapProxy.GetTile(mHexBg._xTile * mHexBg._x, mHexBg._yTile * mHexBg._y);
+            int theMat = theTile.mat;
+            if (theMat > 3)
+                theMat = 0;
+            mBlendBg.spriteId.Clear();
+            mBlendBg.spriteId.Add(mHexBg.spriteId[theMat]);
+            mBlendBg.spriteId.Add(0);
+            mBlendBg.spriteId.Add(0);
+            mBlendBg.spriteId.Add(0);
+
+            int leftMat = -1;
+            int prevMat = -1;
+            int diagMat = -1;
+
+            if(left!=null)
+            {
+                MapTileVO leftTile = mapProxy.GetTile(left.mHexBg._xTile * left.mHexBg._x, left.mHexBg._yTile * left.mHexBg._y);
+                leftMat = leftTile.mat;
+                if (leftMat > 3)
+                    leftMat = 0;
+            }
+            
+            if(prev!=null)
+            {
+                MapTileVO prevTile = mapProxy.GetTile(prev.mHexBg._xTile * prev.mHexBg._x, prev.mHexBg._yTile * prev.mHexBg._y);
+                prevMat = prevTile.mat;
+                if (prevMat > 3)
+                    prevMat = 0;
+            }
+
+            if (diag != null)
+            {
+                MapTileVO diagTile = mapProxy.GetTile(diag.mHexBg._xTile * diag.mHexBg._x, diag.mHexBg._yTile * diag.mHexBg._y);
+                diagMat = diagTile.mat;
+                if (diagMat > 3)
+                    diagMat = 0;
+            }
+
+            bool hasLeft = false;
+            if (left != null && left.mHexBg.spriteId.Count > 0)
+            {
+                hasLeft = true;
+            }
+
+            bool hasPrev = false;
+            if (prev != null && prev.mHexBg.spriteId.Count > 0)
+            {
+                hasPrev = true;
+            }
+
+            mBlendBg.left = hasLeft;
+            mBlendBg.prev = hasPrev;
+       
+            if (hasLeft && !hasPrev)
+            {
+                mBlendBg.spriteId[1] = left.mHexBg.spriteId[leftMat];
+            }
+
+            if (hasPrev && !hasLeft)
+            {
+                mBlendBg.spriteId[2] = prev.mHexBg.spriteId[prevMat];
+            }
+
+            if (hasLeft && hasPrev)
+            {
+                mBlendBg.spriteId[1] = left.mHexBg.spriteId[leftMat];
+                mBlendBg.spriteId[2] = prev.mHexBg.spriteId[prevMat];
+                if (diag != null && diag.mHexBg != null)
+                {
+                    mBlendBg.spriteId[3] = diag.mHexBg.spriteId[diagMat];
+                }
+            }
+        }
     }
 
     public void InitBg(bool isGenheight = true)
     {
-        if(mHexBg == null)
-        {
-            mHexBg = mapHexBg.AddComponent<THEXGON>();
-            mHexBg.isGenHeight = isGenheight;
-            mHexBg.SetBounds(
-            new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
-            new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+		if (mHexBg == null) {
+			mHexBg = mapHexBg.AddComponent<THEXGON> ();
+			mHexBg.isGenHeight = isGenheight;
+			mHexBg.SetBounds (
+				new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
+				new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+			mHexBg.Init(hex, xIdx, yIdx);
+		} else {
+			mHexBg.isGenHeight = isGenheight;
+			mHexBg.ReInit(xIdx, yIdx);
+		}
 
-            mHexWater = mapWaterBg.AddComponent<THEXWATER>();
-            mHexWater.SetBounds(
-                new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
-                new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+		if (mHexWater == null) {
+			mHexWater = mapWaterBg.AddComponent<THEXWATER> ();
+			mHexWater.SetBounds (
+				new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
+				new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+			mHexWater.Init (hex, xIdx, yIdx);
+		} else {
+			mHexWater.ReInit(xIdx, yIdx);
+		}
 
-            UpdateSprList();
+		if (mBlendBg == null) {
+			if (left != null || prev != null) {
+				mBlendBg = mapBlendBg.AddComponent<THEXBLEND> ();
+				mBlendBg.isGenHeight = isGenheight;
+				mBlendBg.SetBounds (
+					new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
+					new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+				mBlendBg.Init(hex, xIdx, yIdx);
+			}
+		} else {
+			if (left != null || prev != null) {
+				mBlendBg.ReInit (xIdx, yIdx);
+			}
+		}
 
-            mHexBg.Init(hex, xIdx, yIdx);
-            mHexWater.Init(hex, xIdx, yIdx);
-        }
-        else
-        {
-            mHexBg.isGenHeight = isGenheight;
-            UpdateSprList();
-            mHexBg.ReInit(xIdx, yIdx);
-            mHexWater.ReInit(xIdx, yIdx);
-        } 
+        UpdateSprList();
     }
 
 #if UNITY_EDITOR

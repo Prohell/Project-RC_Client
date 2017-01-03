@@ -9,7 +9,7 @@ public class SceneLoading : SceneBase
 	public override void OnEntered(object param)
 	{
 		nextId = (SceneId)param;
-		CM_Dispatcher.instance.StartCoroutine (LoadScene());
+		Game.StartCoroutine (LoadScene());
 	}
 
 	private IEnumerator LoadScene(){

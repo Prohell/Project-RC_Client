@@ -10,17 +10,18 @@ public class UICategoryConfigFile : ScriptableObject
             Name = "FullScreen",
             StartDepth = 1,
             EndDepth = 10,
-            MultiPolicy = "Single",
-            CacheNum = 1
+            MultiPolicy = "Overlay",
+            CacheNum = 1,
+            ShowingMax = 999
         },
         new UICategoryConfig()
         {
             Name = "Window",
             StartDepth = 11,
             EndDepth = 20,
-            MultiPolicy = "Overlay",
+            MultiPolicy = "Single",
             CacheNum = 3,
-            ShowingMax = 3
+            ShowingMax = 1
         },
         new UICategoryConfig()
         {

@@ -7,26 +7,26 @@ public class LuaUnitTest : MonoBehaviour
     {
         if (GUILayout.Button("Show pop 1"))
         {
-            UIManager.GetInstance().OpenUI("LuaTest1", (table) => { LuaHelper.CallFunction(table, "LuaTestView:Init"); },
-                (table) => { LuaHelper.CallFunction(table, "LuaTestView:Refresh"); });
+            UIManager.GetInstance().OpenUI("LuaTest1", (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Init"); },
+                (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Refresh"); });
         }
 
         if (GUILayout.Button("Show pop 2"))
         {
-            UIManager.GetInstance().OpenUI("LuaTest2", (table) => { LuaHelper.CallFunction(table, "LuaTestView:Init"); },
-                (table) => { LuaHelper.CallFunction(table, "LuaTestView:Refresh"); });
+            UIManager.GetInstance().OpenUI("LuaTest2", (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Init"); },
+                (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Refresh"); });
         }
 
         if (GUILayout.Button("Show pop 3"))
         {
-            UIManager.GetInstance().OpenUI("LuaTest3", (table) => { LuaHelper.CallFunction(table, "LuaTestView:Init"); },
-                (table) => { LuaHelper.CallFunction(table, "LuaTestView:Refresh"); });
+            UIManager.GetInstance().OpenUI("LuaTest3", (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Init"); },
+                (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Refresh"); });
         }
 
         if (GUILayout.Button("Show pop 4"))
         {
-            UIManager.GetInstance().OpenUI("LuaTest4", (table) => { LuaHelper.CallFunction(table, "LuaTestView:Init"); },
-                (table) => { LuaHelper.CallFunction(table, "LuaTestView:Refresh"); });
+            UIManager.GetInstance().OpenUI("LuaTest4", (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Init"); },
+                (table) => { LuaHelper.CallFunctionWithSelf(table, "LuaTestView:Refresh"); });
         }
 
         if (GUILayout.Button("Show message"))
@@ -38,6 +38,6 @@ public class LuaUnitTest : MonoBehaviour
 
     void Start()
     {
-        Destroy(TempEntrance.Instance);
+        Destroy(Main.Instance.GetComponent<TempEntrance>());
     }
 }

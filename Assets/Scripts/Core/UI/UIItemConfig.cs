@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public class UIItemConfig : ICloneable
@@ -14,15 +15,15 @@ public class UIItemConfig : ICloneable
     public string Name;
     public string ViewName;
     public string MediatorType;
-    public string BundlePath;
     public string BundleName;
+    public string AssetName;
 
     public static Dictionary<string, UIItemConfig> LoadConfig()
     {
         try
         {
 #if UNITY_EDITOR
-            return new UIItemConfigFile().UIItemList.ToDictionary(item => item.Name);
+            return ScriptableObject.CreateInstance<UIItemConfigFile>().UIItemList.ToDictionary(item => item.Name);
 #else
             return Configs.UIItemConfigFile.UIItemList.ToDictionary(item => item.Name);
 #endif

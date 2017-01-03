@@ -18,7 +18,7 @@ public class LuaHelper
         LuaManager.Instance.LuaState.Require(path);
     }
 
-    private static void LoadFileByName(string funName)
+    public static void LoadFileByFuncName(string funName)
     {
         int index = funName.LastIndexOf(".");
         if (index >= 0)
@@ -28,9 +28,9 @@ public class LuaHelper
         LoadFile(funName);
     }
 
-    public static object[] CallStaticFunction(string funName, params object[] args)
+    public static object[] CallFunction(string funName, params object[] args)
     {
-        LoadFileByName(funName);
+        LoadFileByFuncName(funName);
 
         var fun = LuaManager.Instance.LuaState.GetFunction(funName);
         var returnObjects = fun.Call(args);
@@ -39,14 +39,14 @@ public class LuaHelper
         return returnObjects;
     }
 
-    public static object[] CallFunction(LuaTable instance, string funName, params object[] args)
+    public static object[] CallFunctionWithSelf(LuaTable self, string funName, params object[] args)
     {
         funName = funName.Replace(":", ".");
 
-        LoadFileByName(funName);
+        LoadFileByFuncName(funName);
 
         var fun = LuaManager.Instance.LuaState.GetFunction(funName);
-        var returnObjects = fun.Call(instance, args);
+        var returnObjects = fun.Call(self, args);
         fun.Dispose();
 
         return returnObjects;
@@ -89,7 +89,7 @@ public class LuaHelper
     /// <param name="gb"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static LuaTable GetComponent(GameObject gb, string name)
+    public static LuaTable GetLuaComponent(GameObject gb, string name)
     {
         LuaOutlet[] facade = gb.GetComponents<LuaOutlet>();
         if (facade.Length == 0)
@@ -137,7 +137,7 @@ public class LuaHelper
     /// <param name="gb"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static List<LuaTable> GetComponents(GameObject gb, string name)
+    public static List<LuaTable> GetLuaComponents(GameObject gb, string name)
     {
         LuaOutlet[] facade = gb.GetComponents<LuaOutlet>();
         if (facade.Length == 0)
@@ -177,21 +177,19 @@ public class LuaHelper
 
     public static LuaTable GetNewTable()
     {
-        return CallStaticFunction("LuaScriptHelper.NewTable")[0] as LuaTable;
+        return CallFunction("LuaScriptHelper.NewTable")[0] as LuaTable;
     }
 
     #endregion
 
-    public static void LoadBundleGB(string assetBundleName, string assetName, LuaFunction function)
+    public static void LoadBundleGB(string assetBundleName, string assetName, Action<GameObject> OnLoadDone)
     {
-        CM_Dispatcher.instance.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(assetBundleName, assetName,
-            DelegateFactory.Callback_UnityEngine_GameObject(function, null, false) as Callback<GameObject>));
+        Game.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(assetBundleName, assetName, OnLoadDone));
     }
 
-    public static void LoadBundleGB(string assetBundleName, string assetName, LuaTable instance, LuaFunction function)
+	public static void LoadBundleGB(string assetBundleName, string assetName, LuaTable instance, Action<GameObject> OnLoadDone)
     {
-        CM_Dispatcher.instance.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(assetBundleName, assetName,
-            DelegateFactory.Callback_UnityEngine_GameObject(function, instance, true) as Callback<GameObject>));
+        Game.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(assetBundleName, assetName, OnLoadDone));
     }
 
     public static void AddListener(DelegateUtil.VoidDelegate source, object dest)

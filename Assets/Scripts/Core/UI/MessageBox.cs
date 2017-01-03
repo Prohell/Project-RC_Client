@@ -14,7 +14,7 @@ public partial class UIManager
                 view["InfoStr"] = msgText;
                 view["OKCallBack"] = okCallBack;
                 view["CancelCallBack"] = cancelCallBack;
-                LuaHelper.CallFunction(view, "MessageBoxView:Init");
+                LuaHelper.CallFunctionWithSelf(view, "MessageBoxView:Init");
             });
     }
 }

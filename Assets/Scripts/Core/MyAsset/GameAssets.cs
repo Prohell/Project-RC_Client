@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
@@ -39,7 +40,7 @@ public class GameAssets {
 		//加载 所有表文件并缓存
 		yield return LoadAndSaveTables ();
 		//加载 所有表文件并缓存
-		yield return LoadAndSaveLuaScripts ();
+//		yield return LoadAndSaveLuaScripts ();
 	}
 
 
@@ -192,10 +193,10 @@ public class GameAssets {
 		return totalSize;
 	}
 
-	static public IEnumerator LoadAssetBundle(string assetBundleName, Callback<AssetBundle> callback = null){
+	static public IEnumerator LoadAssetBundle(string assetBundleName, Action<AssetBundle> callback = null){
 		yield return AssetLoadManager.LoadAssetBundle (assetBundleName, callback);
 	}
-	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T : Object{
+	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Action<T> callback)where T : UnityEngine.Object{
 		yield return AssetLoadManager.LoadAssetAsync<T> (assetBundleName, assetName, callback);
 	}
 	static public void AddBundleRef(string bundleName){
@@ -212,7 +213,7 @@ public class GameAssets {
 	}
 
 	//反向查找资源并缓存加载
-	static public IEnumerator LoadAssetAsyncByFileName<T>(string fileName, Callback<T> callback)where T : Object{
+	static public IEnumerator LoadAssetAsyncByFileName<T>(string fileName, Action<T> callback)where T : UnityEngine.Object{
 		List<AssetInfo> infos = new List<AssetInfo>();
 
 		StringBuilder strBuilder = new StringBuilder();

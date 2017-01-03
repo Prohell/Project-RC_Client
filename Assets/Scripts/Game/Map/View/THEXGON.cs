@@ -12,6 +12,7 @@ public class THEXGON : MonoBehaviour
     /// 是否有高度
     /// </summary>
     public bool isGenHeight = true;
+	public bool isBlend = false;
     
     //Unity3D中包围盒
     private Bounds _bound;
@@ -30,10 +31,16 @@ public class THEXGON : MonoBehaviour
     private System.WeakReference _weak_hex;
     //private WeakReference _weak_mat;
     //private WeakReference _weak_mesh;
-    private int _x;
-    private int _y;
-    private int _xTile;
-    private int _yTile;
+    public int _x;
+    public int _y;
+    public int _xTile;
+    public int _yTile;
+
+	public HEX GetHex()
+	{
+		var _hex = _weak_hex.Target as HEX;
+		return (HEX)_hex;
+	}
 
     /*
     private Dictionary<Camera, Camera> m_ReflectionCameras = new Dictionary<Camera, Camera>(); // Camera -> Camera table
@@ -104,7 +111,7 @@ public class THEXGON : MonoBehaviour
     }
 
     private MaterialPropertyBlock _block = null;
-    private MaterialPropertyBlock UpdateBlock()
+    public MaterialPropertyBlock UpdateBlock()
     {
         if (_block == null)
         {
@@ -113,13 +120,22 @@ public class THEXGON : MonoBehaviour
         HEX hex = _weak_hex.Target as HEX;
         Dictionary<int, int> TSet = new Dictionary<int, int>();
         List<Vector4> TArray = new List<Vector4>();
-        for (int i = 0; i < spriteId.Count; i++)
+        for (int i = 0; i < spriteId.Count; i++){
+			Vector4 pos = hex.GetSpritePosInfoByName(spriteId[i]);
+			TArray.Add(pos);
+		}	
+		if(TArray.Count!=0){
+			_block.SetVectorArray("_ARRAY", TArray.ToArray());
+		}
+
+		_block.SetTexture("_ATLAS", hex.altasTexture);
+
+        var mr = gameObject.GetComponent<MeshRenderer>();
+        if (mr != null)
         {
-            Vector4 pos = hex.GetSpritePosInfoByName(spriteId[i]);
-            TArray.Add(pos);
+            mr.SetPropertyBlock(_block);
         }
-        _block.SetTexture("_ATLAS", hex.altasTexture);
-        _block.SetVectorArray("_ARRAY", TArray.ToArray());
+
         return _block;
     }
 
@@ -146,7 +162,7 @@ public class THEXGON : MonoBehaviour
 
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
 		mr.sharedMaterials = _hex.GetTerrainMats();
-        UpdateBlock();
+        //UpdateBlock();
         mr.SetPropertyBlock(_block);
 
         //_weak_mat = new WeakReference(mr.material);
@@ -213,11 +229,12 @@ public class THEXGON : MonoBehaviour
         {
             lst = new int[siz];
         }
+
         for (int i = 0; i < siz; i++) { lst[i] = -1; }
 
-
         element e = new element();
-        _reindex reindex = (ref element _elm, int _ver, int _col, int _row) =>
+
+		_reindex reindex = (ref element _elm, int _ver, int _col, int _row) =>
         {
             MapTileVO tileVo = mapProxy.GetTile(_col + _hex.xTile * _x, _row + _hex.yTile * _y);
             int loc = ((_row + 1) * (_hex.xTile + 1) + (_col + 1)) * 8 + _ver;
@@ -236,6 +253,28 @@ public class THEXGON : MonoBehaviour
             float _R = Tx * 2.0f + _hex.fvHex.x;
 
             int m = tileVo.mat;
+
+            /*
+			// sz test
+			if(_x==0 && _y==0)
+			{
+				m=0;
+			}
+			else if(_x==1 && _y==0)
+			{
+				m=0;
+			}
+			else if(_x==0 && _y==1)
+			{
+				m=0;
+			}
+			else if(_x==1 && _y==1)
+			{
+				m=0;
+			}
+            // sz test
+            */
+			
             int n = isGenHeight ? tileVo.height : MapConst.MAP_HEIGHT_HORIZON;
             if (m == 8)
             {
@@ -263,8 +302,10 @@ public class THEXGON : MonoBehaviour
 
             _elm.vHex.Add(hexgon[_ver] + _v);
 			_elm.vNor.Add (_n);
-            _elm.vClr.Add(_c);
-            _elm.vTan.Add(_t);
+
+			_elm.vClr.Add(_c);
+			_elm.vTan.Add(_t);
+
             _elm.vTex.Add(_u);
             return idx;
         };
@@ -279,6 +320,7 @@ public class THEXGON : MonoBehaviour
             }
             return true;
         };
+
         int nHexIndices, nIndexOffset;
 
 #if HEXGON0
@@ -308,11 +350,23 @@ public class THEXGON : MonoBehaviour
 
         List<int> vIdx = new List<int>();
 		List<int> vSub = new List<int>();
+		List<int> vBld = new List<int>();
         bool pass = true;
-        for (int y = 0; y < _yTile; y++)
+        
+		Color R=new Color(1,0,0,1);
+		Color G=new Color(0,1,0,1);
+		Color B=new Color(0,0,1,1);
+		Color C1=new Color(1,1,1,1);
+		Color C0=new Color(0,0,0,0);
+		Vector4 V1=new Vector4(1,1,1,1);
+		Vector4 V0=new Vector4(0,0,0,0);
+
+		for (int y = 0; y < _yTile; y++)
         {
             for (int x = 0; x < _xTile; x++)
+			//int x=0;
             {
+				// hexgon
 				for (int i = 0; i < nHexIndices; i++)
                 {
 					if( recheck(tdx[i], x, y) == true )
@@ -330,12 +384,18 @@ public class THEXGON : MonoBehaviour
 
                 if (IsValid(ww, y))
                 {
+					// block 0
                     pass = true;
                     pass &= recheck(edx[0][0] - nIndexOffset, x, y);
                     pass &= recheck(edx[0][1] - nIndexOffset, x, y);
                     pass &= recheck(edx[0][2] - nIndexOffset, ww, y);
+					
+					bool bBld=false;
+					if(x==0 && isBlend)
+						bBld=true;
 
-					if( pass == true ){
+					if( pass == true && !bBld)
+					{
 						vSub.Add( reindex(ref e, edx[0][0] - nIndexOffset, x, y) );
 						vSub.Add( reindex(ref e, edx[0][1] - nIndexOffset, x, y) );
 						vSub.Add( reindex(ref e, edx[0][2] - nIndexOffset, ww, y) );
@@ -346,12 +406,14 @@ public class THEXGON : MonoBehaviour
                     pass &= recheck(edx[0][4] - nIndexOffset, ww, y);
                     pass &= recheck(edx[0][5] - nIndexOffset, x, y);
 
-					if( pass == true ){
+					if( pass == true && !bBld)
+					{
 						vSub.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y));
 						vSub.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y));
 						vSub.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y));
 					}
 
+					// triangle 0
 					if ( IsValid(nw, y+1) )
 					{
 						pass = true;
@@ -359,13 +421,15 @@ public class THEXGON : MonoBehaviour
 						pass &= recheck(edx[3][1] - nIndexOffset, ww, y);
 						pass &= recheck(edx[3][2] - nIndexOffset, nw, y+1);
 
-						if ( pass == true ){
+						if ( pass == true && !bBld)
+						{
 							vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y));
 							vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y));
 							vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y+1));
 						}
 					}
-
+				
+					// triangle 5
                     if (IsValid(sw, y - 1))
                     {
                         pass = true;
@@ -373,7 +437,11 @@ public class THEXGON : MonoBehaviour
                         pass &= recheck(edx[3][4] - nIndexOffset, sw, y - 1);
                         pass &= recheck(edx[3][5] - nIndexOffset, ww, y);            
 
-						if ( pass == true ){
+						if(y==0 && isBlend)
+							bBld=true;
+
+						if ( pass == true && !bBld)
+						{
 							vSub.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y));
 							vSub.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y-1));
 							vSub.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y));
@@ -381,14 +449,20 @@ public class THEXGON : MonoBehaviour
                     }
                 }
 
-                if (IsValid(sw, y - 1))
-                {
-                    pass = true;
-                    pass &= recheck(edx[1][0] - nIndexOffset, x, y);
-                    pass &= recheck(edx[1][1] - nIndexOffset, x, y);
-                    pass &= recheck(edx[1][2] - nIndexOffset, sw, y - 1);
+				if (IsValid(sw, y - 1))
+				{
+					// block 5
+					pass = true;
+					pass &= recheck(edx[1][0] - nIndexOffset, x, y);
+					pass &= recheck(edx[1][1] - nIndexOffset, x, y);
+					pass &= recheck(edx[1][2] - nIndexOffset, sw, y - 1);
 
-					if ( pass == true ){
+					bool bBld=false;
+					if( (x==0 && y%2==0 || y==0) && isBlend )
+						bBld=true;
+			
+					if ( pass == true && !bBld)
+					{
 						vSub.Add(reindex(ref e, edx[1][0] - nIndexOffset, x, y));
 						vSub.Add(reindex(ref e, edx[1][1] - nIndexOffset, x, y));
 						vSub.Add(reindex(ref e, edx[1][2] - nIndexOffset, sw, y-1));
@@ -399,24 +473,31 @@ public class THEXGON : MonoBehaviour
 					pass &= recheck(edx[1][4] - nIndexOffset, sw, y-1);
 					pass &= recheck(edx[1][5] - nIndexOffset, x, y);
 
-					if ( pass == true ){
+					if ( pass == true && !bBld)
+					{
 						vSub.Add(reindex(ref e, edx[1][3] - nIndexOffset, sw, y-1));
 						vSub.Add(reindex(ref e, edx[1][4] - nIndexOffset, sw, y-1));
 						vSub.Add(reindex(ref e, edx[1][5] - nIndexOffset, x, y));
 					}
-                }
+				}
 
                 if (IsValid(nw, y + 1))
                 {
+					// block 1
                     pass = true;
                     pass &= recheck(edx[2][0] - nIndexOffset, x, y);
                     pass &= recheck(edx[2][1] - nIndexOffset, x, y);
                     pass &= recheck(edx[2][2] - nIndexOffset, nw, y + 1);
 
-					if( pass == true ){
+					bool bBld=false;
+					if(x==0 && y%2==0 && isBlend)
+						bBld=true;
+					
+					if( pass == true && !bBld)
+					{
 						vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y));
 						vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y));
-						vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y+1));
+						vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y+1));	
 					}
 
 					pass = true;
@@ -424,62 +505,22 @@ public class THEXGON : MonoBehaviour
 					pass &= recheck(edx[2][4] - nIndexOffset, nw, y+1);
 					pass &= recheck(edx[2][5] - nIndexOffset, x, y);
 
-					if( pass == true ){
+					if( pass == true && !bBld)
+					{
 						vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, nw, y+1));
 						vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, nw, y+1));
-						vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y));
+						vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y));	
 					}
                 }
-
-                if (y == 0)
-                {
-                    // we only patch west, north west, south west, which leaves crack in zero line 
-                    if (IsValid(x, y - 1))
-                    {
-                        pass = true;
-                        pass &= recheck(edx[2][3] - nIndexOffset, x, y);
-                        pass &= recheck(edx[2][4] - nIndexOffset, x, y);
-                        pass &= recheck(edx[2][5] - nIndexOffset, x, y - 1);
-
-						if( pass == true ){
-							vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, x, y));
-							vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, x, y));
-							vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y-1));
-						}
-
-						pass = true;
-						pass &= recheck(edx[2][0] - nIndexOffset, x, y-1);
-						pass &= recheck(edx[2][1] - nIndexOffset, x, y-1);
-						pass &= recheck(edx[2][2] - nIndexOffset, x, y);
-
-						if ( pass == true ){
-							vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y-1));
-							vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y-1));
-							vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, x, y));
-						}
-
-						if( IsValid( x-1, y-1 ) ){
-							pass = true;
-							pass &= recheck(edx[3][0] - nIndexOffset, x, y-1);
-							pass &= recheck(edx[3][1] - nIndexOffset, x-1, y-1);
-							pass &= recheck(edx[3][2] - nIndexOffset, x, y);
-
-							if ( pass == true ){
-								vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y-1));
-								vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, x-1, y-1));
-								vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, x, y));
-							}
-						}
-					}
-				}
 			}
         }
 
 		Mesh me = new Mesh(); 
-		me.subMeshCount = 2;
+		me.subMeshCount = 3;
 		me.vertices = e.vHex.ToArray();
 		me.SetTriangles(vIdx.ToArray(), 0);
-		me.SetTriangles(vSub.ToArray(),1);
+		me.SetTriangles(vSub.ToArray(), 1);
+		me.SetTriangles(vBld.ToArray(), 2);
 		me.normals = e.vNor.ToArray();
 		me.colors = e.vClr.ToArray();
 		me.tangents = e.vTan.ToArray(); 
@@ -500,7 +541,7 @@ public class THEXGON : MonoBehaviour
 		}
 		mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		mr.sharedMaterials =  _hex.GetTerrainMats();
-		mr.SetPropertyBlock(UpdateBlock());
+		//mr.SetPropertyBlock(UpdateBlock());
     }
 
     private void OnDrawGizmos()

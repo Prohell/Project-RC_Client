@@ -11,7 +11,10 @@ namespace SPacket.SocketInstance
  {
  GC_OBJPOSLIST packet = (GC_OBJPOSLIST )ipacket;
  if (null == packet) return (uint)PACKET_EXE.PACKET_EXE_ERROR;
- //enter your logic
+            //enter your logic
+            BattleProxy proxy = GameFacade.GetProxy<BattleProxy>();
+            proxy.CurrentObjPos = packet;
+            EventManager.GetInstance().SendEvent(EventId.ReceiveSquadPosInfor, packet);            
  return (uint)PACKET_EXE.PACKET_EXE_CONTINUE;
  }
  }

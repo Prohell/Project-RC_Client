@@ -8,15 +8,16 @@ public class LuaHelperWrap
 	{
 		L.BeginClass(typeof(LuaHelper), typeof(System.Object));
 		L.RegFunction("LoadFile", LoadFile);
-		L.RegFunction("CallStaticFunction", CallStaticFunction);
+		L.RegFunction("LoadFileByFuncName", LoadFileByFuncName);
 		L.RegFunction("CallFunction", CallFunction);
+		L.RegFunction("CallFunctionWithSelf", CallFunctionWithSelf);
 		L.RegFunction("LoadGB", LoadGB);
 		L.RegFunction("GetTypeInAll", GetTypeInAll);
 		L.RegFunction("GetTypeInUnityEngine", GetTypeInUnityEngine);
 		L.RegFunction("GetTypeInNGUI", GetTypeInNGUI);
-		L.RegFunction("GetComponent", GetComponent);
+		L.RegFunction("GetLuaComponent", GetLuaComponent);
 		L.RegFunction("GetOutletComponent", GetOutletComponent);
-		L.RegFunction("GetComponents", GetComponents);
+		L.RegFunction("GetLuaComponents", GetLuaComponents);
 		L.RegFunction("GetNewTable", GetNewTable);
 		L.RegFunction("LoadBundleGB", LoadBundleGB);
 		L.RegFunction("AddListener", AddListener);
@@ -66,16 +67,14 @@ public class LuaHelperWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CallStaticFunction(IntPtr L)
+	static int LoadFileByFuncName(IntPtr L)
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
+			ToLua.CheckArgsCount(L, 1);
 			string arg0 = ToLua.CheckString(L, 1);
-			object[] arg1 = ToLua.ToParamsObject(L, 2, count - 1);
-			object[] o = LuaHelper.CallStaticFunction(arg0, arg1);
-			ToLua.Push(L, o);
-			return 1;
+			LuaHelper.LoadFileByFuncName(arg0);
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -89,10 +88,28 @@ public class LuaHelperWrap
 		try
 		{
 			int count = LuaDLL.lua_gettop(L);
+			string arg0 = ToLua.CheckString(L, 1);
+			object[] arg1 = ToLua.ToParamsObject(L, 2, count - 1);
+			object[] o = LuaHelper.CallFunction(arg0, arg1);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CallFunctionWithSelf(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
 			LuaTable arg0 = ToLua.CheckLuaTable(L, 1);
 			string arg1 = ToLua.CheckString(L, 2);
 			object[] arg2 = ToLua.ToParamsObject(L, 3, count - 2);
-			object[] o = LuaHelper.CallFunction(arg0, arg1, arg2);
+			object[] o = LuaHelper.CallFunctionWithSelf(arg0, arg1, arg2);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -171,14 +188,14 @@ public class LuaHelperWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetComponent(IntPtr L)
+	static int GetLuaComponent(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			string arg1 = ToLua.CheckString(L, 2);
-			LuaInterface.LuaTable o = LuaHelper.GetComponent(arg0, arg1);
+			LuaInterface.LuaTable o = LuaHelper.GetLuaComponent(arg0, arg1);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -207,14 +224,14 @@ public class LuaHelperWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetComponents(IntPtr L)
+	static int GetLuaComponents(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			string arg1 = ToLua.CheckString(L, 2);
-			System.Collections.Generic.List<LuaInterface.LuaTable> o = LuaHelper.GetComponents(arg0, arg1);
+			System.Collections.Generic.List<LuaInterface.LuaTable> o = LuaHelper.GetLuaComponents(arg0, arg1);
 			ToLua.PushObject(L, o);
 			return 1;
 		}
@@ -247,20 +264,44 @@ public class LuaHelperWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(LuaInterface.LuaFunction)))
+			if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(System.Action<UnityEngine.GameObject>)))
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				LuaFunction arg2 = ToLua.ToLuaFunction(L, 3);
+				System.Action<UnityEngine.GameObject> arg2 = null;
+				LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+				if (funcType3 != LuaTypes.LUA_TFUNCTION)
+				{
+					 arg2 = (System.Action<UnityEngine.GameObject>)ToLua.ToObject(L, 3);
+				}
+				else
+				{
+					LuaFunction func = ToLua.ToLuaFunction(L, 3);
+					arg2 = DelegateFactory.CreateDelegate(typeof(System.Action<UnityEngine.GameObject>), func) as System.Action<UnityEngine.GameObject>;
+				}
+
 				LuaHelper.LoadBundleGB(arg0, arg1, arg2);
 				return 0;
 			}
-			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(LuaInterface.LuaTable), typeof(LuaInterface.LuaFunction)))
+			else if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string), typeof(LuaInterface.LuaTable), typeof(System.Action<UnityEngine.GameObject>)))
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
 				LuaTable arg2 = ToLua.ToLuaTable(L, 3);
-				LuaFunction arg3 = ToLua.ToLuaFunction(L, 4);
+				System.Action<UnityEngine.GameObject> arg3 = null;
+				LuaTypes funcType4 = LuaDLL.lua_type(L, 4);
+
+				if (funcType4 != LuaTypes.LUA_TFUNCTION)
+				{
+					 arg3 = (System.Action<UnityEngine.GameObject>)ToLua.ToObject(L, 4);
+				}
+				else
+				{
+					LuaFunction func = ToLua.ToLuaFunction(L, 4);
+					arg3 = DelegateFactory.CreateDelegate(typeof(System.Action<UnityEngine.GameObject>), func) as System.Action<UnityEngine.GameObject>;
+				}
+
 				LuaHelper.LoadBundleGB(arg0, arg1, arg2, arg3);
 				return 0;
 			}

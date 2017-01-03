@@ -15,21 +15,10 @@
         {
             if (_input.GetTouchCount() > 0)
             {
-
-                if (UICamera.lastHit.collider != null)
-                {
-                    return false;
-                }
-                else
-                {
-                    //bool uiHold = App.GUIMgr != null && !App.GUIMgr.MouseEnabled;
-                    //if (uiHold){
-                    //	return false;
-                    //}
-                    //else{
-                    return true;
-                    //}
-                }
+				if (UICamera.isOverUI) {
+					return false;
+				}
+				return true;
             }
             else
             {

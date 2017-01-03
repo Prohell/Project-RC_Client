@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
@@ -78,7 +79,7 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 	}
 
 
-	public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback) where T:Object{
+	public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Action<T> callback) where T : UnityEngine.Object{
 		//未初始化先初始化
 		if(!hasInit){
 			yield return Init ();
@@ -92,7 +93,7 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 		yield return request;
 		if(request.isDone){
 			if (request.asset != null) {
-				Object obj = request.asset;
+				UnityEngine.Object obj = request.asset;
 				callback (obj as T);
 			} else {
 				#if UNITY_EDITOR
@@ -103,7 +104,7 @@ public class ReleaseLoader :  IAssetAsyncLoader {
 		}
 	}
 
-	public IEnumerator LoadAssetBundle(string assetBundleName, Callback<AssetBundle> callback = null){
+	public IEnumerator LoadAssetBundle(string assetBundleName, Action<AssetBundle> callback = null){
 		if(bundleDic.ContainsKey(assetBundleName)){
 			yield break;
 		}

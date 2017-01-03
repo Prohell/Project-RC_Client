@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using InputKit;
 
 public class CameraMove : MonoBehaviour {
@@ -19,6 +20,11 @@ public class CameraMove : MonoBehaviour {
 	[Tooltip("摄像机X轴角度的变化范围")]
 	public Vector2 angleXRange;
 
+	public Action<List<GameObject>> gameObjectClick;
+	public Action dragBegin;
+	public Action dragEnd;
+	public Action pinchBegin;
+	public Action pinchEnd;
 	void Start()
 	{
 		InitInteractive ();
@@ -74,6 +80,9 @@ public class CameraMove : MonoBehaviour {
 
 	void OnDragBegin(Vector2 pos){
 		isInertia = false;
+		if(dragBegin != null){
+			dragBegin ();
+		}
 	}
 
 	void OnDrag(Vector2 curPos, Vector2 deltaPos)
@@ -122,13 +131,18 @@ public class CameraMove : MonoBehaviour {
 			deltaPos *= (1.0f - (Time.deltaTime * 2));
 			yield return null;
 		}
+		if(dragEnd != null){
+			dragEnd ();
+		}
 		yield break;
 	}
 
 
 	void OnPinchBegin(Vector2 pos0, Vector2 pos1)
 	{
-		
+		if(pinchBegin != null){
+			pinchBegin ();
+		}
 	}
 
 	void OnPinch(Vector2 pos0, Vector2 delta0, Vector2 pos1, Vector2 delta1) 
@@ -172,20 +186,23 @@ public class CameraMove : MonoBehaviour {
 
 	void OnPinchEnd(Vector2 pos0, Vector2 pos1)
 	{
-		
+		if(pinchEnd != null){
+			pinchEnd ();
+		}
 	}
 
-
-	public Action<GameObject> gameObjectClick;
+	List<GameObject> list = new List<GameObject> ();
 	void OnClick(Vector2 screenPos)
 	{
 		Ray ray = cam.ScreenPointToRay(screenPos);
 		RaycastHit[] hits = Physics.RaycastAll(ray);
 
+		list.Clear ();
 		for(int i = 0;i < hits.Length;i++){
-			if(gameObjectClick != null){
-				gameObjectClick (hits [i].collider.gameObject);
-			}
+			list.Add (hits [i].collider.gameObject);
+		}
+		if(gameObjectClick != null){
+			gameObjectClick (list);
 		}
 		_dragGesture.Reset ();
 	}

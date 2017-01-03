@@ -14,7 +14,7 @@ public class LuaTestProxy : IProxy
 
     public void StartUpdateData()
     {
-        CM_Dispatcher.instance.StartCoroutine(UpdateData());
+		Game.StartCoroutine(UpdateData());
     }
 
     private IEnumerator UpdateData()
@@ -29,7 +29,7 @@ public class LuaTestProxy : IProxy
 
         EventManager.GetInstance().SendEvent(EventId.LuaTestUpdate, null);
 
-        CM_Dispatcher.instance.StartCoroutine(UpdateData());
+		Game.StartCoroutine(UpdateData());
     }
 
     public void OnDestroy()

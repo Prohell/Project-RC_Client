@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public interface IAssetAsyncLoader {
 
 	IEnumerator Init();
-	IEnumerator LoadAssetBundle (string assetBundleName, Callback<AssetBundle> callback = null);
-	IEnumerator LoadAssetAsync<T> (string assetBundleName, string assetName, Callback<T> callback)where T:Object;
+	IEnumerator LoadAssetBundle (string assetBundleName, Action<AssetBundle> callback = null);
+	IEnumerator LoadAssetAsync<T> (string assetBundleName, string assetName, Action<T> callback)where T : UnityEngine.Object;
 
 	void GetBundleNeedLoads (string bundleName, List<string> needLoad);
 	long GetBundleSize (string assetBundleName);

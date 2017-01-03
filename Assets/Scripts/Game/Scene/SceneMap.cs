@@ -11,7 +11,8 @@ public class SceneMap : SceneBase
     {
         ProxyManager.GetInstance().Add(new MapProxy());
         GameFacade.AddMediator(new MapMediator(), MapView.Current.gameObject);
-        Game.TaskManager.Exec(MapView.Current.Init());
+		Game.StartCoroutine (MapView.Current.Init());
+//        Game.TaskManager.Exec(MapView.Current.Init());
         UpdateManager.GetInstance().StartHeartBeat();
     }
 

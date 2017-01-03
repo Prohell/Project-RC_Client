@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,11 +34,11 @@ public class AssetLoadManager{
 	}
 
 	//加载Bundle并缓存
-	static public IEnumerator LoadAssetBundle(string assetBundleName, Callback<AssetBundle> callback = null){
+	static public IEnumerator LoadAssetBundle(string assetBundleName, Action<AssetBundle> callback = null){
 		yield return loader.LoadAssetBundle (assetBundleName, callback);
 	}
 	//加载Bundle缓存 并加载资源
-	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T : Object{
+	static public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Action<T> callback)where T : UnityEngine.Object{
 		yield return loader.LoadAssetAsync<T> (assetBundleName, assetName, callback);
 	}
 
@@ -65,7 +66,7 @@ public class AssetLoadManager{
 		loader.GetBundleNeedLoads (bundleName, needLoad);
 	}
 
-	static public IEnumerator LoadFromResource<T>(string assetPath, Callback<T> callback = null)where T : Object{
+	static public IEnumerator LoadFromResource<T>(string assetPath, Action<T> callback = null)where T : UnityEngine.Object{
 		ResourceRequest request = Resources.LoadAsync(assetPath,typeof(T));
 		yield return request;
 		if(request.isDone){
@@ -76,7 +77,7 @@ public class AssetLoadManager{
 	}
 
 	//开发测试时 可以直接调用此方法从Resource目录加载资源 最后统一替换
-	static public IEnumerator LoadFromResource(string assetPath, Callback<Object> callback = null){
+	static public IEnumerator LoadFromResource(string assetPath, Action<UnityEngine.Object> callback = null){
 		ResourceRequest request = Resources.LoadAsync(assetPath);
 		yield return request;
 		if(request.isDone){

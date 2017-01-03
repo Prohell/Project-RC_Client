@@ -201,23 +201,6 @@ private static Dictionary<int, List<Tab_BuildBarracks> > g_BuildBarracks = new D
  }
  return true;
  }
-private static Dictionary<int, List<Tab_CityBuilding> > g_CityBuilding = new Dictionary<int, List<Tab_CityBuilding> >(); 
- public static bool InitTable_CityBuilding()
- {
- g_CityBuilding.Clear();
- Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
- if (!Tab_CityBuilding.LoadTable(tmps)) return false;
- foreach (KeyValuePair<int, List<object> > kv in tmps)
- {
- List<Tab_CityBuilding> values = new List<Tab_CityBuilding>();
- foreach (object subit in kv.Value)
- {
- values.Add((Tab_CityBuilding)subit);
- }
- g_CityBuilding.Add(kv.Key, values);
- }
- return true;
- }
 private static Dictionary<int, List<Tab_CityBuildingDefault> > g_CityBuildingDefault = new Dictionary<int, List<Tab_CityBuildingDefault> >(); 
  public static bool InitTable_CityBuildingDefault()
  {
@@ -344,8 +327,6 @@ public bool InitTable()
 
 bRet &= InitTable_BuildBarracks();
 
-bRet &= InitTable_CityBuilding();
-
 bRet &= InitTable_CityBuildingDefault();
 
 bRet &= InitTable_CityBuildingLevel();
@@ -430,40 +411,6 @@ public static List<Tab_BuildBarracks> GetBuildBarracksByID(int nKey)
  InitTable_BuildBarracks();
  }
  return g_BuildBarracks;
- }
-
-public static List<Tab_CityBuilding> GetCityBuildingByID(int nKey)
- {
- if(g_CityBuilding.Count==0)
- {
- InitTable_CityBuilding();
- }
- if( g_CityBuilding.ContainsKey(nKey))
- {
- return g_CityBuilding[nKey];
- }
- return null;
- }
- public static Tab_CityBuilding GetCityBuildingByID(int nKey, int nIndex)
- {
- if(g_CityBuilding.Count==0)
- {
- InitTable_CityBuilding();
- }
- if( g_CityBuilding.ContainsKey(nKey))
- {
- if(nIndex>=0 && nIndex<g_CityBuilding[nKey].Count)
- return g_CityBuilding[nKey][nIndex];
- }
- return null;
- }
- public static Dictionary<int, List<Tab_CityBuilding> > GetCityBuilding()
- {
- if(g_CityBuilding.Count==0)
- {
- InitTable_CityBuilding();
- }
- return g_CityBuilding;
  }
 
 public static List<Tab_CityBuildingDefault> GetCityBuildingDefaultByID(int nKey)

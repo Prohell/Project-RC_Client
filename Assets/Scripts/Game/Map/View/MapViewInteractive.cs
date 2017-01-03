@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using DG.Tweening;
 
 public partial class MapView
 {
@@ -303,6 +304,7 @@ public partial class MapView
 
         if (_clickAnimationing)
         {
+
             Go.killAllTweensWithTarget(MapCamera.transform);
             _clickAnimationing = false;
         }

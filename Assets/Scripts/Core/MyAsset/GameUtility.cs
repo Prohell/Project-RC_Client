@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
@@ -121,7 +122,7 @@ public class GameUtility {
 
 
 	static public AssetsInfo assetsInfo;
-	static public IEnumerator LoadAssetsInfo(Callback<AssetsInfo> callback = null){
+	static public IEnumerator LoadAssetsInfo(Action<AssetsInfo> callback = null){
 		if (assetsInfo == null) {
 			yield return LoadFromJson<AssetsInfo> (GameUtility.StreamingHotfixPathFull, "AssetsInfo", (config) => {
 				assetsInfo = config;
@@ -133,7 +134,7 @@ public class GameUtility {
 	}
 
 	static public BundlesInfo bundlesInfo;
-	static public IEnumerator LoadBundlesInfo(Callback<BundlesInfo> callback = null){
+	static public IEnumerator LoadBundlesInfo(Action<BundlesInfo> callback = null){
 		if (bundlesInfo == null) {
 			yield return LoadFromJson<BundlesInfo> (GameUtility.StreamingHotfixPathFull, "BundlesInfo", (config) => {
 				bundlesInfo = config;
@@ -144,7 +145,7 @@ public class GameUtility {
 		}
 	}
 
-	static public IEnumerator LoadFromJson<T>(string path, string name, Callback<T> callback = null){
+	static public IEnumerator LoadFromJson<T>(string path, string name, Action<T> callback = null){
 		yield return GameLoader.LoadText (path + "/" + name + ".txt", (str) => {
 			T config = JsonUtility.FromJson<T> (str);
 			if (callback != null) {

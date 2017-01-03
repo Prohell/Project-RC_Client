@@ -35,11 +35,9 @@ public class NetWorkLogic
     public string GetIP() { return m_strServerAddr; }
     public int GetPort() { return m_nServerPort; }
 
-    public delegate void ConnectDelegate(bool bSuccess, string result);
-    private static ConnectDelegate m_delConnect = null;
+	private static Action<bool,string> m_delConnect = null;
+	private static Action m_delConnectLost = null;
 
-    public delegate void ConnectLostDelegate();
-    private static ConnectLostDelegate m_delConnectLost = null;
     public static NetWorkLogic GetMe()
     {
         if (m_Impl == null)
@@ -92,12 +90,12 @@ public class NetWorkLogic
     public void WaitConnected() { m_connectStatus = ConnectStatus.CONNECTING; }
     public ConnectStatus GetConnectStautus() { return m_connectStatus; }
 
-    public static void SetConcnectDelegate(ConnectDelegate delConnectFun)
+	public static void SetConcnectDelegate(Action<bool,string> delConnectFun)
     {
         m_delConnect = delConnectFun;
     }
 
-    public static void SetConnectLostDelegate(ConnectLostDelegate delFun)
+	public static void SetConnectLostDelegate(Action delFun)
     {
         m_delConnectLost = delFun;
     }

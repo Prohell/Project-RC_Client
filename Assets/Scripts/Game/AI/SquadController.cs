@@ -49,6 +49,24 @@ public class SquadController : BaseController
     private SkillEffect mSkillController;
 
 
+    //TeamFormation infor
+    //the Unit radius
+    float UnitR;
+    float UnitSpaceL;
+    float UnitSpaceH;
+
+    //the space between two Column
+    float DeltaL;
+    //the space between two Row
+    float DeltaH;
+    //the Squad length
+    float SquadL;
+    //the Squad Width
+    float SquadH;
+    
+    float MaxNumberInRow;
+    float MaxNumberInColumn;
+
     void Awake()
     {
         mRichAI = GetComponent<RichAI>();
@@ -110,9 +128,6 @@ public class SquadController : BaseController
         {
             mStateMachine.StateWork();
             mThinkTime = mThinkTimeSpace;
-            /******************
-            这部分逻辑接服务器时需要去掉
-            *******************/
             if (BattleMode.Client)
             {
                 SearchAim();
@@ -150,7 +165,7 @@ public class SquadController : BaseController
                 if (temDistance <= mSquadData.GetSquadView())
                 {
                     mSearchAim = enemySquad.Value.transform;
-                    //ChangeTarget(mSearchAim);
+                    ChangeTarget(mSearchAim);
                     break;
                 }               
             }
@@ -186,12 +201,11 @@ public class SquadController : BaseController
     *******************/
     void SquadIdleGetInFunc()
     {
-        transform.LookAt(new Vector3(transform.forward.x, 0.0f, transform.forward.z), Vector3.up);
-
         if (mOriginalAim != null)
             ChangeTarget(mOriginalAim);
 
         ChangeMoving(false);
+        //StartCoroutine(IdleKeepFormation());
     }
     void SquadIdleGetOutFunc()
     {
@@ -231,7 +245,7 @@ public class SquadController : BaseController
             mAttackSpaceTimer += Time.deltaTime; 
 
         //if arrive the target Pos change the state
-        if (mAttackAim == null && mAttackAim == null)
+        if (mAttackAim == null && mSearchAim == null)
         {
             //if arrive the target Pos change the state
             if (Vector3.Distance(transform.position, mRichAI.target.transform.position) < mMinDistance)
@@ -266,21 +280,13 @@ public class SquadController : BaseController
     void SquadAttackGetInFunc()
     {
         transform.LookAt(mAttackAim, Vector3.up);
-        CastSkill();
         mAttackSpaceTimer = 0.0f;
     }
     void SquadAttackExcuteFunc()
     {
-        if (mAttackAim == null)
-        {         
-            TryOperState(StateEnum.Attack, StateOper.Exit);
-        }
-        else
-        {
-            TryOperState(StateEnum.Attack, StateOper.Exit);
+        if (mAttackAim != null)
             SquadAttackEffect();
-        }
-            
+        TryOperState(StateEnum.Attack, StateOper.Exit);
     }
     void SquadAttackGetOutFunc()
     {
@@ -297,7 +303,6 @@ public class SquadController : BaseController
     {
         if (mAttackAim == null)
             TryOperState(StateEnum.Prepare, StateOper.Exit);
-
         if (mAttackSpaceTimer >= mSquadData.GetAttackSpaceTime())
         {
             mAttackSpaceTimer = mSquadData.GetAttackSpaceTime();
@@ -316,7 +321,7 @@ public class SquadController : BaseController
     void SquadDieGetInFunc()
     {
         ChangeMoving(false);
-        LogModule.DebugLog("Squad Die");
+        //LogModule.DebugLog("Squad Die");
         gameObject.SetActive(false);
     }
     void SquadDieExcuteFunc()
@@ -328,32 +333,29 @@ public class SquadController : BaseController
 
     }
     void SquadAttackEffect()
-    {
-        
+    { 
         SquadController mAttackAimController = mAttackAim.GetComponent<SquadController>();
-        /******************
-        这部分逻辑接服务器时需要去掉
-        *******************/
-        if (BattleMode.Client)
-        {
-            //LogModule.DebugLog("SquadAttackEffect");
-
-            mAttackAimController.SetSquadHP(mAttackAimController.GetSquadData().GetSquadHP() - GetSquadData().GetAttack(),transform);
-
-            //死兵规则受伤一次死一个
-        }
+        mAttackAimController.SetSquadHP(mAttackAimController.GetSquadData().GetSquadHP() - GetSquadData().GetAttack(),transform);
     }
-
 
     public void SetSquadHP(float tHP,Transform tAttackerSquad)
     {
-        UnitDie(3, tAttackerSquad);
         mSquadData.SetSquadHP(tHP);
-        if (tHP <= 0 && mStateMachine.GetCurrentState().StateType != StateEnum.Die)
+        if (BattleMode.Client)
         {
-            EventManager.GetInstance().SendEvent(EventId.SomeSquadDie, transform);
-            TryOperState(StateEnum.Die, StateOper.Switch);
-        }
+            UnitDie(3, tAttackerSquad);
+            //LogModule.DebugLog("剩余人数: " + mUnitTransformList.Count);
+            FormationStrategy();
+            if (tHP <= 0 && mStateMachine.GetCurrentState().StateType != StateEnum.Die)
+            {
+                SquadDeath();
+            }
+        }    
+    }
+    public void SquadDeath()
+    {
+        EventManager.GetInstance().SendEvent(EventId.SomeSquadDie, transform);
+        TryOperState(StateEnum.Die, StateOper.Switch);
     }
     void TryOperState(StateEnum tAimStateEnum, StateOper tOper)
     {
@@ -395,27 +397,27 @@ public class SquadController : BaseController
                 mAttackAim = null;
             if (mSearchAim == diedTrans)
                 mSearchAim = null;
+            StartCoroutine(IdleKeepFormation());
         }
     }
+    // change the position of the Squad in the Embattling
     void ReSetPosition(object param)
     {
         BornPosInfor tBorPos = (BornPosInfor)param;
         if (tBorPos.mSquadID != mSquadData.GetID()|| tBorPos.mSquadID==-1)
             return;
 
-        UnitMarching(tBorPos.mBornPos);
+//      UnitMarching(tBorPos.mBornPos);
 
         transform.position = tBorPos.mBornPos;
         mRichAI.target.position = tBorPos.mBornPos;
 
         FormationStrategy();
 
-
-        //for (int i = 0; i < mUnitTransformList.Count; i++)
-        //{
-        //    mUnitTransformList[i].GetComponent<UnitController>().EmbattingSetPos(tBorPos.mBornPos);
-        //}
-
+        for (int i = 0; i < mUnitTransformList.Count; i++)
+        {
+            mUnitTransformList[i].GetComponent<UnitController>().EmbattingSetPos(tBorPos.mBornPos);
+        }
     }
     //
     public void ChangeMoving(bool RichAIEnable)
@@ -423,7 +425,7 @@ public class SquadController : BaseController
         mRichAI.enabled = RichAIEnable;
     }
     // chose the UnitController has lowest HP 
-    void UnitDie(int count,Transform tAttackSquad)
+    public void UnitDie(int count,Transform tAttackSquad)
     {
         if (mUnitTransformList.Count == 0)
             return;
@@ -461,6 +463,7 @@ public class SquadController : BaseController
                 }
             }
         }
+        List<Transform> tDiedRemovedTrans = new List<Transform>();
         //Select the dying Unit and the Attacker 
         for (int j = 0; j < tDiedTrans.Count; j++)
         {
@@ -468,15 +471,31 @@ public class SquadController : BaseController
             for (int i = 0; i < attackerSquadController.mUnitTransformList.Count; i++)
             {
                 tAttackerUnit = attackerSquadController.mUnitTransformList[i].GetComponent<UnitController>();
-                if (tAttackerUnit.MKillOrder == false&& (tAttackerUnit.GetUnitData().GetAttackType()& UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
+                if (tAttackerUnit.MKillOrder == false)
+                //if (tAttackerUnit.MKillOrder == false&& (tAttackerUnit.GetUnitData().GetAttackType()& UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
                 {
                     tAttackerUnit.MKillOrder = true;
                     tAttackerUnit.SetAttackSpaceTimer(tAttackerUnit.GetUnitData().GetAttackSpaceTime() + 1);
                     tAttackerUnit.SetAttackAim(tDiedTrans[j]);
-                    tDiedTrans.Remove(tDiedTrans[j]);
+                    tDiedRemovedTrans.Add(tDiedTrans[j]);
                     //LogModule.DebugLog("Foce Attack ChangeAim" + tDiedTrans[j].GetHashCode());
                     break;
                 }
+            }
+        }
+        for (int i = 0; i < tDiedRemovedTrans.Count; i++)
+        {
+            tDiedTrans.Remove(tDiedRemovedTrans[i]);
+        }
+        tDiedRemovedTrans.Clear();
+
+        if (tDiedTrans.Count > 0)
+        {
+            for (int i = 0; i < tDiedTrans.Count; i++)
+            {
+                tDiedTrans[i].GetComponent<UnitController>().TryOperState(StateEnum.Die, StateOper.Switch);
+                EventManager.GetInstance().SendEvent(EventId.SomeOneDie, tDiedTrans[i]);
+                LogModule.DebugLog("死的太快了！"+i);
             }
         }            
     }
@@ -484,7 +503,6 @@ public class SquadController : BaseController
     // Send command to all the Unit of this Squad let them to select a Enemy in the EnemyList to Attack 
     public void UnitAttackEnemy(int tEnemyId)
     {
-        List<Transform> tEnemyList = mEnemySquadDic[tEnemyId].GetUnitControllerList();
         for (int i = 0; i < mUnitTransformList.Count; i++)
         {
             mUnitTransformList[i].GetComponent<UnitController>().FindAndAttackEnemy(mEnemySquadDic[tEnemyId].transform);
@@ -493,7 +511,6 @@ public class SquadController : BaseController
     // Send command to all the Unit of this Squad let them to refresh EnemyList
     public void RefreshUnitEnemyList(int tEnemyId)
     {
-        List<Transform> tEnemyList = mEnemySquadDic[tEnemyId].GetUnitControllerList();
         for (int i = 0; i < mUnitTransformList.Count; i++)
         {
             mUnitTransformList[i].GetComponent<UnitController>().RefreshEnemyList(mEnemySquadDic[tEnemyId].transform);
@@ -518,19 +535,20 @@ public class SquadController : BaseController
     }
     public void UnitMarchAttacking(float space, Vector3 tAimPos)
     {
-        TakeCountOthers(space);
+        TakeCountOthers();
         UnitMarching(tAimPos);
     }
     // Take cout of other Unit in the Squad and adjust the Attack distance
-    public void TakeCountOthers(float space)
+    public void TakeCountOthers()
     {
+        //float space = DeltaH * Random.Range(0.5f, 1f);
+        float space = DeltaH;
         for (int i = 0; i < mUnitTransformList.Count; i++)
         {
             UnitData tUnitData = mUnitTransformList[i].GetComponent<UnitController>().GetUnitData();
-            
-            if((tUnitData.GetAttackType()&UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
+
+            if ((tUnitData.GetAttackType()&UnitAttackType.RemoteAttack) == UnitAttackType.RemoteAttack)
             {
-                space = space * Random.Range(0.5f, 1f);
                 switch (i / mSquadData.GetUnitCountOfRow())
                 {
                     case 0:
@@ -548,7 +566,7 @@ public class SquadController : BaseController
     }
     public void RefreshUnitEnemyList(int tEnemyId,float space )
     {
-        TakeCountOthers(space);
+        TakeCountOthers();
         RefreshUnitEnemyList(tEnemyId);
     }
     //Keep the formation
@@ -559,32 +577,32 @@ public class SquadController : BaseController
             mUnitTransformList[i].GetComponent<UnitController>().UnitMarching(transform.position);
         }
     }
-    
-    public void FormationStrategy(int tTeamFormationID =100001)
+    IEnumerator IdleKeepFormation()
     {
-        //float UnitR = 1;
-        //float UnitSpaceL = 1;
-        //float UnitSpaceH = 1;
+        foreach (var tUnit in mUnitTransformList)
+        {
+            yield return tUnit.GetComponent<UnitController>().CheckState();
+        }
+        //LogModule.DebugLog("All Done!");
+        FormationStrategy();
+        KeepFormation();
+    }
 
-        //float DeltaL = 2 * (UnitR + UnitSpaceL);
-        //float DeltaH = 2 * (UnitR + UnitSpaceH);
 
-        //float SquadL = 25;
-        //float SquadH = 25;
+public void FormationStrategy()
+    {
+        UnitR = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitRadius;
+        UnitSpaceL = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitSpaceL;
+        UnitSpaceH = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitSpaceH;
 
+        DeltaL = 2 * (UnitR + UnitSpaceL);
+        DeltaH = 2 * (UnitR + UnitSpaceH);
 
-        float UnitR = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitRadius;
-        float UnitSpaceL = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitSpaceL;
-        float UnitSpaceH = TableManager.GetUnitTemplateByID(mSquadData.GetUnitTemplateID())[0].UnitSpaceH;
+        SquadL = TableManager.GetTeamConfigByID(mSquadData.GetTeamFormationID())[0].SquadL;
+        SquadH = TableManager.GetTeamConfigByID(mSquadData.GetTeamFormationID())[0].SquadH;
 
-        float DeltaL = 2 * (UnitR + UnitSpaceL);
-        float DeltaH = 2 * (UnitR + UnitSpaceH);
-
-        float SquadL = TableManager.GetTeamConfigByID(mSquadData.GetTeamFormationID())[0].SquadL;
-        float SquadH = TableManager.GetTeamConfigByID(mSquadData.GetTeamFormationID())[0].SquadH;
-
-        float MaxNumberInRow = Mathf.Floor(SquadL / DeltaL);
-        float MaxNumberInColumn = Mathf.Floor(SquadH / SquadH);
+        MaxNumberInRow = Mathf.Floor(SquadL / DeltaL);
+        MaxNumberInColumn = Mathf.Floor(SquadH / SquadH);
 
         int tCurrentUnitCounts = mUnitTransformList.Count;
         float CurrentNumberInColumn = Mathf.Ceil(tCurrentUnitCounts / MaxNumberInRow);

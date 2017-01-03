@@ -24,7 +24,7 @@ public class UICategoryConfig
         try
         {
 #if UNITY_EDITOR
-            return new UICategoryConfigFile().UICategoryList.ToDictionary(item => item.Name);
+            return ScriptableObject.CreateInstance<UICategoryConfigFile>().UICategoryList.ToDictionary(item => item.Name);
 #else
             return Configs.UICategoryConfigFile.UICategoryList.ToDictionary(item => item.Name);
 #endif

@@ -7,7 +7,7 @@ public class LuaTestMediator : IUIMediator, IMediator
 {
     public void UpdateItems(object paras)
     {
-        LuaHelper.CallFunction(((IUIMediator)this).m_View, "LuaTestView:UpdateItems");
+        LuaHelper.CallFunctionWithSelf(((IUIMediator)this).m_View, "LuaTestView:UpdateItems");
     }
 
     public void OnInit()
@@ -31,7 +31,6 @@ public class LuaTestMediator : IUIMediator, IMediator
         ProxyManager.GetInstance().Get<LuaTestProxy>().BagItemDataList.Clear();
         LogModule.DebugLog("All removed.");
     }
-
 
     public void OnDestroy()
     {

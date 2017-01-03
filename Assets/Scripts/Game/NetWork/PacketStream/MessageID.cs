@@ -14,12 +14,11 @@ PACKET_CG_CHAT,	//Client send chat info
 PACKET_GC_CHAT,	//Server send chat info
 PACKET_GC_NOTICE,	//notice from server
 PACKET_GC_UPDATE_SCENE_INSTACTIVATION,	//Update Scene InstActivation
-PACKET_GS_CONNECTED_HEARTBEAT,	//gameserver to server heartbeat
-PACKET_SG_CONNECTED_HEARTBEAT,	//server to gameserver heartbeat
 PACKET_CG_MOVE,	//Player Move
 PACKET_GC_MOVE,	//Notify Character Move
 PACKET_GC_STOP,	//Notify Character Stop
 PACKET_GC_TELEMOVE,	//TeleMove
+PACKET_CG_SKILL_USE,	//client send use skill
 PACKET_GC_RET_USE_SKILL,	//Use Skill ret
 PACKET_GC_UPDATE_ANIMATION_STATE,	//Update Animation state
 PACKET_GC_DELETE_OBJ,	//Delete Player
@@ -42,10 +41,13 @@ PACKET_GC_LOGIN_QUEUE_STATUS,	//login queue status
 PACKET_CG_BATTLEINFOR,	//
 PACKET_GC_OBJINFOR,	//
 PACKET_GC_BATTLEINFOR,	//
-PACKET_GC_OBJPOS,	//
 PACKET_GC_OBJPOSLIST,	//
 PACKET_CG_OBJPOSLIST,	//
 PACKET_GC_OBJCOMMANDPURSUE,	//
+PACKET_GC_OBJPREPAREFORATTACK,	//
+PACKET_GC_OBJGETHURT,	//
+PACKET_CG_BUILDING_LEVELUP,	// Send Building LevelUp
+PACKET_GC_BUILDING_LEVELUP,	// Ret Building LevelUp
 
  PACKET_SIZE
  }

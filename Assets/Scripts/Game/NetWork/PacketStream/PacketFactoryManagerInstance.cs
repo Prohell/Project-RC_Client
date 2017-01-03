@@ -30,23 +30,26 @@ AddFactory(new GC_CREATEROLE_RET_PF());
 AddFactory(new GC_LOGIN_QUEUE_STATUS_PF());
 AddFactory(new GC_OBJINFOR_PF());
 AddFactory(new GC_BATTLEINFOR_PF());
-AddFactory(new GC_OBJPOS_PF());
 AddFactory(new GC_OBJPOSLIST_PF());
 AddFactory(new GC_OBJCOMMANDPURSUE_PF());
+AddFactory(new GC_OBJPREPAREFORATTACK_PF());
+AddFactory(new GC_OBJGETHURT_PF());
+AddFactory(new GC_BUILDING_LEVELUP_PF());
 AddFactory(new CG_LOGIN_PF());
 AddFactory(new CG_CONNECTED_HEARTBEAT_PF());
 AddFactory(new CG_REQ_NEAR_LIST_PF());
 AddFactory(new CG_CHAT_PF());
 AddFactory(new CG_MOVE_PF());
+AddFactory(new CG_SKILL_USE_PF());
 AddFactory(new CG_FIGHT_PF());
 AddFactory(new CG_LEAVE_COPYSCENE_PF());
 AddFactory(new CG_ROBOT_OPEN_PF());
 AddFactory(new CG_ASSIGN_HERO_PF());
 AddFactory(new CG_SEND_MARCH_PF());
 AddFactory(new CG_CREATEROLE_PF());
-AddFactory(new CG_CREATEROLE_PF());
 AddFactory(new CG_BATTLEINFOR_PF());
 AddFactory(new CG_OBJPOSLIST_PF());
+AddFactory(new CG_BUILDING_LEVELUP_PF());
  AddPacketHander(MessageID.PACKET_GC_LOGIN_RET, new GC_LOGIN_RETHandler());
 AddPacketHander(MessageID.PACKET_GC_CONNECTED_HEARTBEAT, new GC_CONNECTED_HEARTBEATHandler());
 AddPacketHander(MessageID.PACKET_GC_NEAR_MARCHLIST, new GC_NEAR_MARCHLISTHandler());
@@ -71,14 +74,17 @@ AddPacketHander(MessageID.PACKET_GC_CREATEROLE_RET, new GC_CREATEROLE_RETHandler
 AddPacketHander(MessageID.PACKET_GC_LOGIN_QUEUE_STATUS, new GC_LOGIN_QUEUE_STATUSHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJINFOR, new GC_OBJINFORHandler());
 AddPacketHander(MessageID.PACKET_GC_BATTLEINFOR, new GC_BATTLEINFORHandler());
-AddPacketHander(MessageID.PACKET_GC_OBJPOS, new GC_OBJPOSHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJPOSLIST, new GC_OBJPOSLISTHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJCOMMANDPURSUE, new GC_OBJCOMMANDPURSUEHandler());
+AddPacketHander(MessageID.PACKET_GC_OBJPREPAREFORATTACK, new GC_OBJPREPAREFORATTACKHandler());
+AddPacketHander(MessageID.PACKET_GC_OBJGETHURT, new GC_OBJGETHURTHandler());
+AddPacketHander(MessageID.PACKET_GC_BUILDING_LEVELUP, new GC_BUILDING_LEVELUPHandler());
 AddPacketHander(MessageID.PACKET_CG_LOGIN, new CG_LOGINHandler());
 AddPacketHander(MessageID.PACKET_CG_CONNECTED_HEARTBEAT, new CG_CONNECTED_HEARTBEATHandler());
 AddPacketHander(MessageID.PACKET_CG_REQ_NEAR_LIST, new CG_REQ_NEAR_LISTHandler());
 AddPacketHander(MessageID.PACKET_CG_CHAT, new CG_CHATHandler());
 AddPacketHander(MessageID.PACKET_CG_MOVE, new CG_MOVEHandler());
+AddPacketHander(MessageID.PACKET_CG_SKILL_USE, new CG_SKILL_USEHandler());
 AddPacketHander(MessageID.PACKET_CG_FIGHT, new CG_FIGHTHandler());
 AddPacketHander(MessageID.PACKET_CG_LEAVE_COPYSCENE, new CG_LEAVE_COPYSCENEHandler());
 AddPacketHander(MessageID.PACKET_CG_ROBOT_OPEN, new CG_ROBOT_OPENHandler());
@@ -87,6 +93,7 @@ AddPacketHander(MessageID.PACKET_CG_SEND_MARCH, new CG_SEND_MARCHHandler());
 AddPacketHander(MessageID.PACKET_CG_CREATEROLE, new CG_CREATEROLEHandler());
 AddPacketHander(MessageID.PACKET_CG_BATTLEINFOR, new CG_BATTLEINFORHandler());
 AddPacketHander(MessageID.PACKET_CG_OBJPOSLIST, new CG_OBJPOSLISTHandler());
+AddPacketHander(MessageID.PACKET_CG_BUILDING_LEVELUP, new CG_BUILDING_LEVELUPHandler());
  return true;
  } 
  }
@@ -113,6 +120,13 @@ public class GC_BATTLEINFOR_PF : PacketFactory
  public MessageID GetPacketID()
  {
  return MessageID.PACKET_GC_BATTLEINFOR;
+ }
+ }
+public class GC_BUILDING_LEVELUP_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_GC_BUILDING_LEVELUP;
  }
  }
 public class GC_CHAT_PF : PacketFactory
@@ -192,6 +206,13 @@ public class GC_OBJCOMMANDPURSUE_PF : PacketFactory
  return MessageID.PACKET_GC_OBJCOMMANDPURSUE;
  }
  }
+public class GC_OBJGETHURT_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_GC_OBJGETHURT;
+ }
+ }
 public class GC_OBJINFOR_PF : PacketFactory
  {
  public MessageID GetPacketID()
@@ -199,18 +220,18 @@ public class GC_OBJINFOR_PF : PacketFactory
  return MessageID.PACKET_GC_OBJINFOR;
  }
  }
-public class GC_OBJPOS_PF : PacketFactory
- {
- public MessageID GetPacketID()
- {
- return MessageID.PACKET_GC_OBJPOS;
- }
- }
 public class GC_OBJPOSLIST_PF : PacketFactory
  {
  public MessageID GetPacketID()
  {
  return MessageID.PACKET_GC_OBJPOSLIST;
+ }
+ }
+public class GC_OBJPREPAREFORATTACK_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_GC_OBJPREPAREFORATTACK;
  }
  }
 public class GC_PLAY_EFFECT_PF : PacketFactory
@@ -297,6 +318,13 @@ public class CG_BATTLEINFOR_PF : PacketFactory
  return MessageID.PACKET_CG_BATTLEINFOR;
  }
  }
+public class CG_BUILDING_LEVELUP_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_CG_BUILDING_LEVELUP;
+ }
+ }
 public class CG_CHAT_PF : PacketFactory
  {
  public MessageID GetPacketID()
@@ -372,6 +400,13 @@ public class CG_SEND_MARCH_PF : PacketFactory
  public MessageID GetPacketID()
  {
  return MessageID.PACKET_CG_SEND_MARCH;
+ }
+ }
+public class CG_SKILL_USE_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_CG_SKILL_USE;
  }
  }
 }

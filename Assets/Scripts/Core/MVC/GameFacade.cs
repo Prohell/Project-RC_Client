@@ -5,7 +5,7 @@ using UnityEngine;
 /// by TT
 /// 2016-07-06
 /// </summary>
-public class GameFacade : Singleton<GameFacade>, IInit, IReset, IDestroy
+public class GameFacade :Singleton<GameFacade>, IInit, IReset, IDestroy
 {
     public static MediatorManager Mediator { get { return MediatorManager.GetInstance(); } }
     public static ProxyManager Proxy { get { return ProxyManager.GetInstance(); } }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.IO;
 using System.Collections;
 
@@ -7,10 +8,10 @@ using System.Collections;
 //		www.size;
 //		www.uploadProgress;
 public class Loader  {
-	public Callback<Loader> OnDownLoadStart;
-	public Callback<Loader> OnDownLoadComplete;
-	public Callback<Loader> OnDownLoadProgress;
-	public Callback<Loader> OnDownLoadFailed;
+	public Action<Loader> OnDownLoadStart;
+	public Action<Loader> OnDownLoadComplete;
+	public Action<Loader> OnDownLoadProgress;
+	public Action<Loader> OnDownLoadFailed;
 
 	private int _size;
 	public int Size{
@@ -46,7 +47,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadAssetBundle(string url, Callback<AssetBundle> callback = null){
+	public IEnumerator LoadAssetBundle(string url, Action<AssetBundle> callback = null){
 		_url = url;
 		_www = new WWW (_url);
 
@@ -92,7 +93,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadFromCacheOrDownload(string url, int version, uint crc, Callback<AssetBundle> callback = null){
+	public IEnumerator LoadFromCacheOrDownload(string url, int version, uint crc, Action<AssetBundle> callback = null){
 		_url = url;
 		_www = WWW.LoadFromCacheOrDownload (_url, version, crc);
 		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -133,7 +134,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadBytes(string url,Callback<byte[]> callback = null){
+	public IEnumerator LoadBytes(string url,Action<byte[]> callback = null){
 		_url = url;
 		_www = new WWW (_url);
 		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -174,7 +175,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadText(string url,Callback<string> callback = null){
+	public IEnumerator LoadText(string url,Action<string> callback = null){
 		_url = url;
 		_www = new WWW (_url);
 		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -215,7 +216,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadAudioClip(string url,Callback<AudioClip> callback = null){
+	public IEnumerator LoadAudioClip(string url,Action<AudioClip> callback = null){
 		_url = url;
 		_www = new WWW (_url);
 		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -256,7 +257,7 @@ public class Loader  {
 		}
 	}
 
-	public IEnumerator LoadTexture2D(string url,Callback<Texture2D> callback = null){
+	public IEnumerator LoadTexture2D(string url,Action<Texture2D> callback = null){
 		_url = url;
 		_www = new WWW (_url);
 		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -317,7 +318,7 @@ public class Loader  {
 
 
 //手机不支持
-//	public IEnumerator LoadMovieTexture(string url,Callback<MovieTexture> callback = null){
+//	public IEnumerator LoadMovieTexture(string url,Action<MovieTexture> callback = null){
 //		_url = url;
 //		_www = new WWW (_url);
 //		_bytesDownloaded = _www.bytesDownloaded;_size = _www.size;_progress = _www.progress;
@@ -358,7 +359,7 @@ public class Loader  {
 //		}
 //	}
 
-//	public IEnumerator LoadFromFileAsync(string url, Callback<AssetBundle> callback){
+//	public IEnumerator LoadFromFileAsync(string url, Action<AssetBundle> callback){
 //		_url = url;
 //		FileInfo info = new FileInfo (_url);
 //		if(!info.Exists){

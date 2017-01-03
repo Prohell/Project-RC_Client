@@ -1,106 +1,112 @@
 ﻿using UnityEngine;
 using GCGame.Table;
 using System;
-/// <summary>
-/// Game
-/// by TT
-/// 2016-07-08
-/// </summary>
-public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
+using System.Collections;
+
+public class Game
 {
-    private TableManager mTableManager;
-    public TableManager tableManager { get { return mTableManager; } }
-    private static TaskManager mTaskManager = null;
-    public static TaskManager TaskManager { get { return mTaskManager; } }
-    private static MySceneManager mSceneManager = null;
-    public static MySceneManager SceneManager { get { return mSceneManager; } }
+	static private TableManager mTableManager;
+	static public TableManager tableManager { get { return mTableManager; } }
 
-    public static LuaManager LuaManager { get; private set; }
+	static private MySceneManager mSceneManager = null;
+	static public MySceneManager SceneManager { get { return mSceneManager; } }
 
-    public static UIManager UIManager { get; set; }
+	static public LuaManager LuaManager { get; private set; }
+	static public UIManager UIManager { get; set; }
 
-    /// <summary>
-    /// 游戏初始化完成
-    /// </summary>
-    public bool IsInit = false;
-
-    /// <summary>
-    /// 游戏初始化
-    /// </summary>
-	public void OnInit()
+	//游戏初始化状态
+	static public GameInitState initState = GameInitState.Uninitialized;
+    // 游戏初始化入口
+	[RuntimeInitializeOnLoadMethod]
+	static public void OnInit()
     {
-        GameSettings.InitGame();
+		if(initState != GameInitState.Uninitialized){
+			return;
+		}
+		InitGameBase ();
+	    InitGameAssets();
+    }
+	//初始化游戏基础
+	static public void InitGameBase(){
+		//设置Log
+		Application.logMessageReceived += OnLog;
+		Application.logMessageReceivedThreaded += OnLog;
+		//初始化游戏引擎的一些设置
+		GameSettings.OnInit();
+		// MVC
+		GameFacade.GetInstance().OnInit();
+		// 场景管理
+		mSceneManager = MySceneManager.GetInstance();
+		mSceneManager.OnInit();
+		//添加全局FPS组件
+		Main.Instance.AddMainComponent<ShowFPS>();
+		//添加全局InGameLog组件
+		Main.Instance.AddMainComponent<InGameLog>();
+		// 对象池管理
+		GameObject poolRoot = new GameObject("GameObjectPool");
+		poolRoot.transform.SetParent (Main.Instance.transform);
+		GameObjectPool.GetInstance().root = poolRoot;
+		//Network
+		NetManager.GetInstance().OnInit();
+        //Add temp entrance.
+	    Main.Instance.AddMainComponent<TempEntrance>();
 
-        Application.logMessageReceived += OnLog;
-        Application.logMessageReceivedThreaded += OnLog;
+        initState = GameInitState.GameBaseInited;
+	}
+		
+	static public string ServerIp = "10.12.20.37";
+	static public int ServerPort = 2231;
+	//建立服务器连接
 
-        //Start lua VM.
-        LuaManager = GameObjectCreater.CreateComponent<LuaManager>("LuaManager", Main.DontDestroyRoot);
-        LuaManager.OnInit();
-        LoadingController.GetInstance().UpdateProgress(1,LoadingController.initText);
+	static public void ConnectToServer(Action<bool,string> callback){
+		NetManager.GetInstance().ConnectToServer(ServerIp, ServerPort, callback);
+	}
 
-        //UI framework.
-        UIManager = UIManager.GetInstance();
-        UIManager.OnInit();
-        LoadingController.GetInstance().UpdateProgress();
+	static public void InitGameAssets(Action callback = null){
+		StartCoroutine (InitAssets(callback));
+	}
 
-        // Task系统
-        mTaskManager = GameObjectCreater.CreateComponent<TaskManager>("TaskManager", Main.DontDestroyRoot);
-        LoadingController.GetInstance().UpdateProgress();
+	//异步初始化 和热更资源 缓存表格等
+	static private IEnumerator InitAssets(Action callback = null)
+	{
+		yield return GameAssets.Init();
+		initState = GameInitState.GameAssetsInited;
+		yield return InitAfterAssets ();
+		if(callback != null){
+			callback ();
+		}
+	}
 
+	//资源热更后初始化的游戏资源
+	static private IEnumerator InitAfterAssets()
+	{
         // 表格管理
         mTableManager = new TableManager();
-        tableManager.InitTable();
-        LoadingController.GetInstance().UpdateProgress();
+		tableManager.InitTable();
+		//Start lua VM.
+		LuaManager = Main.Instance.AddMainComponent<LuaManager>();
+		LuaManager.OnInit();
+		//UI framework.
+		UIManager = UIManager.GetInstance();
+		yield return UIManager.InitUIManager();
 
-        // MVC
-        GameFacade.GetInstance().OnInit();
-        LoadingController.GetInstance().UpdateProgress();
+		initState = GameInitState.Initialized;
+	}
 
-        // 场景管理
-        mSceneManager = GameObjectCreater.CreateComponent<MySceneManager>("MySceneManager", Main.DontDestroyRoot);
-        mSceneManager.OnInit();
-        LoadingController.GetInstance().UpdateProgress();
-
-        // 对象池管理
-        GameObject invisibleGoPoolRoot = GameObjectCreater.CreateGo("GoPoolRoot", Main.DontDestroyRoot);
-        GameObjectPool.GetInstance().root = invisibleGoPoolRoot;
-        LoadingController.GetInstance().UpdateProgress();
-
-        //FPS
-        GameObjectCreater.CreateComponent<ShowFPS>("ShowFPS", Main.DontDestroyRoot);
-
-        //Network
-        NetManager.GetInstance().OnInit();
-        LoadingController.GetInstance().UpdateProgress();
-
-        // 游戏初始化完成
-        IsInit = true;
-
-        //show test entrance.
-        var temp = TempEntrance.Instance;
-    }
-
-    public void OnUpdate()
+	static public void OnUpdate()
     {
         UpdateManager.GetInstance().OnUpdate();
         NetManager.GetInstance().OnUpdate();
     }
 
-    public void OnReset()
+	static public void OnReset()
     {
         UpdateManager.GetInstance().OnReset();
-        mTaskManager.OnReset();
         GameFacade.GetInstance().OnReset();
         mSceneManager.OnReset();
     }
 
-    public void OnDestroy()
-    {
-        OnReset();
-    }
-
-    public void OnLog(string message, string stackTrace, LogType type)
+	static public void OnLog(string message, string stackTrace, LogType type)
     {
         switch (type)
         {
@@ -127,4 +133,15 @@ public class Game : Singleton<Game>, IInit, IUpdate, IReset, IDestroy
                 break;
         }
     }
+
+
+	static public GameObject gameObjectRoot{
+		get{ 
+			return Main.Instance.gameObject;
+		}
+	}
+
+	static public void StartCoroutine(IEnumerator ie){
+		Main.Instance.StartCoroutine (ie);
+	}
 }

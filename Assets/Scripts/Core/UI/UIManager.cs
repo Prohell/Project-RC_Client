@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,6 +92,9 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
             if (m_UIItemMap.ContainsKey(p_config.Name) && m_UIItemMap[p_config.Name].IsShowing)
             {
                 LogModule.WarningLog("Cancel open {0} UI cause already in showing.", p_config.Name);
+                //Execute refresh without animation.
+                ExeAfterOpenUI(p_config, p_viewRefreshCallBack, false);
+
                 return false;
             }
 
@@ -210,18 +214,18 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
                 throw new KeyNotFoundException(string.Format("Key: {0} not found in UI Category.", p_config.Type));
             }
 
-            if (p_config.BundlePath == null)
+            if (p_config.BundleName == null)
             {
                 throw new Exception("Cannot create UI cause no res provided.");
             }
 
-            CM_Dispatcher.instance.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(p_config.BundlePath, p_config.BundleName,
+            Game.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(p_config.BundleName, p_config.AssetName,
                 (prefab) =>
                 {
                     CreateUIInternal(p_config, prefab, p_viewInitCallBack,
                         p_viewRefreshCallBack, isShowAnimation);
                 }));
-            GameAssets.AddBundleRef(p_config.BundlePath);
+            GameAssets.AddBundleRef(p_config.BundleName);
         }
         catch (Exception e)
         {
@@ -304,7 +308,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
                 View = view,
                 Mediator = mediator,
                 UIObject = ui,
-                BundlePath = p_config.BundlePath
+                BundlePath = p_config.BundleName
             });
 
             //Get depth and set.
@@ -350,8 +354,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
 
                 m_UIItemMap[p_config.Name].ViewBase.OnCloseUIComplete += () =>
                 {
-                    m_UIItemMap[p_config.Name].RootObject.SetActive(false);
-                    m_UIItemMap[p_config.Name].IsShowing = false;
+                    CloseUIInternal(p_config.Name);
                 };
             }
             //Init
@@ -384,7 +387,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_name"></param>
     /// <param name="isShowAnimation"></param>
     /// <returns></returns>
-    private bool CloseUI(string p_name, bool isShowAnimation)
+    public bool CloseUI(string p_name, bool isShowAnimation)
     {
         try
         {
@@ -404,6 +407,10 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
             {
                 m_UIItemMap[p_name].ViewBase.OnClose();
             }
+            else
+            {
+                CloseUIInternal(p_name);
+            }
 
             return true;
         }
@@ -412,6 +419,12 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
             LogModule.ErrorLog("Exception in close UI, {0}\n{1}", e.Message, e.StackTrace);
             return false;
         }
+    }
+
+    private void CloseUIInternal(string p_name)
+    {
+        m_UIItemMap[p_name].RootObject.SetActive(false);
+        m_UIItemMap[p_name].IsShowing = false;
     }
 
     public bool DestroyUI(string p_name)
@@ -560,11 +573,9 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
 
     #endregion
 
-    private void InitUIFramework()
+    private IEnumerator InitUIFramework()
     {
-        CM_Dispatcher.instance.StartCoroutine(
-            GameAssets.LoadAssetAsync<GameObject>("load_preload$s_ui$ui_root.assetbundle", "UI_Root",
-                InitUIFrameworkInternal));
+        yield return GameAssets.LoadAssetAsync<GameObject>("load_preload$s_ui$ui_root.assetbundle", "UI_Root", InitUIFrameworkInternal);
     }
 
     private void InitUIFrameworkInternal(GameObject prefab)
@@ -591,8 +602,8 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     public float WidthInCoor { get; private set; }
     public float HeightInCoor { get; private set; }
 
-    private const float FixedWidth = 960;
-    private const float FixedHeight = 640;
+    private const float FixedWidth = 2048;
+    private const float FixedHeight = 1536;
 
     private void AutoResize()
     {
@@ -618,9 +629,14 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
 
     public void OnInit()
     {
+        Game.StartCoroutine(InitUIManager());
+    }
+
+    public IEnumerator InitUIManager()
+    {
         if (LoadConfig())
         {
-            InitUIFramework();
+            yield return InitUIFramework();
         }
 
         AutoResize();
@@ -638,8 +654,12 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
 
     public void OnReset()
     {
-        OnDestroy();
+        m_UICategoryMap.Clear();
 
-        OnInit();
+        foreach (var pair in m_UIItemMap)
+        {
+            Object.Destroy(pair.Value.RootObject);
+        }
+        m_UIItemMap.Clear();
     }
 }

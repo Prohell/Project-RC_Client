@@ -23,7 +23,7 @@ public class Arrow : MonoBehaviour {
     public float MGravity { get; set; }
 
     private float mSpeed2=2500f;
-    private float mSpeedBase =160000f;
+    private float mSpeedBase =90000f;
 
     private float mLifeTimeMax = 2f;
     private float mLifeTime ;
@@ -35,7 +35,7 @@ public class Arrow : MonoBehaviour {
 
     private UnitController mReceriveController;
 
-    private float mEffectDistance = 0.5f;
+    private float mEffectDistance = 2f;
 
     private float mReceiveHeight;
 
@@ -145,17 +145,19 @@ public class Arrow : MonoBehaviour {
     }
 
     // Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
         if (mVeclocity != Vector3.zero)
         {
             mVeclocity.y -= MGravity * Time.deltaTime;
             transform.position += mVeclocity * Time.deltaTime;
         }
-
+        Quaternion quation = Quaternion.LookRotation(mVeclocity);
+        transform.rotation = quation;
+        //transform.LookAt(mAimtrans);
         //face the camera
-        transform.rotation = Camera.main.transform.rotation;
-        transform.Rotate(-90f, 0f, 0f);
+        //transform.rotation = Camera.main.transform.rotation;
+        //transform.Rotate(-90f, 0f, 0f);
 
         //Cause Damage
         if (MReceiver != null)

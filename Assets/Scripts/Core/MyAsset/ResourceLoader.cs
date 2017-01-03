@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,11 +9,11 @@ public class ResourceLoader : IAssetAsyncLoader{
 		yield break;
 	}
 
-	public IEnumerator LoadAssetBundle (string assetBundleName, Callback<AssetBundle> callback = null){
+	public IEnumerator LoadAssetBundle (string assetBundleName, Action<AssetBundle> callback = null){
 		yield break;
 	}
 
-	public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Callback<T> callback)where T:Object{
+	public IEnumerator LoadAssetAsync<T>(string assetBundleName, string assetName, Action<T> callback)where T : UnityEngine.Object{
 		string assetPath = null;
 		Debug.Log (assetBundleName);
 		AssetsInfo assetsInfo = GameUtility.assetsInfo;

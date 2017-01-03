@@ -2,7 +2,6 @@
 using UnityEngine;
 using DG.Tweening;
 
-
 public class UIViewBase : MonoBehaviour
 {
     public string Name;
@@ -37,15 +36,15 @@ public class UIViewBase : MonoBehaviour
     }
 
     public void OnOpen()
-	{
+    {
         if (gameObject.activeInHierarchy)
         {
             m_transform.localScale = Vector3.one * AnimMin;
 
-			m_transform.DOScale (Vector3.one, Duration).SetEase(Ease.OutBack).OnComplete(()=>{
-				ViewBase_OnOpenUIComplete();
-			});
-
+            m_transform.DOScale(Vector3.one, Duration).SetEase(Ease.OutBack).OnComplete(() =>
+            {
+                ViewBase_OnOpenUIComplete();
+            });
         }
     }
 
@@ -55,9 +54,10 @@ public class UIViewBase : MonoBehaviour
         {
             transform.localScale = Vector3.one * AnimMax;
 
-			m_transform.DOScale (Vector3.zero, Duration).SetEase(Ease.InBack).OnComplete(()=>{
-				ViewBase_OnCloseUIComplete();
-			});
+            m_transform.DOScale(Vector3.zero, Duration).SetEase(Ease.InBack).OnComplete(() =>
+            {
+                ViewBase_OnCloseUIComplete();
+            });
         }
     }
 

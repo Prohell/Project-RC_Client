@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#define USING_DOTWEENING
+
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +8,7 @@ using LuaInterface;
 
 using BindType = ToLuaMenu.BindType;
 using System.Reflection;
+using DG.Tweening;
 
 public static class CustomSettings
 {
@@ -32,22 +35,27 @@ public static class CustomSettings
     public static DelegateType[] customDelegateList =
     {
         _DT(typeof(Action)),
+        _DT(typeof(Action<int>)),
+        _DT(typeof(Action<GameObject>)),
+
         _DT(typeof(UnityEngine.Events.UnityAction)),
         _DT(typeof(System.Predicate<int>)),
-        _DT(typeof(System.Action<int>)),
         _DT(typeof(System.Comparison<int>)),
+
         _DT(typeof(DelegateUtil.VoidDelegate)),
         _DT(typeof(DelegateUtil.IntDelegate)),
         _DT(typeof(DelegateUtil.FloatDelegate)),
         _DT(typeof(DelegateUtil.StringDelegate)),
         _DT(typeof(DelegateUtil.TableDelegate)),
+
         _DT(typeof(UIEventListener.VoidDelegate)),
         _DT(typeof(UIEventListener.BoolDelegate)),
         _DT(typeof(UIEventListener.FloatDelegate)),
         _DT(typeof(UIEventListener.VectorDelegate)),
         _DT(typeof(UIEventListener.ObjectDelegate)),
         _DT(typeof(UIEventListener.KeyCodeDelegate)),
-        _DT(typeof(Callback<GameObject>)),
+
+        _DT(typeof(TweenCallback)),
     };
 
     //在这里添加你要导出注册到lua的类型列表
@@ -81,8 +89,8 @@ public static class CustomSettings
             _GT(typeof(Rigidbody)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
             _GT(typeof(Camera)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
             _GT(typeof(AudioSource)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
-            //_GT(typeof(LineRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
-            //_GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),    
+            _GT(typeof(LineRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
+            _GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),    
     #else
 
         _GT(typeof(Component)),
@@ -93,8 +101,8 @@ public static class CustomSettings
         _GT(typeof(Camera)),
         _GT(typeof(AudioSource)),
         _GT(typeof(Resources)),
-        //_GT(typeof(LineRenderer))
-        //_GT(typeof(TrailRenderer))
+        _GT(typeof(LineRenderer))
+        _GT(typeof(TrailRenderer))
 #endif
 
         _GT(typeof(Behaviour)),
@@ -176,13 +184,27 @@ public static class CustomSettings
         _GT(typeof(EventManager)),
         _GT(typeof(UIManager)),
         _GT(typeof(UIItem)),
+        _GT(typeof(MySceneManager)),
+        _GT(typeof(SceneId)),
+        _GT(typeof(Game)),
 
         //Game module
         _GT(typeof(LuaTestProxy)),
         _GT(typeof(LuaTestMediator)),
         _GT(typeof(LuaTestMediator2)),
         _GT(typeof(LuaTestMediator3)),
-        _GT(typeof(LuaTestMediator4))
+        _GT(typeof(LuaTestMediator4)),
+        _GT(typeof(MainUIMediator)),
+        _GT(typeof(MainResourceMediator)),
+        _GT(typeof(LoginMediator)),
+
+		//City
+		_GT(typeof(CameraMove)),
+        _GT(typeof(HighlighterController)),
+
+		//Dotween
+		_GT(typeof(DG.Tweening.Ease))
+
     };
 
     //public static BindType[] customTypeList

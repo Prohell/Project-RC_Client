@@ -7,7 +7,9 @@ public enum SceneId
 	Start,
 	MapEditor,
     Map,
-    LuaTest,
-    BattleTest,
-	Castle
+	Castle,
+
+	LuaTest,
+	BattleTest,
+	NetworkTest
 }

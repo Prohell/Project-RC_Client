@@ -69,6 +69,8 @@ public class AnimationTags {
     public const string mRun = "Run";
     public const string mIdle = "Stand";
     public const string mDie = "Die";
-    public const string mAttack = "Attack2B_01";
-    public const string mAttackStand = "Attack_Stand";
+    //public const string mAttack = "Attack2B_01";
+    //public const string mAttackStand = "Attack_Stand";
+    public const string mAttack = "Attack";
+    public const string mAttackStand = "BattleStand";
 }

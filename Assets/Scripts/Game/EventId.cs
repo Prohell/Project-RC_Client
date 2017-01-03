@@ -30,8 +30,20 @@
     //Event TestFPS to BattleController
     public const string LoadSquad = "LoadSquad";
     public const string StartBattle = "StartBattle";
+    public const string StartFight = "StartFight";
     //Event from CG_ASSIGN_HEROHandler to BattleManager
-    public const string GetBattleInfor = "GetBattleInfor";
+    public const string ReceiveBattleInfor = "ReceiveBattleInfor";
+    public const string ReceiveSquadPosInfor = "ReceiveSquadPosInfor";
+    public const string ReceiveCommandPursue = "ReceiveCommandPursue";
+    public const string ReceivePrepareForAttack = "ReceivePrepareForAttack";
+    public const string ReceiveObjGetHurt = "ReceiveObjGetHurt";
     //Lua test event
     public const string LuaTestUpdate = "BagUpdated";
+
+
+	public const string PlayerProxyUpdate = "PlayerProxyUpdate";
+
+	public const string BuildingSelected = "BuildingSelected";
+
+	public const string BuildingBtnClick = "BuildingBtnClick";
 }

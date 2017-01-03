@@ -1,0 +1,1 @@
+MainResourceView = {}

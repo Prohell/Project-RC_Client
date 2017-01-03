@@ -25,7 +25,7 @@ public struct GameSettings
 
     public static bool SceneGestureEnabled = true;
 
-    public static void InitGame()
+    public static void OnInit()
     {
         if (mIsInit)
         {

@@ -12,7 +12,9 @@ namespace SPacket.SocketInstance
  GC_BATTLEINFOR packet = (GC_BATTLEINFOR )ipacket;
  if (null == packet) return (uint)PACKET_EXE.PACKET_EXE_ERROR;
             //enter your logic
-            EventManager.GetInstance().SendEvent(EventId.GetBattleInfor, packet);
+            BattleProxy proxy = GameFacade.GetProxy<BattleProxy>();
+            proxy.BattleInfor = packet;
+            EventManager.GetInstance().SendEvent(EventId.ReceiveBattleInfor, packet);
             return (uint)PACKET_EXE.PACKET_EXE_CONTINUE;
  }
  }

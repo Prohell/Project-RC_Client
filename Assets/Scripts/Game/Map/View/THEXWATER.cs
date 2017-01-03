@@ -107,22 +107,30 @@ public class THEXWATER : MonoBehaviour
     }
 
     private MaterialPropertyBlock _block = null;
-    private MaterialPropertyBlock UpdateBlock()
-    {
-        if (_block == null)
-        {
-            _block = new MaterialPropertyBlock();   // make it lazy
-        }
-        HEX hex = _weak_hex.Target as HEX;
-        Dictionary<int, int> TSet = new Dictionary<int, int>();
-        List<Vector4> TArray = new List<Vector4>();
-        for (int i = 0; i < spriteId.Count; i++)
-        {
-            Vector4 pos = hex.GetSpritePosInfoByName(spriteId[i]);
-            TArray.Add(pos);
-        }
+    public MaterialPropertyBlock UpdateBlock()
+	{
+		if (_block == null) {
+			_block = new MaterialPropertyBlock ();   // make it lazy
+		}
+		HEX hex = _weak_hex.Target as HEX;
+		Dictionary<int, int> TSet = new Dictionary<int, int> ();
+		List<Vector4> TArray = new List<Vector4> ();
+		for (int i = 0; i < spriteId.Count; i++) {
+			Vector4 pos = hex.GetSpritePosInfoByName (spriteId [i]);
+			TArray.Add (pos);
+		}
+		if (TArray.Count > 0) {
+			_block.SetVectorArray ("_ARRAY", TArray.ToArray ());
+		}
+
         _block.SetTexture("_ATLAS", hex.altasTexture);
-        _block.SetVectorArray("_ARRAY", TArray.ToArray());
+
+        var mr = gameObject.GetComponent<MeshRenderer>();
+        if (mr != null)
+        {
+            mr.SetPropertyBlock(_block);
+        }
+
         return _block;
     }
 
@@ -149,8 +157,8 @@ public class THEXWATER : MonoBehaviour
 
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
 		mr.sharedMaterials = _hex.GetWaterMats();
-        UpdateBlock();
-        mr.SetPropertyBlock(_block);
+        //UpdateBlock();
+        //mr.SetPropertyBlock(_block);
 
         //_weak_mat = new WeakReference(mr.material);
         //_weak_mesh = new WeakReference(mf.mesh);
@@ -511,7 +519,7 @@ public class THEXWATER : MonoBehaviour
 		}
 		mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		mr.sharedMaterials =  _hex.GetWaterMats();
-		mr.SetPropertyBlock(UpdateBlock());
+		//mr.SetPropertyBlock(UpdateBlock());
         
     }
 

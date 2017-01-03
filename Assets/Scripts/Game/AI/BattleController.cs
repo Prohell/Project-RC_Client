@@ -14,18 +14,25 @@ public class BattleController : MonoBehaviour {
 
     Vector3 mTemBlueBornPos;
 
-    Quaternion mTemRedBornQu = Quaternion.LookRotation(Vector3.forward, Vector3.up);
+    Quaternion mTemRedBornQu = Quaternion.LookRotation(Vector3.left, Vector3.up);
 
-    Quaternion mTemBlueBornQu = Quaternion.LookRotation(Vector3.back, Vector3.up);
+    Quaternion mTemBlueBornQu = Quaternion.LookRotation(Vector3.right, Vector3.up);
 
 
-    string mArcherPath = "RolelPrefab/Gongjianshou_01";
+    //string mArcherPath = "RolelPrefab/Gongjianshou_01";
+    string mArcherPath = "RolelPrefab/P_gongjianshou_d";
     string mUnitPath = "RolelPrefab/Kuangzhanshi_01";
     string mSquadPath = "SquadPrefab/Cylinder";
     string mUnitAimPath = "AimPrefab/AimObj";
-    string mArrowPath = "MissilePrefab/ArrowPrefab";
+    string mArrowPath = "MissilePrefab/jiantou_A01";
+    //string mArrowPath = "MissilePrefab/ArrowPrefab";
+
     string mPosPath = "SquadPrefab/PositionCube";
     string mSkillPath = "MissilePrefab/Sphere";
+
+
+    //string mtestPath = "SquadPrefab/Sphere";
+    //Object mTestAsset;
 
     Object mArcherAsset;
     Object mUnitAsset;
@@ -74,7 +81,6 @@ public class BattleController : MonoBehaviour {
         mCampRedSquadList = new List<GameObject>();
         mCampBlueSquadList = new List<GameObject>();
 
-        Tab_TeamConfig tTeamConfig = TableManager.GetTeamConfigByID(100001)[0];
         mSquadSpace = 30;
         mUnitSpace = 4;
 
@@ -92,7 +98,17 @@ public class BattleController : MonoBehaviour {
 
         EventManager.GetInstance().AddEventListener(EventId.LoadSquad, LoadSquad);
         EventManager.GetInstance().AddEventListener(EventId.StartBattle, StartBattleTest);
+
+        //Open Battle UI.
+        MediatorManager.GetInstance().Add(new BattleUIController());
     }
+
+    void OnDestroy()
+    {
+        //Close Battle UI.
+        MediatorManager.GetInstance().Remove(typeof(BattleUIController));
+    }
+
     void Start()
     {
     }
@@ -126,20 +142,21 @@ public class BattleController : MonoBehaviour {
                     row = -row;
 
                 GameObject tUnit;
-                if (rowRoot == 1)
+                if (rowRoot != 1)
                 {
                     tUnit = Instantiate(mArcherAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
                 }
                 else
                 {
-                    tUnit = Instantiate(mUnitAsset , tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
+                    tUnit = Instantiate(mUnitAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
                 }                   
 
                 GameObject tUnitAim = Instantiate(mUnitAimAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
 
                 UnitController tUnitController = tUnit.GetComponent<UnitController>();
-                if (rowRoot == 1)
-                    tUnitController.GetUnitData().SetInfor(100002);
+                if (rowRoot != 1)
+                    tUnitController.GetUnitData().SetInfor(100003);
+                    //tUnitController.GetUnitData().SetInfor(100002);
                 else
                     tUnitController.GetUnitData().SetInfor(100001);
 
@@ -177,7 +194,11 @@ public class BattleController : MonoBehaviour {
         {
             mPosAsset = tObject;
         });
-     }
+        //yield return AssetLoadManager.LoadFromResource<Object>(mtestPath, (Object tObject) =>
+        //{
+        //    mTestAsset = tObject;
+        //});
+    }
     void SetSquadEnemy()
     {
         for (int i = 0; i < mCampRedSquadList.Count; i++)
@@ -264,6 +285,7 @@ public class BattleController : MonoBehaviour {
         SetSquadEnemy();
         RefreshEnemyList();
         AddEmbateBornList();
+
         //StartCoroutine(BattleStart());
     }
     public void StartBattleTest(object parm)
@@ -285,7 +307,7 @@ public class BattleController : MonoBehaviour {
             }
             GameObject tCube = Instantiate(mPosAsset, tBorPos.mBornPos, Quaternion.LookRotation(Vector3.forward, Vector3.up)) as GameObject;
             tBorPos.mPosInstance = tCube.transform;
-            tEmb.AddBornList(tBorPos);
+            tEmb.mBornInforList.Add(tBorPos);
         }
 
         //for (int i = 0; i < mBattleSceneConfig.getDefencePosXCount(); i++)

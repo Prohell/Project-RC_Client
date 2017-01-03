@@ -12,7 +12,7 @@ public class Embattling : MonoBehaviour {
 
     private Vector3 mTargetPos;
 
-    private List<BornPosInfor> mBornInforList;
+    public List<BornPosInfor> mBornInforList;
     private float mHalfEdgeLength=15;
 
     private int mCurrentSelectIndx =-1;

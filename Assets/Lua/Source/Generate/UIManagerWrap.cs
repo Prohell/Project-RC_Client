@@ -18,6 +18,7 @@ public class UIManagerWrap
 		L.RegFunction("DestroyUI", DestroyUI);
 		L.RegFunction("ReportState", ReportState);
 		L.RegFunction("OnInit", OnInit);
+		L.RegFunction("InitUIManager", InitUIManager);
 		L.RegFunction("OnDestroy", OnDestroy);
 		L.RegFunction("OnReset", OnReset);
 		L.RegFunction("New", _CreateUIManager);
@@ -317,6 +318,23 @@ public class UIManagerWrap
 			UIManager obj = (UIManager)ToLua.CheckObject(L, 1, typeof(UIManager));
 			obj.OnInit();
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InitUIManager(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIManager obj = (UIManager)ToLua.CheckObject(L, 1, typeof(UIManager));
+			System.Collections.IEnumerator o = obj.InitUIManager();
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

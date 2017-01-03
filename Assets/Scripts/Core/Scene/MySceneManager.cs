@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System;
 
-public class MySceneManager : MonoBehaviour, IInit, IReset
+public class MySceneManager :Singleton<MySceneManager>, IInit, IReset
 {
     private Dictionary<SceneId, Type> mSceneTypeDict = new Dictionary<SceneId, Type>();
     private SceneId mCurrentSceneId;
@@ -31,8 +31,11 @@ public class MySceneManager : MonoBehaviour, IInit, IReset
 		RegisterScene(SceneId.Loading, typeof(SceneLoading));
         RegisterScene(SceneId.MapEditor, typeof(SceneMapEditor));
         RegisterScene(SceneId.Map, typeof(SceneMap));
-        RegisterScene(SceneId.LuaTest, typeof(SceneLuaTest));
 		RegisterScene(SceneId.Castle, typeof(SceneCastle));
+		RegisterScene(SceneId.BattleTest, typeof(SceneBattleTest));
+
+		RegisterScene(SceneId.LuaTest, typeof(SceneLuaTest));
+		RegisterScene(SceneId.NetworkTest, typeof(NetworkTest));
     }
 
     public void SwitchToScene(SceneId sceneId, object param = null)

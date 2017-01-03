@@ -13,15 +13,15 @@ public enum SquadCamp {
 
 public class SquadData {
     //the View of the Unit
-    private float mSquadView = 45;
+    private float mSquadView = 15;
     //the Attack range of the Squad
-    private float mSquadAttackRange=5;
+    private float mSquadAttackRange= 5;
     // the HP of the Squad
-    private float mHP =15;
+    private float mHP =18;
     // the HP of the Squad
-    private float mHPMax = 15;
+    private float mHPMax = 18;
     // the Attack of the Squad
-    private float mSquadAttack =1;
+    private float mSquadAttack =3;
     // the Defence of the Squad
     private float mSquadDefence = 1;
     // the Sp of the Squad 

@@ -13,6 +13,7 @@ public class LuaOutletWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("OutletInfos", get_OutletInfos, set_OutletInfos);
 		L.RegVar("m_LuaName", get_m_LuaName, set_m_LuaName);
+		L.RegVar("m_LuaFile", get_m_LuaFile, set_m_LuaFile);
 		L.RegVar("m_LuaTable", get_m_LuaTable, null);
 		L.EndClass();
 	}
@@ -108,6 +109,25 @@ public class LuaOutletWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_LuaFile(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			LuaOutlet obj = (LuaOutlet)o;
+			UnityEngine.Object ret = obj.m_LuaFile;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_LuaFile on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_LuaTable(IntPtr L)
 	{
 		object o = null;
@@ -161,6 +181,25 @@ public class LuaOutletWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_LuaName on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_LuaFile(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			LuaOutlet obj = (LuaOutlet)o;
+			UnityEngine.Object arg0 = (UnityEngine.Object)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Object));
+			obj.m_LuaFile = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_LuaFile on a nil value" : e.Message);
 		}
 	}
 }

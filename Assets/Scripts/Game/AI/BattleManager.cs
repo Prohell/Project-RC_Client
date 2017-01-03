@@ -3,109 +3,61 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using GCGame.Table;
-
 public class BattleManager : MonoBehaviour
 {
+    Quaternion mBornQu = Quaternion.LookRotation(Vector3.forward, Vector3.up);
 
-    Vector3 mTemRedBornPos;
-
-    Vector3 mTemBlueBornPos;
-
-    Quaternion mTemRedBornQu = Quaternion.LookRotation(Vector3.forward, Vector3.up);
-    Quaternion mTemBlueBornQu = Quaternion.LookRotation(Vector3.back, Vector3.up);
-
-
-    string mArcherPath = "RolelPrefab/Gongjianshou_01";
-    string mUnitPath = "RolelPrefab/Kuangzhanshi_01";
-    string mSquadPath = "SquadPrefab/Cylinder";
-    string mUnitAimPath = "AimPrefab/AimObj";
-    string mArrowPath = "MissilePrefab/ArrowPrefab";
     string mPosPath = "SquadPrefab/PositionCube";
-    string mSkillPath = "MissilePrefab/Sphere";
 
-    Object mArcherAsset;
-    Object mUnitAsset;
+
     Object mSquadAsset;
-    Object mUnitAimAsset;
-    Object mArrowAsset;
     Object mSkillAsset;
-
     Object mPosAsset;
-
     Object mAimAsset;
 
-    //Squad Space between each other
-    float mSquadSpace;
-    //Unit Space between each other
-    float mUnitSpace;
-    //Unit SquadPlace Count;
-    int mSqaudPlaceCount;
-    //Unit SquadPlace Row Count;
-    int mSquadPlaceRowCount;
+    List<SquadData> mSquadDataList;
+    Dictionary<int, GameObject> mSquadGameObjDict;
 
-    int mTemSquadS = 2;
-    int mTemRedUnitNumbers;
-    int mTemRedRowCount;
-    int mTemRedSquadNumbers;
-    List<GameObject> mCampRedSquadList;
-    List<SquadData> mRedSquadDataList;
-
-    int mTemBlueUnitNumbers;
-    int mTemBlueRowCount;
-    int mTemBlueSquadNumbers;
-    List<GameObject> mCampBlueSquadList;
-    List<SquadData> mBlueSquadDataList;
-
+    private int mSceneID=1;
 
     bool mBattleStart;
     float mStartTime = 3f;
 
-    public bool mIsChase;
-
     Tab_SceneClass mBattleSceneConfig;
 
+    //the Squad Brain Thinking Time
+    private float mSynTime;
+    private const float mSynTimeTimeSpace = 1f;
     void Awake()
     {
         GameObject tbattleRoot = GameObjectCreater.CreateGo("BattleRoot");
         GameObjectPool.GetInstance().root = tbattleRoot;
 
-        mCampRedSquadList = new List<GameObject>();
-        mCampBlueSquadList = new List<GameObject>();
+        mSquadDataList = new List<SquadData>();
+        mSquadGameObjDict = new Dictionary<int, GameObject>();
 
-        Tab_TeamConfig tTeamConfig = TableManager.GetTeamConfigByID(100001)[0];
-        //mSquadSpace = tTeamConfig.SquadSpace;
-        //mSquadSpace = 30;
-        //mUnitSpace = tTeamConfig.UnitSpace;
-        //mTemRedUnitNumbers = 1;
-        //mTemRedRowCount = 1;
-        //mTemRedSquadNumbers =2;
-        //mTemBlueUnitNumbers = 1;
-        //mTemBlueRowCount = 1;
-        //mTemBlueSquadNumbers = 2;
-
-        //mTemRedUnitNumbers = tTeamConfig.UnitNumbers;
-        //mTemRedRowCount = tTeamConfig.SquadRowCount;
-        //mTemRedSquadNumbers = tTeamConfig.SquadNumbers;
-        //mTemBlueUnitNumbers = tTeamConfig.UnitNumbers;
-        //mTemBlueRowCount = tTeamConfig.SquadRowCount;
-        //mTemBlueSquadNumbers = tTeamConfig.SquadNumbers;
+        //Tab_TeamConfig tTeamConfig = TableManager.GetTeamConfigByID(100001)[0];
 
         mBattleSceneConfig = TableManager.GetSceneClassByID(100001)[0];
-
-        mTemRedBornPos = SetPosition(mBattleSceneConfig.GetAttackPosXbyIndex(0), mBattleSceneConfig.GetAttackPosZbyIndex(0));
-        mTemBlueBornPos = SetPosition(mBattleSceneConfig.GetDefencePosXbyIndex(0), mBattleSceneConfig.GetDefencePosZbyIndex(0));
-
         StartCoroutine(AssetLoadManager.LoadFromResource(mPosPath, GeneratePos));
 
         EventManager.GetInstance().AddEventListener(EventId.LoadSquad, LoadSquad);
         EventManager.GetInstance().AddEventListener(EventId.StartBattle, StartBattleTest);
-        EventManager.GetInstance().AddEventListener(EventId.GetBattleInfor, GetBattleInfor);
+        EventManager.GetInstance().AddEventListener(EventId.StartFight, StartFight);
+
+        EventManager.GetInstance().AddEventListener(EventId.ReceiveBattleInfor, ReceiveBattleInfor);
+        EventManager.GetInstance().AddEventListener(EventId.ReceiveSquadPosInfor, ReceivePosList);
+        EventManager.GetInstance().AddEventListener(EventId.ReceiveCommandPursue, ReceiveCommandPursue);
+        EventManager.GetInstance().AddEventListener(EventId.ReceivePrepareForAttack, ReceivePrepareForAttack);
+        EventManager.GetInstance().AddEventListener(EventId.ReceiveObjGetHurt, ReceiveObjGetHurt);
+
+        //GetBattlerInfor();
     }
     void Start()
     {
-
+        SENDMARCH(GameFacade.GetProxy<PlayerProxy>().marchlist.marchlistList[0].Marchid);
     }
-    void PrepareForBattle(Vector3 tBornPos, Quaternion mtBornQu, List<GameObject> tSquadList, List<SquadData> tSquadDataList)
+    void PrepareForBattle( Quaternion mtBornQu, Dictionary<int,GameObject> tSquadGameObjDic, List<SquadData> tSquadDataList)
     {
         for (int j = 0; j < tSquadDataList.Count; j++)
         {
@@ -131,11 +83,11 @@ public class BattleManager : MonoBehaviour
                 tUnitController.SquadTransform = tSquad.transform;
 
                 tSquadController.GetUnitControllerList().Add(tUnit.transform);
-                
+
             }
 
             tSquadController.GetSquadData().SkillAsset = mSkillAsset;
-            tSquadList.Add(tSquad);
+            tSquadGameObjDic.Add(tSquadDataList[j].GetID(), tSquad);
 
             tSquadController.FormationStrategy();
 
@@ -145,18 +97,13 @@ public class BattleManager : MonoBehaviour
             }
         }
     }
-    void LoadAllResource()
-    {
-
-    }
-
     IEnumerator LoadUnitAssets(GC_BATTLEINFOR tBattleInfor)
     {
         yield return AssetLoadManager.LoadFromResource<Object>("SquadPrefab/Cylinder", (Object tObject)=>
         {
             mSquadAsset = tObject;
         });
-        yield return AssetLoadManager.LoadFromResource<Object>("AimPrefab/AimObj", (Object tObject) =>
+        yield return AssetLoadManager.LoadFromResource<Object>("MissilePrefab/Sphere", (Object tObject) =>
         {
             mAimAsset = tObject;
         });        
@@ -180,15 +127,7 @@ public class BattleManager : MonoBehaviour
             {
                 tSquadData.UnitArrowAsset = tObjcet;
             });
-            switch (tSquadData.GetSquadCamp())
-            {
-                case SquadCamp.CampRed:
-                    mRedSquadDataList.Add(tSquadData);
-                    break;
-                case SquadCamp.CampBlue:
-                    mBlueSquadDataList.Add(tSquadData);
-                    break;
-            }
+            mSquadDataList.Add(tSquadData);
         }
     }
 
@@ -198,44 +137,11 @@ public class BattleManager : MonoBehaviour
     }
     void SetSquadEnemy()
     {
-        for (int i = 0; i < mCampRedSquadList.Count; i++)
-        {
-            for (int j = 0; j < mCampBlueSquadList.Count; j++)
-            {
-                mCampRedSquadList[i].GetComponent<SquadController>().AddEnemy(mCampBlueSquadList[j].GetComponent<SquadController>().GetSquadData().GetID(), mCampBlueSquadList[j].GetComponent<SquadController>());
-                mCampBlueSquadList[j].GetComponent<SquadController>().AddEnemy(mCampRedSquadList[i].GetComponent<SquadController>().GetSquadData().GetID(), mCampRedSquadList[i].GetComponent<SquadController>());
-            }
-        }
-    }
-    public void refreshPath()
-    {
 
-    }
-
-    public void SetDestination()
-    {
-        Vector3 tAimPos = new Vector3(30f, 0f, -55f);
-        Vector3 tAimPos2 = new Vector3(30f, 0f, -25f);
-
-
-        mCampRedSquadList[0].GetComponent<SquadController>().UnitMarchAttacking(mUnitSpace, tAimPos);
-        mCampBlueSquadList[0].GetComponent<SquadController>().UnitMarchAttacking(mUnitSpace, tAimPos);
-        mCampRedSquadList[1].GetComponent<SquadController>().UnitMarchAttacking(mUnitSpace, tAimPos2);
-        mCampBlueSquadList[1].GetComponent<SquadController>().UnitMarchAttacking(mUnitSpace, tAimPos2);
     }
     public void RefreshEnemyList()
     {
 
-        mCampRedSquadList[0].GetComponent<SquadController>().RefreshUnitEnemyList(mCampBlueSquadList[0].GetComponent<SquadController>().GetSquadData().GetID(), mUnitSpace);
-        mCampBlueSquadList[0].GetComponent<SquadController>().RefreshUnitEnemyList(mCampRedSquadList[0].GetComponent<SquadController>().GetSquadData().GetID(), mUnitSpace);
-
-        mCampRedSquadList[1].GetComponent<SquadController>().RefreshUnitEnemyList(mCampBlueSquadList[1].GetComponent<SquadController>().GetSquadData().GetID(), mUnitSpace);
-        mCampBlueSquadList[1].GetComponent<SquadController>().RefreshUnitEnemyList(mCampRedSquadList[1].GetComponent<SquadController>().GetSquadData().GetID(), mUnitSpace);
-    }
-    public void FindAttackEnemyTest()
-    {
-        mCampRedSquadList[0].GetComponent<SquadController>().UnitAttackEnemy(mCampBlueSquadList[0].GetComponent<SquadController>().GetSquadData().GetID());
-        mCampBlueSquadList[0].GetComponent<SquadController>().UnitAttackEnemy(mCampRedSquadList[0].GetComponent<SquadController>().GetSquadData().GetID());
     }
     IEnumerator BattleStart()
     {
@@ -244,59 +150,79 @@ public class BattleManager : MonoBehaviour
     }
     public void StartBattle(object parm)
     {
-        if (mIsChase)
-        {
-            FindAttackEnemyTest();
-        }
-        else
-        {
-            SetDestination();
-        }
     }
     public void LoadSquad(object parm)
     {
-        string Text = (string)parm;
-        int tNumbers;
-        if (!Text.Equals(""))
+        GameFacade.GetProxy<BattleProxy>().GetBattlerInfor(1);
+        //PrepareForBattle(mBornQu, mSquadGameObjDict, mSquadDataList);
+
+        //SetSquadEnemy();
+        //RefreshEnemyList();
+        //AddEmbateBornList();
+    }
+    void Update()
+    {
+        if (mSynTime < float.Epsilon&& mBattleStart)
         {
-            tNumbers = System.Int32.Parse(Text);
+            mSynTime = mSynTimeTimeSpace;
+            GetPosList();
         }
         else
         {
-            tNumbers = 18;
+            mSynTime -= Time.deltaTime;
         }
-        PrepareForBattle(mTemRedBornPos, mTemRedBornQu, mCampRedSquadList, mRedSquadDataList);
-        PrepareForBattle(mTemBlueBornPos, mTemBlueBornQu, mCampBlueSquadList, mBlueSquadDataList);
-
-        SetSquadEnemy();
-        RefreshEnemyList();
-        AddEmbateBornList();
     }
     public void StartBattleTest(object parm)
     {
         StartCoroutine(BattleStart());
     }
-    public void GetBattleInfor(object parm)
+
+    public void StartFight(object parm)
     {
-        GC_BATTLEINFOR tBattleInfor = (GC_BATTLEINFOR)parm;
-        StartCoroutine(LoadUnitAssets(tBattleInfor));
+        GetFightInfor();
     }
     public void AddEmbateBornList()
     {
         Embattling tEmb = transform.GetComponent<Embattling>();
         tEmb.MPosCube = mPosAsset;
-        for (int i = 0; i < mBattleSceneConfig.getAttackPosXCount(); i++)
+        foreach (var item in mSquadDataList)
         {
-            BornPosInfor tBorPos = new BornPosInfor();
-            tBorPos.mBornPos = SetPosition(mBattleSceneConfig.GetAttackPosXbyIndex(i), mBattleSceneConfig.GetAttackPosZbyIndex(i));
-            if (i < mCampRedSquadList.Count)
+            if (item.GetSquadCamp()==SquadCamp.CampRed)
             {
-                tBorPos.mSquadID = mCampRedSquadList[i].GetComponent<SquadController>().GetSquadData().GetID();
+                for (int i = 0; i < mBattleSceneConfig.getAttackPosXCount(); i++)
+                {
+                    BornPosInfor tBorPos = new BornPosInfor();
+                    tBorPos.mBornPos = SetPosition(mBattleSceneConfig.GetAttackPosXbyIndex(i), mBattleSceneConfig.GetAttackPosZbyIndex(i));
+
+                    if(item.GetBornPosionIndex() ==i)
+                    {
+                        tBorPos.mSquadID = item.GetID();
+                    }
+
+                    GameObject tCube = Instantiate(mPosAsset, tBorPos.mBornPos, Quaternion.LookRotation(Vector3.forward, Vector3.up)) as GameObject;
+                    tBorPos.mPosInstance = tCube.transform;
+                    tEmb.mBornInforList.Add(tBorPos);
+                }
+
             }
-            GameObject tCube = Instantiate(mPosAsset, tBorPos.mBornPos, Quaternion.LookRotation(Vector3.forward, Vector3.up)) as GameObject;
-            tBorPos.mPosInstance = tCube.transform;
-            tEmb.AddBornList(tBorPos);
-        }
+            else if(item.GetSquadCamp() == SquadCamp.CampBlue)
+            {
+
+                for (int i = 0; i < mBattleSceneConfig.getDefencePosXCount(); i++)
+                {
+                    BornPosInfor tBorPos = new BornPosInfor();
+                    tBorPos.mBornPos = SetPosition(mBattleSceneConfig.GetDefencePosXbyIndex(i), mBattleSceneConfig.GetDefencePosZbyIndex(i));
+
+                    if (item.GetBornPosionIndex() == i)
+                    {
+                        tBorPos.mSquadID = item.GetID();
+                    }
+                    GameObject tCube = Instantiate(mPosAsset, tBorPos.mBornPos, Quaternion.LookRotation(Vector3.forward, Vector3.up)) as GameObject;
+                    tBorPos.mPosInstance = tCube.transform;
+                    tEmb.mBornInforList.Add(tBorPos);
+                }
+            }
+        }     
     }
 
     Vector3 SetPosition(float tPosx, float tPosz)
@@ -310,4 +236,78 @@ public class BattleManager : MonoBehaviour
             return new Vector3(tPosx, 0.1f, tPosz);
     }
 
+    public void GetFightInfor()
+    {
+        LogModule.DebugLog("Send Get Fight Infor!");
+        CG_FIGHT fight = (CG_FIGHT)PacketDistributed.CreatePacket(MessageID.PACKET_CG_FIGHT);
+        fight.SetType(1);
+        fight.SetAttackId(GameFacade.GetProxy<PlayerProxy>().marchlist.marchlistList[0].Marchid);
+        fight.SetDefenceId(2);
+        fight.SetSceneId(1);
+        fight.SendPacket();
+    }
+    public void SENDMARCH(long marchID)
+    {
+        CG_SEND_MARCH objListPacket = (CG_SEND_MARCH)PacketDistributed.CreatePacket(MessageID.PACKET_CG_SEND_MARCH);
+        objListPacket.SetMarchid(marchID);
+        objListPacket.SendPacket();
+    }
+
+    public void GetPosList()
+    {
+        CG_OBJPOSLIST objListPacket = (CG_OBJPOSLIST)PacketDistributed.CreatePacket(MessageID.PACKET_GC_OBJPOSLIST);
+        objListPacket.SetSceneId(mSceneID);
+        objListPacket.SendPacket();
+    }
+    public void GetBattlerInfor()
+    {
+        CG_BATTLEINFOR battlerInforPacket = (CG_BATTLEINFOR)PacketDistributed.CreatePacket(MessageID.PACKET_CG_BATTLEINFOR);
+        battlerInforPacket.SetSceneId(mSceneID);
+        battlerInforPacket.SendPacket();
+    }
+    public void ReceivePosList(object parm)
+    {
+        GC_OBJPOSLIST tObjPosList = (GC_OBJPOSLIST)parm;
+        if (mSceneID != tObjPosList.SceneId)
+            return;
+        foreach (var item in tObjPosList.objPosListList)
+        {
+            SquadController tSquadController = mSquadGameObjDict[item.ObjId].GetComponent<SquadController>();
+            tSquadController.UnitMarching(SetPosition(item.PosX,item.PosZ));
+        }
+    }
+    public void ReceiveBattleInfor(object parm)
+    {
+        GC_BATTLEINFOR tBattleInfor = GameFacade.GetProxy<BattleProxy>().BattleInfor;
+        if (mSceneID != tBattleInfor.SceneId)
+            return;
+        StartCoroutine(LoadUnitAssets(tBattleInfor));
+    }
+    public void ReceiveCommandPursue(object parm)
+    {
+        GC_OBJCOMMANDPURSUE tObjCommandPursue = GameFacade.GetProxy<BattleProxy>().PursueInfor;
+        if (mSceneID != tObjCommandPursue.SceneId)
+            return;
+        Vector3 tAimPos = mSquadGameObjDict[tObjCommandPursue.AimObjId].transform.position;
+        mSquadGameObjDict[tObjCommandPursue.ObjId].GetComponent<SquadController>().UnitMarching(tAimPos);
+    }
+    public void ReceivePrepareForAttack(object parm)
+    {
+        GC_OBJPREPAREFORATTACK tObjCommandPursue = GameFacade.GetProxy<BattleProxy>().PrepareForAttackInfor;
+        if (mSceneID != tObjCommandPursue.SceneId)
+            return;
+        Vector3 tAimPos = mSquadGameObjDict[tObjCommandPursue.AimObjId].transform.position;
+        mSquadGameObjDict[tObjCommandPursue.ObjId].GetComponent<SquadController>().UnitMarching(tAimPos);
+    }
+    public void ReceiveObjGetHurt(object parm)
+    {
+        GC_OBJGETHURT tObjHurt = GameFacade.GetProxy<BattleProxy>().ObjectGetHurt;
+        if (mSceneID != tObjHurt.SceneId)
+            return;        
+        mSquadGameObjDict[tObjHurt.ObjId].GetComponent<SquadController>().SetSquadHP(tObjHurt.Damage, mSquadGameObjDict[tObjHurt.AttackObjId].transform);
+        if (tObjHurt.DeathNumber != 0)
+            mSquadGameObjDict[tObjHurt.ObjId].GetComponent<SquadController>().UnitDie(tObjHurt.DeathNumber, mSquadGameObjDict[tObjHurt.AttackObjId].transform);
+        if (tObjHurt.ObjDead == 1)
+            mSquadGameObjDict[tObjHurt.ObjId].GetComponent<SquadController>().SquadDeath();
+    }
 }
