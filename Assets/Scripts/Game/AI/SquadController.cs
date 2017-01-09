@@ -530,7 +530,10 @@ public class SquadController : BaseController
         mRichAI.target = mOriginalAim;
         mRichAI.target.position = tAimPos;
         mRichAI.UpdatePath();
-        TryOperState(StateEnum.Walk, StateOper.Enter);
+        if (mStateMachine.GetCurrentState().StateType == StateEnum.Idle)
+            TryOperState(StateEnum.Walk, StateOper.Enter);
+        else
+            return;
         mIsMarching = true;
     }
     public void UnitMarchAttacking(float space, Vector3 tAimPos)

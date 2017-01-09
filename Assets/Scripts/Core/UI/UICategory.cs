@@ -26,8 +26,8 @@ public class UICategory
     public struct ToShowConfig
     {
         public UIItemConfig ItemConfig;
-        public DelegateUtil.TableDelegate ViewDelegate;
-        public DelegateUtil.TableDelegate RefreshDelegate;
+        public DelegateHelper.TableDelegate ViewDelegate;
+        public DelegateHelper.TableDelegate RefreshDelegate;
         public bool IsShowAnim;
     }
 

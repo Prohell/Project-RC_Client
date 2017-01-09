@@ -63,6 +63,10 @@ public class TempEntrance : MonoBehaviour
         {
             ShowMainUI();
         }
+        if (GUILayout.Button("ShowMap"))
+        {
+            SwitchToMapScene();
+        }
 
         if (GUILayout.Button("StartLuaDebugger"))
         {

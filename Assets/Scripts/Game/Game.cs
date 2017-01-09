@@ -56,11 +56,13 @@ public class Game
 		
 	static public string ServerIp = "10.12.20.37";
 	static public int ServerPort = 2231;
-	//建立服务器连接
+    static public int ServerPortTest = 2236;
+    //建立服务器连接
 
-	static public void ConnectToServer(Action<bool,string> callback){
-		NetManager.GetInstance().ConnectToServer(ServerIp, ServerPort, callback);
-	}
+    static public void ConnectToServer(Action<bool,string> callback){
+        NetManager.GetInstance().ConnectToServer(ServerIp, ServerPort, callback);
+        //NetManager.GetInstance().ConnectToServer(ServerIp, ServerPortTest, callback);
+    }
 
 	static public void InitGameAssets(Action callback = null){
 		StartCoroutine (InitAssets(callback));

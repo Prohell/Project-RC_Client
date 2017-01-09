@@ -6,7 +6,7 @@ using Random = System.Random;
 
 public class LuaTestProxy : IProxy
 {
-    public DelegateUtil.VoidDelegate OnUpdateData;
+    public DelegateHelper.VoidDelegate OnUpdateData;
 
     private Random random = new Random();
 

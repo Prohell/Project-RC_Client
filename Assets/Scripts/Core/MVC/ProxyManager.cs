@@ -18,7 +18,9 @@ public class ProxyManager : Singleton<ProxyManager>, IInit, IReset
             Type type = p.GetType();
             if (mProxies.ContainsKey(type))
             {
-                throw new Exception(type + "already exists in ProxyManager.");
+                LogModule.DebugLog(type + "already exists in ProxyManager.");
+                return;
+                //throw new Exception(type + "already exists in ProxyManager.");
             }
             p.OnInit();
             mProxies.Add(type, p);

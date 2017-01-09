@@ -167,7 +167,7 @@ public class HEX : MonoBehaviour
 		if (HexTerrainMaterials.Count < 2)
 			return new Material[2];
 
-		if (ModiRq2 == false ){
+		if (ModiRq2 == false){
 			if (HexTerrainMaterials [0] != null && HexTerrainMaterials [1] != null) {
 				HexTerrainMaterials [0].renderQueue = HexTerrainMaterials [0].shader.renderQueue;
 				HexTerrainMaterials [1].renderQueue = HexTerrainMaterials [0].renderQueue + 1;
@@ -180,8 +180,12 @@ public class HEX : MonoBehaviour
 	bool ModiRq3 = false;
 	public Material GetTerrainBlendMat()
 	{
-		if (ModiRq3 == false ){
-			HexTerrainBlendMaterial.renderQueue = HexTerrainBlendMaterial.shader.renderQueue;
+        if (HexTerrainBlendMaterial == null)
+            return new Material("");
+
+		if (ModiRq3 == false)
+        {
+            HexTerrainBlendMaterial.renderQueue = HexTerrainBlendMaterial.shader.renderQueue;
 			ModiRq3 = true;
 		}
 		return HexTerrainBlendMaterial;

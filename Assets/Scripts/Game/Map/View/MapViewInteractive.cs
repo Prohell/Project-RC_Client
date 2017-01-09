@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 
 public partial class MapView
@@ -210,6 +211,14 @@ public partial class MapView
         RaycastHit[] hits = Physics.RaycastAll(ray);
         // map space
         Coord c = Layout.ScreenPos2Coord(MapCamera, screenPos);
+        //
+        IMapAStar mapAStar = new MapAStarCompact();
+        List<Coord> roteNodes = mapAStar.CalcPath(new Coord(5, 5), c);
+        foreach (var item in roteNodes)
+        {
+            LogModule.DebugLog("roteNodes: X= " + item.x + "Y= " + item.y);
+        }
+        //
         DoClickOnTile(c);
     }
 

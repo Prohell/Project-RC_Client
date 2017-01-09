@@ -9,6 +9,7 @@ public class BattleProxy : IProxy {
     public GC_OBJPREPAREFORATTACK PrepareForAttackInfor { get; set; }
     public GC_OBJGETHURT ObjectGetHurt { get; set; }
     public GC_OBJPOSLIST CurrentObjPos { get; set; }
+    public GC_FIGHT FightInfor { get; set; }
     public void OnDestroy()
     {
     }

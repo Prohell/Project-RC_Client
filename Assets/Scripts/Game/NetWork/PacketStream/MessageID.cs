@@ -28,6 +28,7 @@ PACKET_GC_UPDATE_NEEDIMPACTINFO,	//syn need Impact Info
 PACKET_GC_PLAY_EFFECT,	//Server Send Player Use Tool
 PACKET_GC_REMOVEEFFECT,	//remove Effect
 PACKET_CG_FIGHT,	//Send Open Fight Req to Server
+PACKET_GC_FIGHT,	//Send Open Fight Ret to client
 PACKET_CG_LEAVE_COPYSCENE,	// Client Leave Copyscene
 PACKET_CG_ROBOT_OPEN,	// Send Rotbot Open
 PACKET_GC_ROBOT_OPEN,	// Ret Rotbot Open
@@ -39,7 +40,6 @@ PACKET_CG_CREATEROLE,	//client send createRole
 PACKET_GC_CREATEROLE_RET,	//server send create role result
 PACKET_GC_LOGIN_QUEUE_STATUS,	//login queue status
 PACKET_CG_BATTLEINFOR,	//
-PACKET_GC_OBJINFOR,	//
 PACKET_GC_BATTLEINFOR,	//
 PACKET_GC_OBJPOSLIST,	//
 PACKET_CG_OBJPOSLIST,	//

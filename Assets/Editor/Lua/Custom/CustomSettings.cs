@@ -42,11 +42,11 @@ public static class CustomSettings
         _DT(typeof(System.Predicate<int>)),
         _DT(typeof(System.Comparison<int>)),
 
-        _DT(typeof(DelegateUtil.VoidDelegate)),
-        _DT(typeof(DelegateUtil.IntDelegate)),
-        _DT(typeof(DelegateUtil.FloatDelegate)),
-        _DT(typeof(DelegateUtil.StringDelegate)),
-        _DT(typeof(DelegateUtil.TableDelegate)),
+        _DT(typeof(DelegateHelper.VoidDelegate)),
+        _DT(typeof(DelegateHelper.IntDelegate)),
+        _DT(typeof(DelegateHelper.FloatDelegate)),
+        _DT(typeof(DelegateHelper.StringDelegate)),
+        _DT(typeof(DelegateHelper.TableDelegate)),
 
         _DT(typeof(UIEventListener.VoidDelegate)),
         _DT(typeof(UIEventListener.BoolDelegate)),

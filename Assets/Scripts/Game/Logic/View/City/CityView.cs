@@ -21,6 +21,8 @@ public class CityView : MonoBehaviour {
 		cameraMove.gameObjectClick += ClickBuilding;
 		cameraMove.dragBegin += DragBeginHandle;
 		cameraMove.pinchBegin += PinchBeginHandle;
+
+		UIManager.GetInstance ().OpenUI ("CityUI", null, null, false);
 	}
 
 	private HighlighterController targetHighlight;
@@ -35,14 +37,16 @@ public class CityView : MonoBehaviour {
 			if(list [i].tag == "Building"){
 				if(curSlot != null){
 					curSlot.HideBuildingName ();
+					curSlot.HideBuildingLevel ();
 				}
 
+				HideBtns ();
+
 				GameObject obj = list [i];
+
 				curSlot = obj.transform.parent.GetComponent<Slot> ();
 
 				ShowCurSlotCenter ();
-
-				ShowBtns ();
 				break;
 			}
 		}
@@ -51,21 +55,37 @@ public class CityView : MonoBehaviour {
 	public void ShowCurSlotCenter(){
 		if (curSlot != null) {
 			curSlot.ShowBuildingName ();
+			curSlot.ShowBuildingLevel ();
 			Vector3 offset = curSlot.cameraOffset;
 			Vector3 pos = new Vector3 (curSlot.transform.position.x + offset.x, cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y + offset.y, curSlot.transform.position.z - Mathf.Tan (cameraMove.angleXRange.y) * (cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y) + offset.z);
 			Vector3 angle = new Vector3 (cameraMove.angleXRange.y, 0f, 0f);
+
 
 			cameraMove.transform.DOMove (pos, 0.5f).SetEase (Ease.OutCirc);
 			cameraMove.cam.transform.DORotate (angle, 0.5f).SetEase (Ease.OutCirc);
 
 			targetHighlight = curSlot.modelChild.GetComponent<HighlighterController> ();
 			targetHighlight.Fire2 ();
+			ShowBtns ();
+
+		}
+	}
+
+	public void ShowBtns(){
+		Game.StartCoroutine (ShowBtnsCoroutine());
+	}
+
+	IEnumerator ShowBtnsCoroutine(){
+		yield return new WaitForSeconds (0.2f);
+		if (curSlot != null) {
+			EventManager.GetInstance().SendEvent(EventId.BuildingSelected, curSlot.transform.GetSiblingIndex() + 1);
 		}
 	}
 
 	public void ShowCurSlotDetail(){
 		if (curSlot != null) {
 			curSlot.ShowBuildingName ();
+			curSlot.ShowBuildingLevel ();
 			Vector3 offset = curSlot.cameraOffset;
 			Vector3 pos = new Vector3 (curSlot.transform.position.x + offset.x + 50f, cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y + offset.y, curSlot.transform.position.z - Mathf.Tan (cameraMove.angleXRange.y) * (cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y) + offset.z);
 			Vector3 angle = new Vector3 (cameraMove.angleXRange.y, 0f, 0f);
@@ -78,29 +98,15 @@ public class CityView : MonoBehaviour {
 		}
 	}
 
-	public void ShowBtns(){
-		if (curSlot != null) {
-			//选择建筑物事件
-			if (UIManager.GetInstance ().GetItem ("CityUI") != null && UIManager.GetInstance ().GetItem ("CityUI").IsShowing) {
-				UIManager.GetInstance ().CloseUI ("CityUI", false);
-			}
-			UIManager.GetInstance ().OpenUI ("CityUI", null, CityUIRefresh);
-		}
-	}
 
 	public void HideBtns(){
 		if(curSlot != null){
 			curSlot.HideBuildingName ();
+			curSlot.HideBuildingLevel ();
 		}
 		curSlot = null;
 		targetHighlight = null;
-		if(UIManager.GetInstance ().GetItem("CityUI") != null && UIManager.GetInstance ().GetItem("CityUI").IsShowing){
-			UIManager.GetInstance ().CloseUI ("CityUI", false);
-		}
-	}
-
-	private void CityUIRefresh(LuaTable table){
-		EventManager.GetInstance().SendEvent(EventId.BuildingSelected, curSlot.transform.GetSiblingIndex() + 1);
+		EventManager.GetInstance().SendEvent(EventId.BuildingSelected, -1);
 	}
 
 	private void DragBeginHandle(){

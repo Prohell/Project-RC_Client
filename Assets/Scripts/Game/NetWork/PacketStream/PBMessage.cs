@@ -4443,6 +4443,125 @@ public override bool IsInitialized() {
 
 
 [Serializable]
+public class GC_FIGHT : PacketDistributed
+{
+
+public const int retFieldNumber = 1;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
+public const int marchIdFieldNumber = 2;
+ private bool hasMarchId;
+ private Int64 marchId_ = 0;
+ public bool HasMarchId {
+ get { return hasMarchId; }
+ }
+ public Int64 MarchId {
+ get { return marchId_; }
+ set { SetMarchId(value); }
+ }
+ public void SetMarchId(Int64 value) { 
+ hasMarchId = true;
+ marchId_ = value;
+ }
+
+public const int sceneIdFieldNumber = 3;
+ private bool hasSceneId;
+ private Int32 sceneId_ = 0;
+ public bool HasSceneId {
+ get { return hasSceneId; }
+ }
+ public Int32 SceneId {
+ get { return sceneId_; }
+ set { SetSceneId(value); }
+ }
+ public void SetSceneId(Int32 value) { 
+ hasSceneId = true;
+ sceneId_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Ret);
+}
+ if (HasMarchId) {
+size += pb::CodedOutputStream.ComputeInt64Size(2, MarchId);
+}
+ if (HasSceneId) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, SceneId);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasRet) {
+output.WriteInt32(1, Ret);
+}
+ 
+if (HasMarchId) {
+output.WriteInt64(2, MarchId);
+}
+ 
+if (HasSceneId) {
+output.WriteInt32(3, SceneId);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_FIGHT _inst = (GC_FIGHT) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
+   case  16: {
+ _inst.MarchId = input.ReadInt64();
+break;
+}
+   case  24: {
+ _inst.SceneId = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasRet) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
 public class CG_LEAVE_COPYSCENE : PacketDistributed
 {
 
@@ -7369,21 +7488,21 @@ public const int unitDataIdFieldNumber = 2;
  unitDataId_ = value;
  }
 
-public const int skillDataIdFieldNumber = 3;
- private pbc::PopsicleList<Int32> skillDataId_ = new pbc::PopsicleList<Int32>();
- public scg::IList<Int32> skillDataIdList {
- get { return pbc::Lists.AsReadOnly(skillDataId_); }
+public const int skilldataidFieldNumber = 3;
+ private pbc::PopsicleList<Int32> skilldataid_ = new pbc::PopsicleList<Int32>();
+ public scg::IList<Int32> skilldataidList {
+ get { return pbc::Lists.AsReadOnly(skilldataid_); }
  }
  
- public int skillDataIdCount {
- get { return skillDataId_.Count; }
+ public int skilldataidCount {
+ get { return skilldataid_.Count; }
  }
  
-public Int32 GetSkillDataId(int index) {
- return skillDataId_[index];
+public Int32 GetSkilldataid(int index) {
+ return skilldataid_[index];
  }
- public void AddSkillDataId(Int32 value) {
- skillDataId_.Add(value);
+ public void AddSkilldataid(Int32 value) {
+ skilldataid_.Add(value);
  }
 
 public const int campFieldNumber = 4;
@@ -7401,19 +7520,19 @@ public const int campFieldNumber = 4;
  camp_ = value;
  }
 
-public const int unitCountFieldNumber = 5;
- private bool hasUnitCount;
- private Int32 unitCount_ = 0;
- public bool HasUnitCount {
- get { return hasUnitCount; }
+public const int unitcountFieldNumber = 5;
+ private bool hasUnitcount;
+ private Int32 unitcount_ = 0;
+ public bool HasUnitcount {
+ get { return hasUnitcount; }
  }
- public Int32 UnitCount {
- get { return unitCount_; }
- set { SetUnitCount(value); }
+ public Int32 Unitcount {
+ get { return unitcount_; }
+ set { SetUnitcount(value); }
  }
- public void SetUnitCount(Int32 value) { 
- hasUnitCount = true;
- unitCount_ = value;
+ public void SetUnitcount(Int32 value) { 
+ hasUnitcount = true;
+ unitcount_ = value;
  }
 
 public const int hpFieldNumber = 6;
@@ -7506,49 +7625,49 @@ public const int levelFieldNumber = 11;
  level_ = value;
  }
 
-public const int posXFieldNumber = 12;
- private bool hasPosX;
- private Int32 posX_ = 0;
- public bool HasPosX {
- get { return hasPosX; }
+public const int posxFieldNumber = 12;
+ private bool hasPosx;
+ private Int32 posx_ = 0;
+ public bool HasPosx {
+ get { return hasPosx; }
  }
- public Int32 PosX {
- get { return posX_; }
- set { SetPosX(value); }
+ public Int32 Posx {
+ get { return posx_; }
+ set { SetPosx(value); }
  }
- public void SetPosX(Int32 value) { 
- hasPosX = true;
- posX_ = value;
- }
-
-public const int posZFieldNumber = 13;
- private bool hasPosZ;
- private Int32 posZ_ = 0;
- public bool HasPosZ {
- get { return hasPosZ; }
- }
- public Int32 PosZ {
- get { return posZ_; }
- set { SetPosZ(value); }
- }
- public void SetPosZ(Int32 value) { 
- hasPosZ = true;
- posZ_ = value;
+ public void SetPosx(Int32 value) { 
+ hasPosx = true;
+ posx_ = value;
  }
 
-public const int arrangeIndexFieldNumber = 14;
- private bool hasArrangeIndex;
- private Int32 arrangeIndex_ = 0;
- public bool HasArrangeIndex {
- get { return hasArrangeIndex; }
+public const int poszFieldNumber = 13;
+ private bool hasPosz;
+ private Int32 posz_ = 0;
+ public bool HasPosz {
+ get { return hasPosz; }
  }
- public Int32 ArrangeIndex {
- get { return arrangeIndex_; }
- set { SetArrangeIndex(value); }
+ public Int32 Posz {
+ get { return posz_; }
+ set { SetPosz(value); }
  }
- public void SetArrangeIndex(Int32 value) { 
- hasArrangeIndex = true;
- arrangeIndex_ = value;
+ public void SetPosz(Int32 value) { 
+ hasPosz = true;
+ posz_ = value;
+ }
+
+public const int arrangeindexFieldNumber = 14;
+ private bool hasArrangeindex;
+ private Int32 arrangeindex_ = 0;
+ public bool HasArrangeindex {
+ get { return hasArrangeindex; }
+ }
+ public Int32 Arrangeindex {
+ get { return arrangeindex_; }
+ set { SetArrangeindex(value); }
+ }
+ public void SetArrangeindex(Int32 value) { 
+ hasArrangeindex = true;
+ arrangeindex_ = value;
  }
 
  private int memoizedSerializedSize = -1;
@@ -7565,17 +7684,17 @@ size += pb::CodedOutputStream.ComputeInt32Size(2, UnitDataId);
 }
 {
 int dataSize = 0;
-for(int i=0; i<skillDataIdList.Count; ++i){
-dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(skillDataIdList[i]);
+for(int i=0; i<skilldataidList.Count; ++i){
+dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(skilldataidList[i]);
 }
 size += dataSize;
-size += 1 * skillDataId_.Count;
+size += 1 * skilldataid_.Count;
 }
  if (HasCamp) {
 size += pb::CodedOutputStream.ComputeInt32Size(4, Camp);
 }
- if (HasUnitCount) {
-size += pb::CodedOutputStream.ComputeInt32Size(5, UnitCount);
+ if (HasUnitcount) {
+size += pb::CodedOutputStream.ComputeInt32Size(5, Unitcount);
 }
  if (HasHp) {
 size += pb::CodedOutputStream.ComputeInt32Size(6, Hp);
@@ -7595,14 +7714,14 @@ size += pb::CodedOutputStream.ComputeInt32Size(10, Sp);
  if (HasLevel) {
 size += pb::CodedOutputStream.ComputeInt32Size(11, Level);
 }
- if (HasPosX) {
-size += pb::CodedOutputStream.ComputeInt32Size(12, PosX);
+ if (HasPosx) {
+size += pb::CodedOutputStream.ComputeInt32Size(12, Posx);
 }
- if (HasPosZ) {
-size += pb::CodedOutputStream.ComputeInt32Size(13, PosZ);
+ if (HasPosz) {
+size += pb::CodedOutputStream.ComputeInt32Size(13, Posz);
 }
- if (HasArrangeIndex) {
-size += pb::CodedOutputStream.ComputeInt32Size(14, ArrangeIndex);
+ if (HasArrangeindex) {
+size += pb::CodedOutputStream.ComputeInt32Size(14, Arrangeindex);
 }
  memoizedSerializedSize = size;
  return size;
@@ -7620,9 +7739,9 @@ if (HasUnitDataId) {
 output.WriteInt32(2, UnitDataId);
 }
 {
-if (skillDataId_.Count > 0) {
-for(int i=0; i<skillDataId_.Count; ++i){
-output.WriteInt32(3,skillDataId_[i]);
+if (skilldataid_.Count > 0) {
+for(int i=0; i<skilldataid_.Count; ++i){
+output.WriteInt32(3,skilldataid_[i]);
 }
 }
 
@@ -7632,8 +7751,8 @@ if (HasCamp) {
 output.WriteInt32(4, Camp);
 }
  
-if (HasUnitCount) {
-output.WriteInt32(5, UnitCount);
+if (HasUnitcount) {
+output.WriteInt32(5, Unitcount);
 }
  
 if (HasHp) {
@@ -7660,16 +7779,16 @@ if (HasLevel) {
 output.WriteInt32(11, Level);
 }
  
-if (HasPosX) {
-output.WriteInt32(12, PosX);
+if (HasPosx) {
+output.WriteInt32(12, Posx);
 }
  
-if (HasPosZ) {
-output.WriteInt32(13, PosZ);
+if (HasPosz) {
+output.WriteInt32(13, Posz);
 }
  
-if (HasArrangeIndex) {
-output.WriteInt32(14, ArrangeIndex);
+if (HasArrangeindex) {
+output.WriteInt32(14, Arrangeindex);
 }
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
@@ -7690,7 +7809,7 @@ break;
 break;
 }
    case  24: {
- _inst.AddSkillDataId(input.ReadInt32());
+ _inst.AddSkilldataid(input.ReadInt32());
 break;
 }
    case  32: {
@@ -7698,7 +7817,7 @@ break;
 break;
 }
    case  40: {
- _inst.UnitCount = input.ReadInt32();
+ _inst.Unitcount = input.ReadInt32();
 break;
 }
    case  48: {
@@ -7726,15 +7845,15 @@ break;
 break;
 }
    case  96: {
- _inst.PosX = input.ReadInt32();
+ _inst.Posx = input.ReadInt32();
 break;
 }
    case  104: {
- _inst.PosZ = input.ReadInt32();
+ _inst.Posz = input.ReadInt32();
 break;
 }
    case  112: {
- _inst.ArrangeIndex = input.ReadInt32();
+ _inst.Arrangeindex = input.ReadInt32();
 break;
 }
 
@@ -7747,16 +7866,16 @@ public override bool IsInitialized() {
   if (!hasId) return false;
  if (!hasUnitDataId) return false;
  if (!hasCamp) return false;
- if (!hasUnitCount) return false;
+ if (!hasUnitcount) return false;
  if (!hasHp) return false;
  if (!hasMaxhp) return false;
  if (!hasAttack) return false;
  if (!hasDefence) return false;
  if (!hasSp) return false;
  if (!hasLevel) return false;
- if (!hasPosX) return false;
- if (!hasPosZ) return false;
- if (!hasArrangeIndex) return false;
+ if (!hasPosx) return false;
+ if (!hasPosz) return false;
+ if (!hasArrangeindex) return false;
  return true;
  }
 

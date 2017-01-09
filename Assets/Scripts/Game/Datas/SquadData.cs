@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using GCGame.Table;
 /// <summary>
 /// 小队数据部分
 /// by Zhengxuesong
 /// 2016-11-11
 /// </summary>
 public enum SquadCamp {
-    CampRed,
-    CampBlue
+    CampRed =1,
+    CampBlue =2
 }
 
 public class SquadData {
@@ -36,6 +37,8 @@ public class SquadData {
     private int mUnitCount;
     // the Unit cout in one Row
     private int mUnitCountOfRow;
+    //the Squad Template ID
+    private int mSquadTemplateID =1;
     // the Unit Template ID
     private int mUnitTemplateID= 100001;
     // the teamformation ID
@@ -72,16 +75,20 @@ public class SquadData {
     }
     public void SetSquadInfor(GC_OBJINFOR tObjInfor)
     {
+        mID = tObjInfor.Id;
         mSquadCamp = (SquadCamp)tObjInfor.Camp;
-        mUnitCount = tObjInfor.UnitCount;
+        mUnitCount = tObjInfor.Unitcount;
         mHP = tObjInfor.Hp;
         mHPMax = tObjInfor.Maxhp;
         mSquadAttack = tObjInfor.Attack;
         mSquadDefence = tObjInfor.Defence;
         mSp = tObjInfor.Sp;
         mlevel = tObjInfor.Level;
-        mBornPosionX = tObjInfor.PosX;
-        mBornPosionZ = tObjInfor.PosZ;
+        mBornPosionX = tObjInfor.Posx;
+        mBornPosionZ = tObjInfor.Posz;
+        mSquadTemplateID = tObjInfor.UnitDataId;
+        Tab_RoleBaseAttr tRoleBaseAttr = TableManager.GetRoleBaseAttrByID(tObjInfor.UnitDataId)[0];
+        mUnitTemplateID = tRoleBaseAttr.UnitDataID;
     }
     public int GetBornPosionIndex()
     {

@@ -269,6 +269,23 @@ private static Dictionary<int, List<Tab_PVETile> > g_PVETile = new Dictionary<in
  }
  return true;
  }
+private static Dictionary<int, List<Tab_RoleBaseAttr> > g_RoleBaseAttr = new Dictionary<int, List<Tab_RoleBaseAttr> >(); 
+ public static bool InitTable_RoleBaseAttr()
+ {
+ g_RoleBaseAttr.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_RoleBaseAttr.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_RoleBaseAttr> values = new List<Tab_RoleBaseAttr>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_RoleBaseAttr)subit);
+ }
+ g_RoleBaseAttr.Add(kv.Key, values);
+ }
+ return true;
+ }
 private static Dictionary<int, List<Tab_SceneClass> > g_SceneClass = new Dictionary<int, List<Tab_SceneClass> >(); 
  public static bool InitTable_SceneClass()
  {
@@ -334,6 +351,8 @@ bRet &= InitTable_CityBuildingLevel();
 bRet &= InitTable_CityBuildingSlot();
 
 bRet &= InitTable_PVETile();
+
+bRet &= InitTable_RoleBaseAttr();
 
 bRet &= InitTable_SceneClass();
 
@@ -547,6 +566,40 @@ public static List<Tab_PVETile> GetPVETileByID(int nKey)
  InitTable_PVETile();
  }
  return g_PVETile;
+ }
+
+public static List<Tab_RoleBaseAttr> GetRoleBaseAttrByID(int nKey)
+ {
+ if(g_RoleBaseAttr.Count==0)
+ {
+ InitTable_RoleBaseAttr();
+ }
+ if( g_RoleBaseAttr.ContainsKey(nKey))
+ {
+ return g_RoleBaseAttr[nKey];
+ }
+ return null;
+ }
+ public static Tab_RoleBaseAttr GetRoleBaseAttrByID(int nKey, int nIndex)
+ {
+ if(g_RoleBaseAttr.Count==0)
+ {
+ InitTable_RoleBaseAttr();
+ }
+ if( g_RoleBaseAttr.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_RoleBaseAttr[nKey].Count)
+ return g_RoleBaseAttr[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_RoleBaseAttr> > GetRoleBaseAttr()
+ {
+ if(g_RoleBaseAttr.Count==0)
+ {
+ InitTable_RoleBaseAttr();
+ }
+ return g_RoleBaseAttr;
  }
 
 public static List<Tab_SceneClass> GetSceneClassByID(int nKey)

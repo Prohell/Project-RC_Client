@@ -192,28 +192,28 @@ public class LuaHelper
         Game.StartCoroutine(GameAssets.LoadAssetAsync<GameObject>(assetBundleName, assetName, OnLoadDone));
     }
 
-    public static void AddListener(DelegateUtil.VoidDelegate source, object dest)
+    public static void AddListener(DelegateHelper.VoidDelegate source, object dest)
     {
-        source += (DelegateUtil.VoidDelegate)dest;
+        source += (DelegateHelper.VoidDelegate)dest;
     }
 
-    public static void AddListener(DelegateUtil.IntDelegate source, object dest)
+    public static void AddListener(DelegateHelper.IntDelegate source, object dest)
     {
-        source += (DelegateUtil.IntDelegate)dest;
+        source += (DelegateHelper.IntDelegate)dest;
     }
 
-    public static void AddListener(DelegateUtil.FloatDelegate source, object dest)
+    public static void AddListener(DelegateHelper.FloatDelegate source, object dest)
     {
-        source += (DelegateUtil.FloatDelegate)dest;
+        source += (DelegateHelper.FloatDelegate)dest;
     }
 
-    public static void AddListener(DelegateUtil.StringDelegate source, object dest)
+    public static void AddListener(DelegateHelper.StringDelegate source, object dest)
     {
-        source += (DelegateUtil.StringDelegate)dest;
+        source += (DelegateHelper.StringDelegate)dest;
     }
 
-    public static void AddListener(DelegateUtil.TableDelegate source, object dest)
+    public static void AddListener(DelegateHelper.TableDelegate source, object dest)
     {
-        source += (DelegateUtil.TableDelegate)dest;
+        source += (DelegateHelper.TableDelegate)dest;
     }
 }

@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using LuaInterface;
 
 public class CityUIMediator : IUIMediator, IMediator{
+
+	private Dictionary<int,string[]> typeDic = new Dictionary<int, string[]>();
 
 	public void OnInit()
 	{
 		EventManager.GetInstance ().AddEventListener (EventId.BuildingSelected, BuildingSelected);
 		EventManager.GetInstance().AddEventListener(EventId.BuildingBtnClick, BuildingBtnClick);
+
+
+		typeDic.Add (1,new string[3]{"Btn_Info","Btn_LevelUp","Btn_Train"});
 	}
 
 	public void OnDestroy()
@@ -21,7 +27,7 @@ public class CityUIMediator : IUIMediator, IMediator{
 		curSlot = num;
 		if(num == -1){
 			if (selectType != null) {
-				selectType (-1);
+				selectType (null);
 			}
 			return;
 		}
@@ -30,7 +36,7 @@ public class CityUIMediator : IUIMediator, IMediator{
 		BuildingData data = cityMediator.GetDataByNum (num);
 		if (data != null) {
 			if (selectType != null) {
-				selectType (data.id);
+				selectType (typeDic[data.id]);
 			}
 		} else {
 			#if UNITY_EDITOR
@@ -43,9 +49,7 @@ public class CityUIMediator : IUIMediator, IMediator{
 		string n = name.ToString ();
 		switch(n){
 		case "details":
-			if (UIManager.GetInstance ().GetItem ("CityUI") != null && UIManager.GetInstance ().GetItem ("CityUI").IsShowing) {
-				UIManager.GetInstance ().CloseUI ("CityUI", false);
-			}
+			BuildingSelected (-1);
 
 			UIManager.GetInstance ().OpenUI ("DetailsUI");
 
@@ -56,8 +60,9 @@ public class CityUIMediator : IUIMediator, IMediator{
 		case "levelUp":
 			break;
 		case "training":
+			BuildingSelected (-1);
 
-			UIManager.GetInstance ().OpenUI ("TrainingUI");
+			UIManager.GetInstance ().OpenUI ("TroopTrainUI");
 			break;
 		case "collect":
 			break;
@@ -67,11 +72,11 @@ public class CityUIMediator : IUIMediator, IMediator{
 	private IEnumerator AAA(){
 		yield return new WaitForSeconds (0.1f);
 		if(selectType != null){
-			selectType (100);
+			selectType (typeDic[1]);
 		}
 	}
 
-	public Action<int> selectType;
+	public Action<string[]> selectType;
 
 
 	LuaTable IUIMediator.m_View { get; set; }

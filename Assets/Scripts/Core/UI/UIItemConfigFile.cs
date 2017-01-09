@@ -83,17 +83,17 @@ public class UIItemConfigFile : ScriptableObject
             Name = "CityUI",
 			BundleName = "load_preload$s_ui$cityui.assetbundle",
             AssetName = "CityUI",
-            Type = "Window",
+            Type = "FullScreen",
 			ViewName = "CityUI"
         },
 		new UIItemConfig()
 		{
-			MediatorType = "TrainingUIMediator",
-			Name = "TrainingUI",
-			BundleName = "load_preload$s_ui$trainingui.assetbundle",
-			AssetName = "TrainingUI",
+			MediatorType = "TroopTrainUIMediator",
+			Name = "TroopTrainUI",
+			BundleName = "load_preload$s_ui$trooptrainui.assetbundle",
+			AssetName = "TroopTrainUI",
 			Type = "Window",
-			ViewName = "TrainingUI"
+			ViewName = "TroopTrainUI"
 		},
 		new UIItemConfig()
 		{

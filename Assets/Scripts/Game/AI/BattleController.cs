@@ -92,7 +92,7 @@ public class BattleController : MonoBehaviour {
         mBattleSceneConfig = TableManager.GetSceneClassByID(100001)[0];
 
         mTemRedBornPos = SetPosition(mBattleSceneConfig.GetAttackPosXbyIndex(0),mBattleSceneConfig.GetAttackPosZbyIndex(0));
-        mTemBlueBornPos = SetPosition(mBattleSceneConfig.GetDefencePosXbyIndex(0), mBattleSceneConfig.GetDefencePosZbyIndex(0));
+        mTemBlueBornPos = SetPosition(mBattleSceneConfig.GetDefencePosXbyIndex(0) , mBattleSceneConfig.GetDefencePosZbyIndex(0));
 
         StartCoroutine(LoadUnitAssets());
 
@@ -100,7 +100,7 @@ public class BattleController : MonoBehaviour {
         EventManager.GetInstance().AddEventListener(EventId.StartBattle, StartBattleTest);
 
         //Open Battle UI.
-        MediatorManager.GetInstance().Add(new BattleUIController());
+        // MediatorManager.GetInstance().Add(new BattleUIController());
     }
 
     void OnDestroy()
@@ -123,10 +123,11 @@ public class BattleController : MonoBehaviour {
             if (tReverse)
                 rowRoot = -rowRoot;
 
-            GameObject tSquad =Instantiate(mSquadAsset, tBornPos + new Vector3(rowRoot * mSquadSpace, 0f, colRoot * mSquadSpace), mtBornQu)as GameObject;
+            Vector3 tSquadPos = tBornPos + new Vector3(rowRoot * mSquadSpace, 0f, colRoot * mSquadSpace);
+            GameObject tSquad =Instantiate(mSquadAsset,SetPosition(tSquadPos.x,tSquadPos.z) , mtBornQu)as GameObject;
             tSquadList.Add(tSquad);
 
-            GameObject tSquadAim = Instantiate(mUnitAimAsset, tBornPos + new Vector3(rowRoot * mSquadSpace, 0f, colRoot * mSquadSpace), mtBornQu) as GameObject;
+            GameObject tSquadAim = Instantiate(mUnitAimAsset, SetPosition(tSquadPos.x, tSquadPos.z), mtBornQu) as GameObject;
             tSquadList[j].GetComponent<SquadController>().SetmOriginalAim(tSquadAim.transform);
             tSquadList[j].GetComponent<SquadController>().GetSquadData().SetUnitCountOfRow(tUnitNumbers/ tRowCount);
 
@@ -142,16 +143,18 @@ public class BattleController : MonoBehaviour {
                     row = -row;
 
                 GameObject tUnit;
+                Vector3 tUnitPos = tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace);
+
                 if (rowRoot != 1)
                 {
-                    tUnit = Instantiate(mArcherAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
+                    tUnit = Instantiate(mArcherAsset, SetPosition(tUnitPos.x,tUnitPos.z), mtBornQu) as GameObject;
                 }
                 else
                 {
-                    tUnit = Instantiate(mUnitAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
+                    tUnit = Instantiate(mUnitAsset, SetPosition(tUnitPos.x, tUnitPos.z), mtBornQu) as GameObject;
                 }                   
 
-                GameObject tUnitAim = Instantiate(mUnitAimAsset, tBornPos + new Vector3(row * mUnitSpace + rowRoot * mSquadSpace, 0f, col * mUnitSpace + colRoot * mSquadSpace), mtBornQu) as GameObject;
+                GameObject tUnitAim = Instantiate(mUnitAimAsset,SetPosition(tUnitPos.x,tUnitPos.z), mtBornQu) as GameObject;
 
                 UnitController tUnitController = tUnit.GetComponent<UnitController>();
                 if (rowRoot != 1)

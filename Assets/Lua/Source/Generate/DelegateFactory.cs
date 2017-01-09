@@ -23,11 +23,11 @@ public static class DelegateFactory
 		dict.Add(typeof(UnityEngine.Events.UnityAction), UnityEngine_Events_UnityAction);
 		dict.Add(typeof(System.Predicate<int>), System_Predicate_int);
 		dict.Add(typeof(System.Comparison<int>), System_Comparison_int);
-		dict.Add(typeof(DelegateUtil.VoidDelegate), DelegateUtil_VoidDelegate);
-		dict.Add(typeof(DelegateUtil.IntDelegate), DelegateUtil_IntDelegate);
-		dict.Add(typeof(DelegateUtil.FloatDelegate), DelegateUtil_FloatDelegate);
-		dict.Add(typeof(DelegateUtil.StringDelegate), DelegateUtil_StringDelegate);
-		dict.Add(typeof(DelegateUtil.TableDelegate), DelegateUtil_TableDelegate);
+		dict.Add(typeof(DelegateHelper.VoidDelegate), DelegateHelper_VoidDelegate);
+		dict.Add(typeof(DelegateHelper.IntDelegate), DelegateHelper_IntDelegate);
+		dict.Add(typeof(DelegateHelper.FloatDelegate), DelegateHelper_FloatDelegate);
+		dict.Add(typeof(DelegateHelper.StringDelegate), DelegateHelper_StringDelegate);
+		dict.Add(typeof(DelegateHelper.TableDelegate), DelegateHelper_TableDelegate);
 		dict.Add(typeof(UIEventListener.VoidDelegate), UIEventListener_VoidDelegate);
 		dict.Add(typeof(UIEventListener.BoolDelegate), UIEventListener_BoolDelegate);
 		dict.Add(typeof(UIEventListener.FloatDelegate), UIEventListener_FloatDelegate);
@@ -498,10 +498,10 @@ public static class DelegateFactory
 		}
 	}
 
-	class DelegateUtil_VoidDelegate_Event : LuaDelegate
+	class DelegateHelper_VoidDelegate_Event : LuaDelegate
 	{
-		public DelegateUtil_VoidDelegate_Event(LuaFunction func) : base(func) { }
-		public DelegateUtil_VoidDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public DelegateHelper_VoidDelegate_Event(LuaFunction func) : base(func) { }
+		public DelegateHelper_VoidDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
 		public void Call()
 		{
@@ -517,34 +517,34 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate DelegateUtil_VoidDelegate(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate DelegateHelper_VoidDelegate(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			DelegateUtil.VoidDelegate fn = delegate() { };
+			DelegateHelper.VoidDelegate fn = delegate() { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			DelegateUtil_VoidDelegate_Event target = new DelegateUtil_VoidDelegate_Event(func);
-			DelegateUtil.VoidDelegate d = target.Call;
+			DelegateHelper_VoidDelegate_Event target = new DelegateHelper_VoidDelegate_Event(func);
+			DelegateHelper.VoidDelegate d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			DelegateUtil_VoidDelegate_Event target = new DelegateUtil_VoidDelegate_Event(func, self);
-			DelegateUtil.VoidDelegate d = target.CallWithSelf;
+			DelegateHelper_VoidDelegate_Event target = new DelegateHelper_VoidDelegate_Event(func, self);
+			DelegateHelper.VoidDelegate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
 	}
 
-	class DelegateUtil_IntDelegate_Event : LuaDelegate
+	class DelegateHelper_IntDelegate_Event : LuaDelegate
 	{
-		public DelegateUtil_IntDelegate_Event(LuaFunction func) : base(func) { }
-		public DelegateUtil_IntDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public DelegateHelper_IntDelegate_Event(LuaFunction func) : base(func) { }
+		public DelegateHelper_IntDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
 		public void Call(int param0)
 		{
@@ -564,36 +564,36 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate DelegateUtil_IntDelegate(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate DelegateHelper_IntDelegate(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			DelegateUtil.IntDelegate fn = delegate(int param0) { };
+			DelegateHelper.IntDelegate fn = delegate(int param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			DelegateUtil_IntDelegate_Event target = new DelegateUtil_IntDelegate_Event(func);
-			DelegateUtil.IntDelegate d = target.Call;
+			DelegateHelper_IntDelegate_Event target = new DelegateHelper_IntDelegate_Event(func);
+			DelegateHelper.IntDelegate d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			DelegateUtil_IntDelegate_Event target = new DelegateUtil_IntDelegate_Event(func, self);
-			DelegateUtil.IntDelegate d = target.CallWithSelf;
+			DelegateHelper_IntDelegate_Event target = new DelegateHelper_IntDelegate_Event(func, self);
+			DelegateHelper.IntDelegate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
 	}
 
-	class DelegateUtil_FloatDelegate_Event : LuaDelegate
+	class DelegateHelper_FloatDelegate_Event : LuaDelegate
 	{
-		public DelegateUtil_FloatDelegate_Event(LuaFunction func) : base(func) { }
-		public DelegateUtil_FloatDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public DelegateHelper_FloatDelegate_Event(LuaFunction func) : base(func) { }
+		public DelegateHelper_FloatDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
-		public void Call(int param0)
+		public void Call(float param0)
 		{
 			func.BeginPCall();
 			func.Push(param0);
@@ -601,7 +601,7 @@ public static class DelegateFactory
 			func.EndPCall();
 		}
 
-		public void CallWithSelf(int param0)
+		public void CallWithSelf(float param0)
 		{
 			func.BeginPCall();
 			func.Push(self);
@@ -611,36 +611,36 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate DelegateUtil_FloatDelegate(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate DelegateHelper_FloatDelegate(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			DelegateUtil.FloatDelegate fn = delegate(int param0) { };
+			DelegateHelper.FloatDelegate fn = delegate(float param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			DelegateUtil_FloatDelegate_Event target = new DelegateUtil_FloatDelegate_Event(func);
-			DelegateUtil.FloatDelegate d = target.Call;
+			DelegateHelper_FloatDelegate_Event target = new DelegateHelper_FloatDelegate_Event(func);
+			DelegateHelper.FloatDelegate d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			DelegateUtil_FloatDelegate_Event target = new DelegateUtil_FloatDelegate_Event(func, self);
-			DelegateUtil.FloatDelegate d = target.CallWithSelf;
+			DelegateHelper_FloatDelegate_Event target = new DelegateHelper_FloatDelegate_Event(func, self);
+			DelegateHelper.FloatDelegate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
 	}
 
-	class DelegateUtil_StringDelegate_Event : LuaDelegate
+	class DelegateHelper_StringDelegate_Event : LuaDelegate
 	{
-		public DelegateUtil_StringDelegate_Event(LuaFunction func) : base(func) { }
-		public DelegateUtil_StringDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public DelegateHelper_StringDelegate_Event(LuaFunction func) : base(func) { }
+		public DelegateHelper_StringDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
-		public void Call(int param0)
+		public void Call(string param0)
 		{
 			func.BeginPCall();
 			func.Push(param0);
@@ -648,7 +648,7 @@ public static class DelegateFactory
 			func.EndPCall();
 		}
 
-		public void CallWithSelf(int param0)
+		public void CallWithSelf(string param0)
 		{
 			func.BeginPCall();
 			func.Push(self);
@@ -658,34 +658,34 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate DelegateUtil_StringDelegate(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate DelegateHelper_StringDelegate(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			DelegateUtil.StringDelegate fn = delegate(int param0) { };
+			DelegateHelper.StringDelegate fn = delegate(string param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			DelegateUtil_StringDelegate_Event target = new DelegateUtil_StringDelegate_Event(func);
-			DelegateUtil.StringDelegate d = target.Call;
+			DelegateHelper_StringDelegate_Event target = new DelegateHelper_StringDelegate_Event(func);
+			DelegateHelper.StringDelegate d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			DelegateUtil_StringDelegate_Event target = new DelegateUtil_StringDelegate_Event(func, self);
-			DelegateUtil.StringDelegate d = target.CallWithSelf;
+			DelegateHelper_StringDelegate_Event target = new DelegateHelper_StringDelegate_Event(func, self);
+			DelegateHelper.StringDelegate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
 	}
 
-	class DelegateUtil_TableDelegate_Event : LuaDelegate
+	class DelegateHelper_TableDelegate_Event : LuaDelegate
 	{
-		public DelegateUtil_TableDelegate_Event(LuaFunction func) : base(func) { }
-		public DelegateUtil_TableDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public DelegateHelper_TableDelegate_Event(LuaFunction func) : base(func) { }
+		public DelegateHelper_TableDelegate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
 		public void Call(LuaInterface.LuaTable param0)
 		{
@@ -705,25 +705,25 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate DelegateUtil_TableDelegate(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate DelegateHelper_TableDelegate(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			DelegateUtil.TableDelegate fn = delegate(LuaInterface.LuaTable param0) { };
+			DelegateHelper.TableDelegate fn = delegate(LuaInterface.LuaTable param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			DelegateUtil_TableDelegate_Event target = new DelegateUtil_TableDelegate_Event(func);
-			DelegateUtil.TableDelegate d = target.Call;
+			DelegateHelper_TableDelegate_Event target = new DelegateHelper_TableDelegate_Event(func);
+			DelegateHelper.TableDelegate d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			DelegateUtil_TableDelegate_Event target = new DelegateUtil_TableDelegate_Event(func, self);
-			DelegateUtil.TableDelegate d = target.CallWithSelf;
+			DelegateHelper_TableDelegate_Event target = new DelegateHelper_TableDelegate_Event(func, self);
+			DelegateHelper.TableDelegate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

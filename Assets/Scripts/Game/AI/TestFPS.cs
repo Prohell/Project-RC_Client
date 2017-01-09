@@ -6,9 +6,10 @@ public class TestFPS : MonoBehaviour {
 
     private string mUnitNumbers;
     public InputField mInputField;
+    public InputField mInputField2;
 
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
        // EventManager.GetInstance().AddEventListener("Prepare", StartBattle);
     }
 	
@@ -26,6 +27,6 @@ public class TestFPS : MonoBehaviour {
     }
     public void StartFight()
     {
-        EventManager.GetInstance().SendEvent(EventId.StartFight);
+        EventManager.GetInstance().SendEvent(EventId.StartFight, mInputField2.text);
     }
 }

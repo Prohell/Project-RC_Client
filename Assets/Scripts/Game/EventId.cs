@@ -31,7 +31,9 @@
     public const string LoadSquad = "LoadSquad";
     public const string StartBattle = "StartBattle";
     public const string StartFight = "StartFight";
-    //Event from CG_ASSIGN_HEROHandler to BattleManager
+    //Event from Handler to BattleManager
+    public const string ReceiveFight = "ReceiveFight";
+
     public const string ReceiveBattleInfor = "ReceiveBattleInfor";
     public const string ReceiveSquadPosInfor = "ReceiveSquadPosInfor";
     public const string ReceiveCommandPursue = "ReceiveCommandPursue";

@@ -53,7 +53,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_viewInitCallBack"></param>
     /// <param name="p_viewRefreshCallBack"></param>
     /// <param name="isShowAnimation"></param>
-    public void OpenUI(string p_name, DelegateUtil.TableDelegate p_viewInitCallBack = null, DelegateUtil.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
+    public void OpenUI(string p_name, DelegateHelper.TableDelegate p_viewInitCallBack = null, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
         try
         {
@@ -85,7 +85,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_allocateDepth">allocate several panel depth to ui</param>
     /// <param name="p_viewName"></param>
     /// <param name="isShowAnimation"></param>
-    public bool OpenUIInternal(UIItemConfig p_config, DelegateUtil.TableDelegate p_viewInitCallBack = null, DelegateUtil.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
+    public bool OpenUIInternal(UIItemConfig p_config, DelegateHelper.TableDelegate p_viewInitCallBack = null, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
         try
         {
@@ -137,7 +137,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_name">name you defined</param>
     /// <param name="p_viewRefreshCallBack"></param>
     /// <param name="isShowAnimation"></param>
-    private void ExeAfterOpenUI(UIItemConfig p_config, DelegateUtil.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
+    private void ExeAfterOpenUI(UIItemConfig p_config, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
         try
         {
@@ -205,7 +205,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_allocateDepth">allocate several panel depth to ui</param>
     /// <param name="p_viewName"></param>
     /// <param name="isShowAnimation"></param>
-    private void CreateUI(UIItemConfig p_config, DelegateUtil.TableDelegate p_viewInitCallBack, DelegateUtil.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
+    private void CreateUI(UIItemConfig p_config, DelegateHelper.TableDelegate p_viewInitCallBack, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
         try
         {
@@ -246,7 +246,7 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// <param name="p_allocateDepth">allocate several panel depth to ui</param>
     /// <param name="p_viewName"></param>
     /// <param name="isShowAnimation"></param>
-    private void CreateUIInternal(UIItemConfig p_config, GameObject p_prefab, DelegateUtil.TableDelegate p_viewInitCallBack, DelegateUtil.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
+    private void CreateUIInternal(UIItemConfig p_config, GameObject p_prefab, DelegateHelper.TableDelegate p_viewInitCallBack, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
         try
         {

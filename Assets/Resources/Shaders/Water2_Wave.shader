@@ -7,12 +7,12 @@
 5. LightColor ： 光的颜色， 另外水的透明度可由LightColor的alpha值设置
 6. WaveDirection ： 水流的速度（大小和方向）,xy是波1，zw是波2
 7. Reflect ： 水面的反射度，值越大，天空盒越不明显
-8. Fog Color： 雾的颜色
-9. Fog Near：雾的范围
-10. Fog Far： 雾的范围
 
 修改，针对部分安卓机（如小米3）显示异常进行调整，在保证原显示效果的基础上，
 将计算uv值的过程放入vertex函数中，修改雾颜色计算方法
+
+修改，取消了雾效，使用unity自带的即可，更改一些数据的精度从fixed改为float，fixed的取值范围仅有[-2~2]，
+在某些机器如华为P1上，会导致数据被截取
 **************************************/
 
 Shader "Water/Water_wave" {
@@ -25,12 +25,9 @@ Shader "Water/Water_wave" {
 		_LightColor("Light Color",Color)=(1,1,1,1)
 		_WaveDirection("Wave Direction", vector) =(1,0,0,0)
 		_Reflect("reflect",range(0,1))=0.5
-		_FogColor("Fog Color", Color) = (1,1,1,1)
-		_FogNear("Fog Near", float) =1
-		_FogFar("Fog Far",float) = 300
 	}
 	SubShader {
-		Tags { "RenderType"="Transparent" "Queue"="Transparent+1"}
+		Tags { "RenderType"="Transparent" "Queue"="Transparent-1"}
 		Blend SrcAlpha OneMinusSrcAlpha
 		LOD 200
 		Pass {
@@ -52,15 +49,12 @@ Shader "Water/Water_wave" {
 			float3 _LightDirection;
 			float4 _LightColor;
 			fixed _Reflect;
-			fixed _FogNear;
-			fixed _FogFar;
-			fixed4 _FogColor;
-			fixed4 _WaveDirection;
+			float4 _WaveDirection;
 			
 			struct v2f {
 			    fixed4 pos : SV_POSITION;
-				fixed4 pack0 : TEXCOORD0;
-				fixed2 pack1 : TEXCOORD1;
+				float4 pack0 : TEXCOORD0;
+				float2 pack1 : TEXCOORD1;
 				fixed3 lightDir : TEXCOORD2;
 				fixed4 viewDir : TEXCOORD3;
 		   };
@@ -68,14 +62,12 @@ Shader "Water/Water_wave" {
 			    fixed4 vertex : POSITION;
 				fixed4 tangent : TANGENT;
 				fixed3 normal : NORMAL;
-				fixed2 texcoord : TEXCOORD0;
+				float2 texcoord : TEXCOORD0;
 			};
 			v2f vert(vertexInput v){
 			    v2f o = (v2f)0;
 				TANGENT_SPACE_ROTATION;				
 				o.viewDir.xyz = mul(rotation,WorldSpaceViewDir(v.vertex));	
-				fixed  depth = length(mul (UNITY_MATRIX_MV, v.vertex).xyz);//获取到相机的距离			
-				o.viewDir.w = saturate((_FogFar-depth)/(_FogFar-_FogNear));//计算fog factor
 				o.lightDir = mul(rotation,_LightDirection);
 				o.pack1.xy =TRANSFORM_TEX(v.texcoord, _MainTex);
 				//扰动
@@ -100,11 +92,9 @@ Shader "Water/Water_wave" {
 			    fixed4 baseColor = tex2D(_MainTex, (IN.pack1.xy+bump.xy));//贴图颜色
 				fixed4 envColor =texCUBE(_Cube, reflect(IN.viewDir.xyz,bump));//环境色
 				fixed4 specColor = _LightColor*spec;
-				fixed fogStrength = 1-IN.viewDir.w;
 
 				fixed4 finalColor;
-				finalColor = _LightColor*(baseColor*(_Reflect)+envColor*(1-_Reflect))+specColor;//+_LightColor.rgb*spec;
-				finalColor = lerp(finalColor, _FogColor, fogStrength);
+				finalColor = _LightColor*(baseColor*(_Reflect)+envColor*(1-_Reflect));//+specColor;//+_LightColor.rgb*spec;
 				finalColor.a = _LightColor.a;
 				return finalColor;
 			}

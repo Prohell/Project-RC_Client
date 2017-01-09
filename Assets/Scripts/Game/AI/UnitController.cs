@@ -39,7 +39,7 @@ public class UnitController : BaseController
     private Animation mUnitAnimation;
 
     //if the distance between A,B larger than mMinDistance they can search Each other 
-    private float mMinDistance = 1f;
+    private float mMinDistance = 1.5f;
 
     //Arrow
     private Transform mArrow;
@@ -51,6 +51,10 @@ public class UnitController : BaseController
     private SkillEffect mSkillController;
     //the prefab of the Skill
     private Object mSkillAsset;
+
+    private float mStopMovingTimer;
+    private float mStopMovingTimeSpace = 1f;
+    private Vector3 mLastTimerPos;
 
     //private float mAttackChaseTimer;
     //private float mAttackChaseTimeSpace = 2f;
@@ -311,6 +315,7 @@ public class UnitController : BaseController
     {
         ChangeMoving(true, true);
         mUnitAnimation.Play(AnimationTags.mRun);
+        mLastTimerPos = transform.position;
     }
 
     void UnitWalkExcuteFunc()
@@ -320,6 +325,24 @@ public class UnitController : BaseController
             mAttackSpaceTimer = mUnitData.GetAttackSpaceTime();
         else
             mAttackSpaceTimer += Time.deltaTime;
+
+        if (mStopMovingTimer >= mStopMovingTimeSpace)
+        {
+            mStopMovingTimer = 0f;
+            if(Vector3.Distance(transform.position, mLastTimerPos) < mMinDistance)
+            {
+                if (mRVOController.enabled == true)
+                    StartCoroutine(ReActiveRVO());
+            }
+            mLastTimerPos = transform.position;
+            
+        }
+        else
+        {
+            mStopMovingTimer++;
+        }
+
+            
 
         //if arrive the target Pos change the state
         if (mAttackAim == null&& mSearchAim == null)
@@ -561,8 +584,11 @@ public class UnitController : BaseController
         int tId = Random.Range(0, mEnemyTrans.Count);
         mAttackAim = null;
         mSearchAim = mEnemyTrans[tId];
-        ChangeTarget(mSearchAim);;
-        ChangeMoving(true, true);
+        ChangeTarget(mSearchAim);
+        if (mStateMachine.GetCurrentState().StateType == StateEnum.Idle)
+            TryOperState(StateEnum.Walk, StateOper.Enter);
+        else
+            return;
     }
     public void UnitMarching(Vector3 tPos,float tAngle=0f)
     {
@@ -608,6 +634,13 @@ public class UnitController : BaseController
             judge = mStateMachine.GetCurrentState().StateType != StateEnum.Idle;
         }
         //LogModule.DebugLog("Unit Done");
+    }
+    // Avoid the problem of RVO can't move
+    IEnumerator ReActiveRVO()
+    {
+        mRVOController.enabled = false;
+        yield return new WaitForSeconds(0.5f);
+        mRVOController.enabled = true;
     }
 
     //Re find Enemy

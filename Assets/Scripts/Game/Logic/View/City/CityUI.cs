@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CityUI : MonoBehaviour {
-	public UIButton details;
-	public UIButton levelUp;
-	public UIButton training;
-	public UIButton collect;
+
+	public List<UIButton> buttons;
 
 	private CityUIMediator mediator;
 	void Awake(){
@@ -14,7 +13,7 @@ public class CityUI : MonoBehaviour {
 
 	void Start () {
 		mediator = GameFacade.GetMediator<CityUIMediator> ();
-		mediator.selectType += BuildingSelected;
+		mediator.selectType += ShowBtns;
 	}
 	
 	// Update is called once per frame
@@ -22,59 +21,26 @@ public class CityUI : MonoBehaviour {
 	
 	}
 
-	private void BuildingSelected(int id){
-		switch(id){
-		case -1:
-			details.gameObject.SetActive (false);
-			levelUp.gameObject.SetActive (false);
-			training.gameObject.SetActive (false);
-			collect.gameObject.SetActive (false);
-			break;
-		case 1:
-			details.gameObject.SetActive (true);
-			training.gameObject.SetActive (false);
-			collect.gameObject.SetActive (false);
-			break;
-		case 9:
-			details.gameObject.SetActive (true);
-			training.gameObject.SetActive (true);
-			collect.gameObject.SetActive (false);
-			break;
-		default :
-			details.gameObject.SetActive (true);
-			levelUp.gameObject.SetActive (true);
-			training.gameObject.SetActive (true);
-			collect.gameObject.SetActive (true);
-			break;
+	private void HideBtns(){
+		for (int i = 0; i < buttons.Count; i++) {
+			buttons [i].gameObject.SetActive (false);
 		}
-		SortBtns ();
 	}
 
-	private float space = 120f;
-	private void SortBtns(){
-		int index = 0;
-		if(details.gameObject.activeSelf){
-			details.transform.localPosition = new Vector3 (index * space, details.transform.localPosition.y,0f);
-			index++;
-		}
-		if(levelUp.gameObject.activeSelf){
-			levelUp.transform.localPosition = new Vector3 (index * space, levelUp.transform.localPosition.y,0f);
-			index++;
-		}
-		if(training.gameObject.activeSelf){
-			training.transform.localPosition = new Vector3 (index * space, training.transform.localPosition.y,0f);
-			index++;
-		}
-		if(collect.gameObject.activeSelf){
-			collect.transform.localPosition = new Vector3 (index * space, collect.transform.localPosition.y,0f);
-			index++;
+	private void ShowBtns(string[] names){
+		if(names == null){
+			HideBtns ();
+			return;
 		}
 
-		float offset = space * (index - 1)* 0.5f;
-		details.transform.localPosition = new Vector3 (details.transform.localPosition.x - offset, details.transform.localPosition.y,0f);
-		levelUp.transform.localPosition = new Vector3 (levelUp.transform.localPosition.x - offset, levelUp.transform.localPosition.y,0f);
-		training.transform.localPosition = new Vector3 (training.transform.localPosition.x - offset, training.transform.localPosition.y,0f);
-		collect.transform.localPosition = new Vector3 (collect.transform.localPosition.x - offset, collect.transform.localPosition.y,0f);
+		for(int i = 0;i < buttons.Count;i++){
+			buttons [i].gameObject.SetActive (false);
+			for(int j = 0;j < names.Length;j++){
+				if(names[j] == buttons[i].gameObject.name){
+					buttons [i].gameObject.SetActive (true);
+				}
+			}
+		}
 	}
 
 	public void DetailsClick(){

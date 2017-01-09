@@ -23,12 +23,12 @@ AddFactory(new GC_FORCE_SETPOS_PF());
 AddFactory(new GC_UPDATE_NEEDIMPACTINFO_PF());
 AddFactory(new GC_PLAY_EFFECT_PF());
 AddFactory(new GC_REMOVEEFFECT_PF());
+AddFactory(new GC_FIGHT_PF());
 AddFactory(new GC_ROBOT_OPEN_PF());
 AddFactory(new GC_ASSIGN_HERO_PF());
 AddFactory(new GC_SEND_MARCH_PF());
 AddFactory(new GC_CREATEROLE_RET_PF());
 AddFactory(new GC_LOGIN_QUEUE_STATUS_PF());
-AddFactory(new GC_OBJINFOR_PF());
 AddFactory(new GC_BATTLEINFOR_PF());
 AddFactory(new GC_OBJPOSLIST_PF());
 AddFactory(new GC_OBJCOMMANDPURSUE_PF());
@@ -67,12 +67,12 @@ AddPacketHander(MessageID.PACKET_GC_FORCE_SETPOS, new GC_FORCE_SETPOSHandler());
 AddPacketHander(MessageID.PACKET_GC_UPDATE_NEEDIMPACTINFO, new GC_UPDATE_NEEDIMPACTINFOHandler());
 AddPacketHander(MessageID.PACKET_GC_PLAY_EFFECT, new GC_PLAY_EFFECTHandler());
 AddPacketHander(MessageID.PACKET_GC_REMOVEEFFECT, new GC_REMOVEEFFECTHandler());
+AddPacketHander(MessageID.PACKET_GC_FIGHT, new GC_FIGHTHandler());
 AddPacketHander(MessageID.PACKET_GC_ROBOT_OPEN, new GC_ROBOT_OPENHandler());
 AddPacketHander(MessageID.PACKET_GC_ASSIGN_HERO, new GC_ASSIGN_HEROHandler());
 AddPacketHander(MessageID.PACKET_GC_SEND_MARCH, new GC_SEND_MARCHHandler());
 AddPacketHander(MessageID.PACKET_GC_CREATEROLE_RET, new GC_CREATEROLE_RETHandler());
 AddPacketHander(MessageID.PACKET_GC_LOGIN_QUEUE_STATUS, new GC_LOGIN_QUEUE_STATUSHandler());
-AddPacketHander(MessageID.PACKET_GC_OBJINFOR, new GC_OBJINFORHandler());
 AddPacketHander(MessageID.PACKET_GC_BATTLEINFOR, new GC_BATTLEINFORHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJPOSLIST, new GC_OBJPOSLISTHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJCOMMANDPURSUE, new GC_OBJCOMMANDPURSUEHandler());
@@ -157,6 +157,13 @@ public class GC_DELETE_OBJ_PF : PacketFactory
  return MessageID.PACKET_GC_DELETE_OBJ;
  }
  }
+public class GC_FIGHT_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_GC_FIGHT;
+ }
+ }
 public class GC_FORCE_SETPOS_PF : PacketFactory
  {
  public MessageID GetPacketID()
@@ -211,13 +218,6 @@ public class GC_OBJGETHURT_PF : PacketFactory
  public MessageID GetPacketID()
  {
  return MessageID.PACKET_GC_OBJGETHURT;
- }
- }
-public class GC_OBJINFOR_PF : PacketFactory
- {
- public MessageID GetPacketID()
- {
- return MessageID.PACKET_GC_OBJINFOR;
  }
  }
 public class GC_OBJPOSLIST_PF : PacketFactory

@@ -15,27 +15,29 @@ public class MapAStarCompact : IMapAStar
 
     public MapAStarCompact()
     {
-        var waypointTiles = GameFacade.GetProxy<MapProxy>().GetWayPointsByCamp();
-        for (int i = 0; i < 5; ++i)
-        {
-            for (int j = 0; j < 5; ++j)
-            {
-                if (i == j)
-                {
-                    continue;
-                }
-                if (_waypoints[i, j] == null)
-                    _waypoints[i, j] = new List<Coord>();
-                if (i != 4)
-                {
-                    _waypoints[i, j].Add(waypointTiles[i].coord);
-                }
-                if (j != 4)
-                {
-                    _waypoints[i, j].Add(waypointTiles[j].coord);
-                }
-            }
-        }
+        //var waypointTiles = GameFacade.GetProxy<MapProxy>().GetWayPointsByCamp();
+        //for (int i = 0; i < 5; ++i)
+        //{
+        //    for (int j = 0; j < 5; ++j)
+        //    {
+        //        if (i == j)
+        //        {
+        //            continue;
+        //        }
+        //        if (_waypoints[i, j] == null)
+        //            _waypoints[i, j] = new List<Coord>();
+        //        if (i != 4)
+        //        {
+        //            if (null!= waypointTiles[i].coord)
+        //                _waypoints[i, j].Add(waypointTiles[i].coord);
+        //        }
+        //        if (j != 4)
+        //        {
+        //            if (null!= waypointTiles[j].coord)
+        //                _waypoints[i, j].Add(waypointTiles[j].coord);
+        //        }
+        //    }
+        //}
     }
 
     public List<Coord> CalcPath(Coord src, Coord dst)

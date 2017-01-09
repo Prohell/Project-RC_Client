@@ -174,12 +174,12 @@ public static class LuaBinder
 		L.RegFunction("Action_bool_string", System_Action_bool_string);
 		L.RegFunction("Action_System_Collections_Generic_List_UnityEngine_GameObject", System_Action_System_Collections_Generic_List_UnityEngine_GameObject);
 		L.EndModule();
-		L.BeginModule("DelegateUtil");
-		L.RegFunction("VoidDelegate", DelegateUtil_VoidDelegate);
-		L.RegFunction("IntDelegate", DelegateUtil_IntDelegate);
-		L.RegFunction("FloatDelegate", DelegateUtil_FloatDelegate);
-		L.RegFunction("StringDelegate", DelegateUtil_StringDelegate);
-		L.RegFunction("TableDelegate", DelegateUtil_TableDelegate);
+		L.BeginModule("DelegateHelper");
+		L.RegFunction("VoidDelegate", DelegateHelper_VoidDelegate);
+		L.RegFunction("IntDelegate", DelegateHelper_IntDelegate);
+		L.RegFunction("FloatDelegate", DelegateHelper_FloatDelegate);
+		L.RegFunction("StringDelegate", DelegateHelper_StringDelegate);
+		L.RegFunction("TableDelegate", DelegateHelper_TableDelegate);
 		L.EndModule();
 		L.BeginModule("UIEventListener");
 		L.RegFunction("VoidDelegate", UIEventListener_VoidDelegate);
@@ -1470,7 +1470,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int DelegateUtil_VoidDelegate(IntPtr L)
+	static int DelegateHelper_VoidDelegate(IntPtr L)
 	{
 		try
 		{
@@ -1479,13 +1479,13 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.VoidDelegate), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.VoidDelegate), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.VoidDelegate), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.VoidDelegate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -1497,7 +1497,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int DelegateUtil_IntDelegate(IntPtr L)
+	static int DelegateHelper_IntDelegate(IntPtr L)
 	{
 		try
 		{
@@ -1506,13 +1506,13 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.IntDelegate), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.IntDelegate), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.IntDelegate), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.IntDelegate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -1524,7 +1524,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int DelegateUtil_FloatDelegate(IntPtr L)
+	static int DelegateHelper_FloatDelegate(IntPtr L)
 	{
 		try
 		{
@@ -1533,13 +1533,13 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.FloatDelegate), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.FloatDelegate), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.FloatDelegate), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.FloatDelegate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -1551,7 +1551,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int DelegateUtil_StringDelegate(IntPtr L)
+	static int DelegateHelper_StringDelegate(IntPtr L)
 	{
 		try
 		{
@@ -1560,13 +1560,13 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.StringDelegate), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.StringDelegate), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.StringDelegate), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.StringDelegate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -1578,7 +1578,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int DelegateUtil_TableDelegate(IntPtr L)
+	static int DelegateHelper_TableDelegate(IntPtr L)
 	{
 		try
 		{
@@ -1587,13 +1587,13 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.TableDelegate), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.TableDelegate), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateUtil.TableDelegate), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(DelegateHelper.TableDelegate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

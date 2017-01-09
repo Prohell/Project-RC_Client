@@ -3,6 +3,7 @@
 /// by TT
 /// 2016-11-1
 /// </summary>
+using UnityEngine;
 public class SceneMap : SceneBase
 {
     public override SceneId Id { get { return SceneId.Map; } }
@@ -14,6 +15,8 @@ public class SceneMap : SceneBase
 		Game.StartCoroutine (MapView.Current.Init());
 //        Game.TaskManager.Exec(MapView.Current.Init());
         UpdateManager.GetInstance().StartHeartBeat();
+        UIManager.GetInstance().OnReset();
+        Object.Destroy(Main.Instance.GetComponent<TempEntrance>());
     }
 
     public override void OnWillExit()

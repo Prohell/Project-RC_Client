@@ -29,11 +29,12 @@ public class Slot : MonoBehaviour {
 	}
 
 
-	public void ShowBuildingLevel(int lv){
+	public int level = 0;
+	public void ShowBuildingLevel(){
 		if(levelTxt == null){
 			levelTxt = transform.FindChild ("Level").GetComponent<TextMesh>();
 		}
-		levelTxt.text = lv.ToString();
+		levelTxt.text = "等级 " + level.ToString();
 		levelTxt.gameObject.SetActive (true);
 	}
 
