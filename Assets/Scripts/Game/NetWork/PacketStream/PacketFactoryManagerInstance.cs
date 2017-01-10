@@ -35,6 +35,7 @@ AddFactory(new GC_OBJCOMMANDPURSUE_PF());
 AddFactory(new GC_OBJPREPAREFORATTACK_PF());
 AddFactory(new GC_OBJGETHURT_PF());
 AddFactory(new GC_BUILDING_LEVELUP_PF());
+AddFactory(new GC_UPDATE_MARCH_PF());
 AddFactory(new CG_LOGIN_PF());
 AddFactory(new CG_CONNECTED_HEARTBEAT_PF());
 AddFactory(new CG_REQ_NEAR_LIST_PF());
@@ -79,6 +80,7 @@ AddPacketHander(MessageID.PACKET_GC_OBJCOMMANDPURSUE, new GC_OBJCOMMANDPURSUEHan
 AddPacketHander(MessageID.PACKET_GC_OBJPREPAREFORATTACK, new GC_OBJPREPAREFORATTACKHandler());
 AddPacketHander(MessageID.PACKET_GC_OBJGETHURT, new GC_OBJGETHURTHandler());
 AddPacketHander(MessageID.PACKET_GC_BUILDING_LEVELUP, new GC_BUILDING_LEVELUPHandler());
+AddPacketHander(MessageID.PACKET_GC_UPDATE_MARCH, new GC_UPDATE_MARCHHandler());
 AddPacketHander(MessageID.PACKET_CG_LOGIN, new CG_LOGINHandler());
 AddPacketHander(MessageID.PACKET_CG_CONNECTED_HEARTBEAT, new CG_CONNECTED_HEARTBEATHandler());
 AddPacketHander(MessageID.PACKET_CG_REQ_NEAR_LIST, new CG_REQ_NEAR_LISTHandler());
@@ -288,6 +290,13 @@ public class GC_UPDATE_ANIMATION_STATE_PF : PacketFactory
  public MessageID GetPacketID()
  {
  return MessageID.PACKET_GC_UPDATE_ANIMATION_STATE;
+ }
+ }
+public class GC_UPDATE_MARCH_PF : PacketFactory
+ {
+ public MessageID GetPacketID()
+ {
+ return MessageID.PACKET_GC_UPDATE_MARCH;
  }
  }
 public class GC_UPDATE_NEEDIMPACTINFO_PF : PacketFactory

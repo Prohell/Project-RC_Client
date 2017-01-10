@@ -57,6 +57,7 @@ case MessageID.PACKET_GC_SEND_MARCH: { packet = new GC_SEND_MARCH(); } break;
 case MessageID.PACKET_GC_STOP: { packet = new GC_STOP(); } break;
 case MessageID.PACKET_GC_TELEMOVE: { packet = new GC_TELEMOVE(); } break;
 case MessageID.PACKET_GC_UPDATE_ANIMATION_STATE: { packet = new GC_UPDATE_ANIMATION_STATE(); } break;
+case MessageID.PACKET_GC_UPDATE_MARCH: { packet = new GC_Update_March(); } break;
 case MessageID.PACKET_GC_UPDATE_NEEDIMPACTINFO: { packet = new GC_UPDATE_NEEDIMPACTINFO(); } break;
 case MessageID.PACKET_GC_UPDATE_SCENE_INSTACTIVATION: { packet = new GC_UPDATE_SCENE_INSTACTIVATION(); } break;
  

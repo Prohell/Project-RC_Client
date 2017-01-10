@@ -6701,6 +6701,21 @@ public GC_TroopData GetTroop(int index) {
  troop_.Add(value);
  }
 
+public const int sceneidFieldNumber = 11;
+ private bool hasSceneid;
+ private Int32 sceneid_ = 0;
+ public bool HasSceneid {
+ get { return hasSceneid; }
+ }
+ public Int32 Sceneid {
+ get { return sceneid_; }
+ set { SetSceneid(value); }
+ }
+ public void SetSceneid(Int32 value) { 
+ hasSceneid = true;
+ sceneid_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -6740,6 +6755,9 @@ for(int i=0; i<troopList.Count; ++i){
 int subsize = troopList[i].SerializedSize();	
 size += pb::CodedOutputStream.ComputeTagSize((int)10) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
 }
+}
+ if (HasSceneid) {
+size += pb::CodedOutputStream.ComputeInt32Size(11, Sceneid);
 }
  memoizedSerializedSize = size;
  return size;
@@ -6795,6 +6813,10 @@ troopList[i].WriteTo(output);
 
 }
 }while(false);
+ 
+if (HasSceneid) {
+output.WriteInt32(11, Sceneid);
+}
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
  GC_MarchData _inst = (GC_MarchData) _base;
@@ -6847,6 +6869,10 @@ break;
 GC_TroopData subBuilder =  new GC_TroopData();
 input.ReadMessage(subBuilder);
  _inst.AddTroop(subBuilder);
+break;
+}
+   case  88: {
+ _inst.Sceneid = input.ReadInt32();
 break;
 }
 
@@ -8966,6 +8992,80 @@ break;
 public override bool IsInitialized() {
   if (!hasBuildingID) return false;
  if (!hasLevel) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_Update_March : PacketDistributed
+{
+
+public const int dataFieldNumber = 1;
+ private bool hasData;
+ private GC_MarchData data_ =  new GC_MarchData();
+ public bool HasData {
+ get { return hasData; }
+ }
+ public GC_MarchData Data {
+ get { return data_; }
+ set { SetData(value); }
+ }
+ public void SetData(GC_MarchData value) { 
+ hasData = true;
+ data_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+ {
+int subsize = Data.SerializedSize();	
+size += pb::CodedOutputStream.ComputeTagSize((int)1) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+ {
+output.WriteTag((int)1, pb::WireFormat.WireType.LengthDelimited);
+output.WriteRawVarint32((uint)Data.SerializedSize());
+Data.WriteTo(output);
+
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_Update_March _inst = (GC_Update_March) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+     case  10: {
+GC_MarchData subBuilder =  new GC_MarchData();
+ input.ReadMessage(subBuilder);
+ _inst.Data = subBuilder;
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+   if (HasData) {
+if (!Data.IsInitialized()) return false;
+}
  return true;
  }
 
