@@ -70,6 +70,13 @@ Shader "Hidden/Unlit/Transparent Colored 1"
 				// Sample the texture
 				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
 				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
+				//置灰效果
+				if(col.r == 0)  
+                {
+                    float grey = dot( col.rgb, float3(0.299, 0.587, 0.114 ));  
+                    col.rgb = float3(grey, grey, grey );
+                }  
+
 				return col;
 			}
 			ENDCG

@@ -17,7 +17,7 @@ function LoginView:AddListener()
 end
 
 function LoginView:Login()
-	self.Mediator:ConnectToServer(self.LoginAccountLabel.text, self.LoginPasswordLabel.text)
+	self.Mediator:ConnectToServer(self.LoginAccountLabel.text, self.LoginPasswordLabel.text, self.PortLabel.text)
 end
 
 function LoginView:EnterGame()

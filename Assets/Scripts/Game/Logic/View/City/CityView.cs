@@ -10,9 +10,13 @@ public class CityView : MonoBehaviour {
 	public GameObject slots;
 	public GameObject camContainer;
 	private CameraMove cameraMove;
-
+	CityMediator mediator;
 	void Awake(){
-		GameFacade.AddMediator<CityView> (new CityMediator(), gameObject);
+		mediator = new CityMediator();
+		GameFacade.AddMediator<CityView> (mediator, gameObject);
+		mediator.PlayerProxyUpdate (null);
+
+		EventManager.GetInstance().AddEventListener("Private_RefreshBuildingLevel",BuildingLevelUp);
 	}
 
 	// Use this for initialization
@@ -35,18 +39,22 @@ public class CityView : MonoBehaviour {
 
 		for(int i = 0;i < list.Count;i++){
 			if(list [i].tag == "Building"){
-				if(curSlot != null){
-					curSlot.HideBuildingName ();
-					curSlot.HideBuildingLevel ();
-				}
-
-				HideBtns ();
-
 				GameObject obj = list [i];
+				Slot slt = obj.transform.parent.GetComponent<Slot> ();
 
-				curSlot = obj.transform.parent.GetComponent<Slot> ();
+				if(curSlot != slt){
+					if(curSlot != null){
+						curSlot.HideBuildingName ();
+						curSlot.HideBuildingLevel ();
+					}
 
-				ShowCurSlotCenter ();
+					HideBtns ();
+					curSlot = slt;
+
+					mediator.curSlot = curSlot.transform.GetSiblingIndex () + 1;
+					mediator.curSlotType = curSlot.slotType;
+					ShowCurSlotCenter ();
+				}
 				break;
 			}
 		}
@@ -55,6 +63,10 @@ public class CityView : MonoBehaviour {
 	public void ShowCurSlotCenter(){
 		if (curSlot != null) {
 			curSlot.ShowBuildingName ();
+
+			BuildingData data = mediator.GetDataBySlot (mediator.curSlot);
+			curSlot.level = data.level;
+
 			curSlot.ShowBuildingLevel ();
 			Vector3 offset = curSlot.cameraOffset;
 			Vector3 pos = new Vector3 (curSlot.transform.position.x + offset.x, cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y + offset.y, curSlot.transform.position.z - Mathf.Tan (cameraMove.angleXRange.y) * (cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y) + offset.z);
@@ -82,23 +94,6 @@ public class CityView : MonoBehaviour {
 		}
 	}
 
-	public void ShowCurSlotDetail(){
-		if (curSlot != null) {
-			curSlot.ShowBuildingName ();
-			curSlot.ShowBuildingLevel ();
-			Vector3 offset = curSlot.cameraOffset;
-			Vector3 pos = new Vector3 (curSlot.transform.position.x + offset.x + 50f, cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y + offset.y, curSlot.transform.position.z - Mathf.Tan (cameraMove.angleXRange.y) * (cameraMove.limitBounds.center.y + cameraMove.limitBounds.extents.y) + offset.z);
-			Vector3 angle = new Vector3 (cameraMove.angleXRange.y, 0f, 0f);
-
-			cameraMove.transform.DOMove (pos, 0.5f).SetEase(Ease.OutCirc);
-			cameraMove.cam.transform.DORotate (angle, 0.5f).SetEase(Ease.OutCirc);
-
-			targetHighlight = curSlot.modelChild.transform.GetComponent<HighlighterController>();
-			targetHighlight.Fire2 ();
-		}
-	}
-
-
 	public void HideBtns(){
 		if(curSlot != null){
 			curSlot.HideBuildingName ();
@@ -125,10 +120,11 @@ public class CityView : MonoBehaviour {
 	}
 
 
-	public void UpdateData(BuildingData data){
+	private void UpdateData(BuildingData data){
 		Transform trans = slots.transform.FindChild ("Slot" + data.slot);
-		if (trans.GetComponent<Slot> ().modelChild != null) {
-			if(trans.GetComponent<Slot> ().modelChild.name != data.asset){
+		Slot slot = trans.GetComponent<Slot> ();
+		if (slot.modelChild != null) {
+			if(slot.modelChild.name != data.asset){
 				//更新模型
 				UpdateModel();
 
@@ -136,8 +132,26 @@ public class CityView : MonoBehaviour {
 		}
 	}
 
+	private void BuildingLevelUp(object obj){
+		long guid = (long)obj;
+		var data = mediator.GetDataByGuid (guid);
+
+		Transform trans = slots.transform.FindChild ("Slot" + data.slot);
+		Slot slot = trans.GetComponent<Slot> ();
+
+		//更新等级
+		slot.level = data.level;
+
+		//更新模型
+		if (slot.modelChild != null) {
+			if(slot.modelChild.name != data.asset){
+				UpdateModel();
+			}
+		}
+	}
+
 	private void UpdateModel(){
-		
+
 	}
 
 	// Update is called once per frame

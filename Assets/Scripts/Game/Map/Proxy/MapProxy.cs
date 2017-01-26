@@ -137,10 +137,11 @@ public class MapProxy : IProxy
 
         if (_regions.ContainsKey(dl))
         {
-			if (_regions [dl].Contains (new Vector2 (vo.coord.x, vo.coord.y))) {
-				
-			}
-			else
+            if (_regions[dl].Contains(new Vector2(vo.coord.x, vo.coord.y)))
+            {
+
+            }
+            else
             {
                 Rect current = _regions[dl];
                 if (vo.coord.x < current.x)
@@ -205,7 +206,7 @@ public class MapProxy : IProxy
             _editorTiles = value;
         }
     }
-    
+
     public void SeedTile(MapTileVO tile)
     {
         EditorTiles[tile.coord.y, tile.coord.x] = tile;
@@ -259,7 +260,7 @@ public class MapProxy : IProxy
     {
         if (x >= 0 && x < MapConst.MAP_SUBMAPS && y >= 0 && y < MapConst.MAP_SUBMAPS)
         {
-			return MapTileVO.TileSprDecodeLocal(_tilesSprs[y, x]);
+            return MapTileVO.TileSprDecodeLocal(_tilesSprs[y, x]);
         }
         else
         {

@@ -117,6 +117,10 @@ public class SquadController : BaseController
     {
         return mSquadData;
     }
+    public void SetSquadData(SquadData tSquadData)
+    {
+        mSquadData = tSquadData;
+    }
 
     // Update is called once per frame
     void Update()
@@ -201,15 +205,14 @@ public class SquadController : BaseController
     *******************/
     void SquadIdleGetInFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Idle Get In");
         if (mOriginalAim != null)
             ChangeTarget(mOriginalAim);
-
         ChangeMoving(false);
-        //StartCoroutine(IdleKeepFormation());
     }
     void SquadIdleGetOutFunc()
     {
-
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Idle Get Out");
     }
     void SquadIdleExcuteFunc()
     {
@@ -229,10 +232,12 @@ public class SquadController : BaseController
     *******************/
     void SquadWalkGetInFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Walk Get In");
         ChangeMoving(true);
     }
     void SquadWalkGetOutFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Walk Get Out");
         mSearchAim = null;
         ChangeMoving(false);
     }
@@ -279,6 +284,7 @@ public class SquadController : BaseController
     *******************/
     void SquadAttackGetInFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Attack Get In");
         transform.LookAt(mAttackAim, Vector3.up);
         mAttackSpaceTimer = 0.0f;
     }
@@ -290,13 +296,14 @@ public class SquadController : BaseController
     }
     void SquadAttackGetOutFunc()
     {
-
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Attack Get Out");
     }
     /******************
     Prepare State Function 
     *******************/
     void SquadPrepareGetInFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Prepare Get In");
         transform.LookAt(mAttackAim, Vector3.up);
     }
     void SquadPrepareExcuteFunc()
@@ -312,7 +319,7 @@ public class SquadController : BaseController
     }
     void SquadPrepareGetOutFunc()
     {
-
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Prepare Get Out");
     }
 
     /******************
@@ -320,6 +327,7 @@ public class SquadController : BaseController
     *******************/
     void SquadDieGetInFunc()
     {
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Die Get In");
         ChangeMoving(false);
         //LogModule.DebugLog("Squad Die");
         gameObject.SetActive(false);
@@ -330,12 +338,15 @@ public class SquadController : BaseController
     }
     void SquadDieGetOutFunc()
     {
-
+        //LogModule.DebugLog("ID: " + mSquadData.GetID() + "Die Get Out");
     }
     void SquadAttackEffect()
-    { 
-        SquadController mAttackAimController = mAttackAim.GetComponent<SquadController>();
-        mAttackAimController.SetSquadHP(mAttackAimController.GetSquadData().GetSquadHP() - GetSquadData().GetAttack(),transform);
+    {
+        if (BattleMode.Client)
+        {
+            SquadController mAttackAimController = mAttackAim.GetComponent<SquadController>();
+            mAttackAimController.SetSquadHP(mAttackAimController.GetSquadData().GetSquadHP() - GetSquadData().GetAttack(), transform);
+        }
     }
 
     public void SetSquadHP(float tHP,Transform tAttackerSquad)
@@ -365,19 +376,22 @@ public class SquadController : BaseController
         }
         mStateMachine.OperState(tAimStateEnum, tOper);
     }
-    public void CastSkill()
+    public void CastSkill(Transform tAttakAim)
     {
         mSkill = GameObjectPool.GetInstance().SpawnGo((GameObject)mSquadData.SkillAsset).transform;
         mSkill.parent = null;
         mSkill.gameObject.SetActive(true);
-        SquadController mAttackAimController = mAttackAim.GetComponent<SquadController>();
         mSkill.position = transform.position;
         SetSkill(mSkill);
         if((mSkillController.GetSkillData().GetSkillType()&SkillType.Move)== SkillType.Move)
         {
-            mSkillController.MReceiver = mAttackAimController.transform;
-            mSkillController.MScender = transform;
-            mSkillController.SetSkillEffectData();
+            if (tAttakAim != null)
+            {
+                SquadController mAttackAimController = tAttakAim.GetComponent<SquadController>();
+                mSkillController.MReceiver = mAttackAimController.transform;
+                mSkillController.MScender = transform;
+                mSkillController.SetSkillEffectData();
+            }
         }
     }
     public void SetSkill(Transform tSkill)
@@ -526,7 +540,6 @@ public class SquadController : BaseController
         {
             mUnitTransformList[i].GetComponent<UnitController>().UnitMarching(tAimPos, 0f);
         }
-
         mRichAI.target = mOriginalAim;
         mRichAI.target.position = tAimPos;
         mRichAI.UpdatePath();
@@ -535,6 +548,63 @@ public class SquadController : BaseController
         else
             return;
         mIsMarching = true;
+    }
+    public void SquadAttackEnemy(SquadController tEnemySquad)
+    {
+        int tTargetID=0;
+        if (mAttackAim != tEnemySquad.transform|| mAttackAim==null)
+        {
+            mAttackAim = tEnemySquad.transform;
+            tTargetID = mAttackAim.GetComponent<SquadController>().GetSquadData().GetID();
+            RefreshUnitEnemyList(tTargetID);
+        }
+        UnitAttackEnemy(tTargetID);
+    }
+    public void SquadAttackPrepare(SquadController tEnemySquad)
+    {
+        int tTargetID = 0;
+        if (mAttackAim != tEnemySquad.transform || mAttackAim == null)
+        {
+            mAttackAim = tEnemySquad.transform;
+            tTargetID = mAttackAim.GetComponent<SquadController>().GetSquadData().GetID();
+            RefreshUnitEnemyList(tTargetID);
+        }
+        UnitAttackEnemy(tTargetID);
+        ChangeTarget(mAttackAim);
+        TryOperState(StateEnum.Prepare, StateOper.Enter);
+    }
+
+
+    public void CorretSquadInfor(GC_OBJPOS tObjPosList ,SquadController tTargetController=null)
+    {
+        switch (mStateMachine.GetCurrentState().StateType)
+        {
+            case StateEnum.Attack:
+                break;
+            case StateEnum.Idle:
+                //
+                if((SquadState)tObjPosList.ObjState == SquadState.AI_COMBAT)
+                {                
+                    if(tTargetController!=null)    
+                        SquadAttackPrepare(tTargetController);
+                }
+                //
+                if ((SquadState)tObjPosList.ObjState == SquadState.AI_MARCH)
+                {
+                    UnitMarching(BattleFunction.SetPosition(tObjPosList.PosX, tObjPosList.PosZ));
+                }
+                break;
+            case StateEnum.Prepare:
+                break;
+            case StateEnum.Walk:
+                UnitMarching(BattleFunction.SetPosition(tObjPosList.PosX, tObjPosList.PosZ));
+                break;
+        }
+        //transform.position=SetPosition(tObjPosList.PosX, tObjPosList.PosZ);
+        //for (int i = 0; i < mUnitTransformList.Count; i++)
+        //{
+        //    mUnitTransformList[i].GetComponent<UnitController>().UnitMarching(transform.position, 0f);
+        //}
     }
     public void UnitMarchAttacking(float space, Vector3 tAimPos)
     {

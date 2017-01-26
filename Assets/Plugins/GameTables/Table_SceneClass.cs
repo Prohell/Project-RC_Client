@@ -41,6 +41,10 @@ ID_ATTACKPOSX8,
 ID_ATTACKPOSZ8,
 ID_ATTACKPOSX9,
 ID_ATTACKPOSZ9,
+ID_ATTACKPOSX10,
+ID_ATTACKPOSZ10,
+ID_ATTACKPOSX11,
+ID_ATTACKPOSZ11,
 ID_DEFENCEPOSX1,
 ID_DEFENCEPOSZ1,
 ID_DEFENCEPOSX2,
@@ -59,23 +63,27 @@ ID_DEFENCEPOSX8,
 ID_DEFENCEPOSZ8,
 ID_DEFENCEPOSX9,
 ID_DEFENCEPOSZ9,
+ID_DEFENCEPOSX10,
+ID_DEFENCEPOSZ10,
+ID_DEFENCEPOSX11,
+ID_DEFENCEPOSZ11,
 ID_EDGELENGTH,
 MAX_RECORD
  }
  public static string GetInstanceFile(){return TAB_FILE_DATA; }
 
-public int getAttackPosXCount() { return 9; } 
- private int[] m_AttackPosX = new int[9];
- public int GetAttackPosXbyIndex(int idx) {
- if(idx>=0 && idx<9) return m_AttackPosX[idx];
- return -1;
+public int getAttackPosXCount() { return 11; } 
+ private float[] m_AttackPosX = new float[11];
+ public float GetAttackPosXbyIndex(int idx) {
+ if(idx>=0 && idx<11) return m_AttackPosX[idx];
+ return 0.0f;
  }
 
-public int getAttackPosZCount() { return 9; } 
- private int[] m_AttackPosZ = new int[9];
- public int GetAttackPosZbyIndex(int idx) {
- if(idx>=0 && idx<9) return m_AttackPosZ[idx];
- return -1;
+public int getAttackPosZCount() { return 11; } 
+ private float[] m_AttackPosZ = new float[11];
+ public float GetAttackPosZbyIndex(int idx) {
+ if(idx>=0 && idx<11) return m_AttackPosZ[idx];
+ return 0.0f;
  }
 
 private int m_BGMusic;
@@ -84,18 +92,18 @@ private int m_BGMusic;
 private int m_CopySceneID;
  public int CopySceneID { get{ return m_CopySceneID;}}
 
-public int getDefencePosXCount() { return 9; } 
- private int[] m_DefencePosX = new int[9];
- public int GetDefencePosXbyIndex(int idx) {
- if(idx>=0 && idx<9) return m_DefencePosX[idx];
- return -1;
+public int getDefencePosXCount() { return 11; } 
+ private float[] m_DefencePosX = new float[11];
+ public float GetDefencePosXbyIndex(int idx) {
+ if(idx>=0 && idx<11) return m_DefencePosX[idx];
+ return 0.0f;
  }
 
-public int getDefencePosZCount() { return 9; } 
- private int[] m_DefencePosZ = new int[9];
- public int GetDefencePosZbyIndex(int idx) {
- if(idx>=0 && idx<9) return m_DefencePosZ[idx];
- return -1;
+public int getDefencePosZCount() { return 11; } 
+ private float[] m_DefencePosZ = new float[11];
+ public float GetDefencePosZbyIndex(int idx) {
+ if(idx>=0 && idx<11) return m_DefencePosZ[idx];
+ return 0.0f;
  }
 
 private int m_EdgeLength;
@@ -152,44 +160,52 @@ public static bool LoadTable(Dictionary<int, List<object> > _tab)
  throw TableException.ErrorReader("Load {0} error as CodeSize:{1} not Equal DataSize:{2}", GetInstanceFile(),_ID.MAX_RECORD,valuesList.Length);
  }
  Tab_SceneClass _values = new Tab_SceneClass();
- _values.m_AttackPosX [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX1] as string);
-_values.m_AttackPosX [ 1 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX2] as string);
-_values.m_AttackPosX [ 2 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX3] as string);
-_values.m_AttackPosX [ 3 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX4] as string);
-_values.m_AttackPosX [ 4 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX5] as string);
-_values.m_AttackPosX [ 5 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX6] as string);
-_values.m_AttackPosX [ 6 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX7] as string);
-_values.m_AttackPosX [ 7 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX8] as string);
-_values.m_AttackPosX [ 8 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSX9] as string);
-_values.m_AttackPosZ [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ1] as string);
-_values.m_AttackPosZ [ 1 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ2] as string);
-_values.m_AttackPosZ [ 2 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ3] as string);
-_values.m_AttackPosZ [ 3 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ4] as string);
-_values.m_AttackPosZ [ 4 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ5] as string);
-_values.m_AttackPosZ [ 5 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ6] as string);
-_values.m_AttackPosZ [ 6 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ7] as string);
-_values.m_AttackPosZ [ 7 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ8] as string);
-_values.m_AttackPosZ [ 8 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_ATTACKPOSZ9] as string);
+ _values.m_AttackPosX [ 0 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX1] as string );
+_values.m_AttackPosX [ 1 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX2] as string );
+_values.m_AttackPosX [ 2 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX3] as string );
+_values.m_AttackPosX [ 3 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX4] as string );
+_values.m_AttackPosX [ 4 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX5] as string );
+_values.m_AttackPosX [ 5 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX6] as string );
+_values.m_AttackPosX [ 6 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX7] as string );
+_values.m_AttackPosX [ 7 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX8] as string );
+_values.m_AttackPosX [ 8 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX9] as string );
+_values.m_AttackPosX [ 9 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX10] as string );
+_values.m_AttackPosX [ 10 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSX11] as string );
+_values.m_AttackPosZ [ 0 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ1] as string );
+_values.m_AttackPosZ [ 1 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ2] as string );
+_values.m_AttackPosZ [ 2 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ3] as string );
+_values.m_AttackPosZ [ 3 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ4] as string );
+_values.m_AttackPosZ [ 4 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ5] as string );
+_values.m_AttackPosZ [ 5 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ6] as string );
+_values.m_AttackPosZ [ 6 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ7] as string );
+_values.m_AttackPosZ [ 7 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ8] as string );
+_values.m_AttackPosZ [ 8 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ9] as string );
+_values.m_AttackPosZ [ 9 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ10] as string );
+_values.m_AttackPosZ [ 10 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_ATTACKPOSZ11] as string );
 _values.m_BGMusic =  Convert.ToInt32(valuesList[(int)_ID.ID_BGMUSIC] as string);
 _values.m_CopySceneID =  Convert.ToInt32(valuesList[(int)_ID.ID_COPYSCENEID] as string);
-_values.m_DefencePosX [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX1] as string);
-_values.m_DefencePosX [ 1 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX2] as string);
-_values.m_DefencePosX [ 2 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX3] as string);
-_values.m_DefencePosX [ 3 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX4] as string);
-_values.m_DefencePosX [ 4 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX5] as string);
-_values.m_DefencePosX [ 5 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX6] as string);
-_values.m_DefencePosX [ 6 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX7] as string);
-_values.m_DefencePosX [ 7 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX8] as string);
-_values.m_DefencePosX [ 8 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSX9] as string);
-_values.m_DefencePosZ [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ1] as string);
-_values.m_DefencePosZ [ 1 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ2] as string);
-_values.m_DefencePosZ [ 2 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ3] as string);
-_values.m_DefencePosZ [ 3 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ4] as string);
-_values.m_DefencePosZ [ 4 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ5] as string);
-_values.m_DefencePosZ [ 5 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ6] as string);
-_values.m_DefencePosZ [ 6 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ7] as string);
-_values.m_DefencePosZ [ 7 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ8] as string);
-_values.m_DefencePosZ [ 8 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_DEFENCEPOSZ9] as string);
+_values.m_DefencePosX [ 0 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX1] as string );
+_values.m_DefencePosX [ 1 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX2] as string );
+_values.m_DefencePosX [ 2 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX3] as string );
+_values.m_DefencePosX [ 3 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX4] as string );
+_values.m_DefencePosX [ 4 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX5] as string );
+_values.m_DefencePosX [ 5 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX6] as string );
+_values.m_DefencePosX [ 6 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX7] as string );
+_values.m_DefencePosX [ 7 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX8] as string );
+_values.m_DefencePosX [ 8 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX9] as string );
+_values.m_DefencePosX [ 9 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX10] as string );
+_values.m_DefencePosX [ 10 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSX11] as string );
+_values.m_DefencePosZ [ 0 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ1] as string );
+_values.m_DefencePosZ [ 1 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ2] as string );
+_values.m_DefencePosZ [ 2 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ3] as string );
+_values.m_DefencePosZ [ 3 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ4] as string );
+_values.m_DefencePosZ [ 4 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ5] as string );
+_values.m_DefencePosZ [ 5 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ6] as string );
+_values.m_DefencePosZ [ 6 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ7] as string );
+_values.m_DefencePosZ [ 7 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ8] as string );
+_values.m_DefencePosZ [ 8 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ9] as string );
+_values.m_DefencePosZ [ 9 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ10] as string );
+_values.m_DefencePosZ [ 10 ] =  Convert.ToSingle(valuesList[(int)_ID.ID_DEFENCEPOSZ11] as string );
 _values.m_EdgeLength =  Convert.ToInt32(valuesList[(int)_ID.ID_EDGELENGTH] as string);
 _values.m_Length =  Convert.ToInt32(valuesList[(int)_ID.ID_LENGTH] as string);
 _values.m_Name =  valuesList[(int)_ID.ID_NAME] as string;

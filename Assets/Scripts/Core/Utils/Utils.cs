@@ -32,6 +32,20 @@ public static class Utils
         return ins;
     }
 
+    public static void StandardizeObject(GameObject go, Transform parent)
+    {
+        go.transform.parent = parent;
+
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation = Quaternion.identity;
+        go.transform.localScale = Vector3.one;
+
+        if (parent != null)
+        {
+            go.layer = parent.gameObject.layer;
+        }
+    }
+
     public static void StandardizeObject(GameObject go)
     {
         go.transform.localPosition = Vector3.zero;

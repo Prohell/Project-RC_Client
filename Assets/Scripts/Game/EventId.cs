@@ -31,21 +31,37 @@
     public const string LoadSquad = "LoadSquad";
     public const string StartBattle = "StartBattle";
     public const string StartFight = "StartFight";
+    public const string SendMarch = "SendMarch";
+    public const string UseSkill = "UseSkill";
+    public const string AutoFight = "AutoFight";
     //Event from Handler to BattleManager
     public const string ReceiveFight = "ReceiveFight";
-
+    public const string ReceiveSkill = "ReceiveSkill";
     public const string ReceiveBattleInfor = "ReceiveBattleInfor";
     public const string ReceiveSquadPosInfor = "ReceiveSquadPosInfor";
     public const string ReceiveCommandPursue = "ReceiveCommandPursue";
     public const string ReceivePrepareForAttack = "ReceivePrepareForAttack";
     public const string ReceiveObjGetHurt = "ReceiveObjGetHurt";
+    public const string ReceiveBattleEnd = "ReceiveBattleEnd";
     //Lua test event
     public const string LuaTestUpdate = "BagUpdated";
 
+    public const string WorldMarchDataUpdate = "WorldMarchDataUpdate";
+    public const string WorldCityDataUpdate = "WorldCityDataUpdate";
+
+	public const string CreateRole = "CreateRole";
 
 	public const string PlayerProxyUpdate = "PlayerProxyUpdate";
 
 	public const string BuildingSelected = "BuildingSelected";
+	public const string BuildingLevelUp = "BuildingLevelUp";
+	public const string AssignHero = "AssignHero";
+	public const string TroopTrain = "TroopTrain";
+	public const string TroopTrainOver = "TroopTrainOver";
 
-	public const string BuildingBtnClick = "BuildingBtnClick";
+	public const string MapBlockSelected = "MapBlockSelected";
+	public const string ReceiveSendMarchMsg = "ReceiveSendMarchMsg";
+	public const string ReceiveUpdateMarchMsg = "ReceiveUpdateMarchMsg";
+	public const string ReceiveAllMarchMsg = "ReceiveAllMarchMsg";
+
 }

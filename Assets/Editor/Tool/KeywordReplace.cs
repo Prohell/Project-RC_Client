@@ -19,9 +19,17 @@ public class KeywordReplace : UnityEditor.AssetModificationProcessor
     {
         path = path.Replace(".meta", "");
         int index = path.LastIndexOf(".");
+        if (index < 0)
+        {
+            return;
+        }
         string file = path.Substring(index);
         if (file != ".cs" && file != ".js" && file != ".boo") return;
         index = Application.dataPath.LastIndexOf("Assets");
+        if (index < 0)
+        {
+            return;
+        }
         path = Application.dataPath.Substring(0, index) + path;
         file = System.IO.File.ReadAllText(path);
 

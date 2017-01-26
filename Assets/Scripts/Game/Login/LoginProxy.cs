@@ -5,12 +5,14 @@ public class LoginProxy : IProxy
 {
     private string m_account;
     private string m_password;
+    private int m_port;
 
-    public void ConnectToServer(string account, string password)
+    public void ConnectToServer(string account, string password, int port = -1)
     {
         m_account = account;
         m_password = password;
-        Game.ConnectToServer(ConnectHandle);
+        m_port = port;
+        Game.ConnectToServer(ConnectHandle, m_port);
     }
 
     void ConnectHandle(bool success, string result)

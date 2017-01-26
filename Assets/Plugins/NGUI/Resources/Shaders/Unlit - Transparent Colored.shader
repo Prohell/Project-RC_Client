@@ -57,10 +57,22 @@ Shader "Unlit/Transparent Colored"
 				return o;
 			}
 				
-			fixed4 frag (v2f IN) : SV_Target
-			{
-				return tex2D(_MainTex, IN.texcoord) * IN.color;
-			}
+//			fixed4 frag (v2f IN) : SV_Target
+//			{
+//				return tex2D(_MainTex, IN.texcoord) * IN.color;
+//			}
+
+			//置灰效果
+			fixed4 frag (v2f IN) : COLOR  
+            {  
+                fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;  
+                if( IN.color.r == 0)  
+                {
+                    float grey = dot( col.rgb, float3(0.299, 0.587, 0.114 ));  
+                    col.rgb = float3(grey, grey, grey );
+                }  
+                return col;  
+            }  
 			ENDCG
 		}
 	}

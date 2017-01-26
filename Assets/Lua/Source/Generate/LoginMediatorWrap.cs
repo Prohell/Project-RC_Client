@@ -47,11 +47,12 @@ public class LoginMediatorWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
+			ToLua.CheckArgsCount(L, 4);
 			LoginMediator obj = (LoginMediator)ToLua.CheckObject(L, 1, typeof(LoginMediator));
 			string arg0 = ToLua.CheckString(L, 2);
 			string arg1 = ToLua.CheckString(L, 3);
-			obj.ConnectToServer(arg0, arg1);
+			string arg2 = ToLua.CheckString(L, 4);
+			obj.ConnectToServer(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)

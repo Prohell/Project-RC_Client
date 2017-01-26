@@ -100,7 +100,7 @@ public class UnitData {
 
     public float GetAttackSpaceTime()
     {
-        return mAttackSpaceTime;
+        return mAttackSpaceTime+Random.Range(0,0.5f);
     }
     public void SetAdjustAttackRange(float tempAttackRange)
     {

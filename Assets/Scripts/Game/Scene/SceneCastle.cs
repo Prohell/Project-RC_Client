@@ -16,4 +16,9 @@ public class SceneCastle : SceneBase
         }, false);
         UIManager.GetInstance().OpenUI("MainResource", null, null, false);
     }
+
+    public override void OnWillExit()
+    {
+        UIManager.GetInstance().CloseUI("CityUI");
+    }
 }

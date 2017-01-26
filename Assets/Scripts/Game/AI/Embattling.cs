@@ -6,6 +6,8 @@ public class BornPosInfor {
     public Vector3 mBornPos;
     public int mSquadID = -1;
     public Transform mPosInstance;
+    //public int mArrangeindex= -1;
+    public SquadCamp mPosCamp;
 }
 
 public class Embattling : MonoBehaviour {
@@ -86,6 +88,30 @@ public class Embattling : MonoBehaviour {
             mBornInforList[i].mSquadID = tSquadID[i];
         }
     }
+    public void PreparePosition(int tSceneID, SquadCamp tCamp)
+    {
+        CG_BATTLEPREPARE battlerPreparePacket = (CG_BATTLEPREPARE)PacketDistributed.CreatePacket(MessageID.PACKET_CG_BATTLEPREPARE);
+        for (int i = 0; i < mBornInforList.Count; i++)
+        {
+            //if (mBornInforList[i].mSquadID != -1&& mBornInforList[i].mPosCamp == tCamp)
+            //{
+            //    CG_OBJARRANGEINDEX tBattlePreapare = new CG_OBJARRANGEINDEX();
+            //    tBattlePreapare.SetObjId(mBornInforList[i].mSquadID);
+            //    tBattlePreapare.SetArrangeindex(mBornInforList[i].mArrangeindex);
+            //    battlerPreparePacket.AddObjList(tBattlePreapare);
+            //}
+            if (mBornInforList[i].mSquadID != -1)
+            {
+                CG_OBJARRANGEINDEX tBattlePreapare = new CG_OBJARRANGEINDEX();
+                tBattlePreapare.SetObjId(mBornInforList[i].mSquadID);
+                tBattlePreapare.SetArrangeindex(i);
+                battlerPreparePacket.AddObjList(tBattlePreapare);
+            }
+        }
+        battlerPreparePacket.SetSceneId(tSceneID);
+        battlerPreparePacket.SendPacket();
+    }
+
 
     public void PickUpSquad(Vector3 tBornPos)
     {
@@ -105,6 +131,9 @@ public class Embattling : MonoBehaviour {
                 //LogModule.DebugLog("Aim tBornInforIndex:" + tBornInforIndex + "the ID: " + mBornInforList[tBornInforIndex].mSquadID);
                 mBornInforList[mCurrentSelectIndx].mSquadID = tBornInforSquadID;
 
+                //mBornInforList[mCurrentSelectIndx].mArrangeindex = mCurrentSelectIndx;
+                //mBornInforList[tBornInforIndex].mArrangeindex = tBornInforIndex;
+
                 EventManager.GetInstance().SendEvent(EventId.ReSetPosition, mBornInforList[mCurrentSelectIndx]);
                 EventManager.GetInstance().SendEvent(EventId.ReSetPosition, mBornInforList[tBornInforIndex]);
 
@@ -123,9 +152,5 @@ public class Embattling : MonoBehaviour {
                 // Light up  mCurrentSelectIndx Squad
             }
         }
-    }
-    public void AddBornList(BornPosInfor tAimPosInfor)
-    {
-        mBornInforList.Add(tAimPosInfor);
     }
 }

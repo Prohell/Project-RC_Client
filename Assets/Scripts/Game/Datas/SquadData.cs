@@ -11,6 +11,13 @@ public enum SquadCamp {
     CampRed =1,
     CampBlue =2
 }
+public enum SquadState {
+    AI_IDLE = 0,//待机
+    AI_COMBAT,//战斗
+    AI_MARCH,//行军
+    AI_TRACE,//追击
+}
+
 
 public class SquadData {
     //the View of the Unit
@@ -49,11 +56,14 @@ public class SquadData {
     private float mBornPosionX;
     private float mBornPosionZ;
 
-    private float mAttackSpaceTime=2f;
+    private float mAttackSpaceTime;
 
     private SquadCamp mSquadCamp;
 
+    public IList<int> mSkillIDList;
 
+
+    public int SkillTemplateID { get; set; }
     //the prefab of the Skill
     public Object SkillAsset { get; set; }
     public Object UnitAsset { get; set; }
@@ -66,29 +76,40 @@ public class SquadData {
     }
     public SquadData()
     {
-        mIdTimer++;
-        mID = mIdTimer;
+        if (BattleMode.Client)
+        {
+            mIdTimer++;
+            mID = mIdTimer;
+            mAttackSpaceTime = 2f;
+        }else
+        {
+            mAttackSpaceTime = 0f;
+        }
     }
     public SquadCamp GetSquadCamp()
     {
         return mSquadCamp;
     }
-    public void SetSquadInfor(GC_OBJINFOR tObjInfor)
+    public void SetSquadInfor(CObjInfor tObjInfor)
     {
-        mID = tObjInfor.Id;
-        mSquadCamp = (SquadCamp)tObjInfor.Camp;
-        mUnitCount = tObjInfor.Unitcount;
-        mHP = tObjInfor.Hp;
-        mHPMax = tObjInfor.Maxhp;
-        mSquadAttack = tObjInfor.Attack;
-        mSquadDefence = tObjInfor.Defence;
-        mSp = tObjInfor.Sp;
-        mlevel = tObjInfor.Level;
-        mBornPosionX = tObjInfor.Posx;
-        mBornPosionZ = tObjInfor.Posz;
-        mSquadTemplateID = tObjInfor.UnitDataId;
-        Tab_RoleBaseAttr tRoleBaseAttr = TableManager.GetRoleBaseAttrByID(tObjInfor.UnitDataId)[0];
+        mID = tObjInfor.id;
+        mSquadCamp = (SquadCamp)tObjInfor.camp;
+        mUnitCount = tObjInfor.unitcount;
+        mHP = tObjInfor.hp;
+        mHPMax = tObjInfor.maxhp;
+        mSquadAttack = tObjInfor.attack;
+        mSquadDefence = tObjInfor.defence;
+        mSp = tObjInfor.sp;
+        mlevel = tObjInfor.level;
+        mBornPosionX = tObjInfor.posx;
+        mBornPosionZ = tObjInfor.posz;
+        mSquadTemplateID = tObjInfor.unitDataId;
+        mBornPosionIndex = tObjInfor.arrangeindex;
+        Tab_RoleBaseAttr tRoleBaseAttr = TableManager.GetRoleBaseAttrByID(tObjInfor.unitDataId)[0];
         mUnitTemplateID = tRoleBaseAttr.UnitDataID;
+        mSkillIDList = tObjInfor.skilldataid;
+        Tab_SkillEx tSkillEx = TableManager.GetSkillExByID(mSkillIDList[0])[0];
+        SkillTemplateID = tSkillEx.SkillDataID;
     }
     public int GetBornPosionIndex()
     {

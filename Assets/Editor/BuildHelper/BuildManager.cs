@@ -244,7 +244,8 @@ public class BuildManager
         }
         else
         {
-            ToLuaMenu.CopyLuaFilesToRes();
+            //ToLuaMenu.CopyLuaFilesToRes();
+            ToLuaMenu.CopyLuaFilesToPrepareBundle();
             UIConfigEditor.SOToBundle();
 
             BundleBuildWindow.Build_Develop();

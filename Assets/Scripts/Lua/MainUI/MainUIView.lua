@@ -98,5 +98,5 @@ function MainUIView:OpenCastle()
 end
 
 function MainUIView:OpenWorld()
-	MySceneManager.GetInstance():SwitchToScene(SceneId.BattleTest, nil);
+	MySceneManager.GetInstance():SwitchToScene(SceneId.Map, nil);
 end

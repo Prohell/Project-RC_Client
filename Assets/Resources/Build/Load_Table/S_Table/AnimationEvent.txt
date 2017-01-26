@@ -2,12 +2,12 @@ Id	Desc	FunctionName	AnimationClipName	PrefabName	Time
 INT	STRING	STRING	STRING	STRING	FLOAT
 #					
 #		动画Event对应的处理函数名字	动画片段名字	对应的PrefabName	Event生效的时间点
-100001		AttackEnd	Attack2B_01	Gongjianshou_01	99.9
+100001		AttackEnd	Attack	Gongjianshou_01	99.9
 100002		DieEnd	Die	Gongjianshou_01	99.9
-100003		AttackEffect	Attack2B_01	Gongjianshou_01	0.8
-100004		AttackEnd	Attack2B_01	Kuangzhanshi_01	99.9
+100003		AttackEffect	Attack	Gongjianshou_01	0.8
+100004		AttackEnd	Attack	Kuangzhanshi_01	99.9
 100005		DieEnd	Die	Kuangzhanshi_01	99.9
-100006		AttackEffect	Attack2B_01	Kuangzhanshi_01	0.8
+100006		AttackEffect	Attack	Kuangzhanshi_01	0.8
 100007		AttackEnd	Attack	P_gongjianshou_d	99.9
 100008		DieEnd	Die	P_gongjianshou_d	99.9
 100009		AttackEffect	Attack	P_gongjianshou_d	0.8

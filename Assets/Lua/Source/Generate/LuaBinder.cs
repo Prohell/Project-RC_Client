@@ -17,6 +17,7 @@ public static class LuaBinder
 		UILabelWrap.Register(L);
 		UIGridWrap.Register(L);
 		UIButtonWrap.Register(L);
+		UIToggleWrap.Register(L);
 		NGUIToolsWrap.Register(L);
 		EventDelegateWrap.Register(L);
 		LuaOutletWrap.Register(L);
@@ -29,6 +30,7 @@ public static class LuaBinder
 		MySceneManagerWrap.Register(L);
 		SceneIdWrap.Register(L);
 		GameWrap.Register(L);
+		TimeHelperWrap.Register(L);
 		LuaTestProxyWrap.Register(L);
 		LuaTestMediatorWrap.Register(L);
 		LuaTestMediator2Wrap.Register(L);
@@ -37,6 +39,8 @@ public static class LuaBinder
 		MainUIMediatorWrap.Register(L);
 		MainResourceMediatorWrap.Register(L);
 		LoginMediatorWrap.Register(L);
+		WorldMediatorWrap.Register(L);
+		WorldControllerWrap.Register(L);
 		CameraMoveWrap.Register(L);
 		HighlighterControllerWrap.Register(L);
 		UIRectWrap.Register(L);
@@ -48,6 +52,8 @@ public static class LuaBinder
 		Singleton_EventManagerWrap.Register(L);
 		Singleton_UIManagerWrap.Register(L);
 		Singleton_MySceneManagerWrap.Register(L);
+		Mono_Singleton_TimeHelperWrap.Register(L);
+		Singleton_WorldControllerWrap.Register(L);
 		L.BeginModule("DG");
 		L.BeginModule("Tweening");
 		DG_Tweening_DOTweenWrap.Register(L);
@@ -164,6 +170,9 @@ public static class LuaBinder
 		UIGrid_ArrangementWrap.Register(L);
 		L.RegFunction("OnReposition", UIGrid_OnReposition);
 		L.EndModule();
+		L.BeginModule("TimeHelper");
+		TimeHelper_ClockTimeWrap.Register(L);
+		L.EndModule();
 		L.BeginModule("System");
 		L.RegFunction("Action", System_Action);
 		L.RegFunction("Action_int", System_Action_int);
@@ -223,6 +232,9 @@ public static class LuaBinder
 		L.EndModule();
 		L.BeginModule("UIDrawCall");
 		L.RegFunction("OnRenderCallback", UIDrawCall_OnRenderCallback);
+		L.EndModule();
+		L.BeginModule("UIToggle");
+		L.RegFunction("Validate", UIToggle_Validate);
 		L.EndModule();
 		L.BeginModule("EventDelegate");
 		L.RegFunction("Callback", EventDelegate_Callback);
@@ -2377,6 +2389,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIDrawCall.OnRenderCallback), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIToggle_Validate(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIToggle.Validate), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIToggle.Validate), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

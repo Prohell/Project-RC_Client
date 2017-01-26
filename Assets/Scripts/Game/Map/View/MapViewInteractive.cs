@@ -1,8 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using DG.Tweening;
+using System.ComponentModel;
 
 public partial class MapView
 {
@@ -211,14 +210,6 @@ public partial class MapView
         RaycastHit[] hits = Physics.RaycastAll(ray);
         // map space
         Coord c = Layout.ScreenPos2Coord(MapCamera, screenPos);
-        //
-        IMapAStar mapAStar = new MapAStarCompact();
-        List<Coord> roteNodes = mapAStar.CalcPath(new Coord(5, 5), c);
-        foreach (var item in roteNodes)
-        {
-            LogModule.DebugLog("roteNodes: X= " + item.x + "Y= " + item.y);
-        }
-        //
         DoClickOnTile(c);
     }
 
@@ -299,6 +290,13 @@ public partial class MapView
         if (State == LodState.Lod0)
         {
             OnClickLod0(screenPos);
+            EventManager.GetInstance().SendEvent(EventId.MapBlockSelected, screenPos);
+
+#if UNITY_EDITOR
+            Coord c = Layout.ScreenPos2Coord(MapCamera, screenPos);
+            MapTileVO data = ProxyManager.GetInstance().Get<MapProxy>().GetTile(c);
+            LogModule.DebugLog(string.Format("coord:{0},height:{1},type:{2},blockType:{3},camp{4}", data.coord, data.height, data.type, data.blockType, data.camp));
+#endif
         }
         else if (State == LodState.Lod1)
         {
@@ -313,7 +311,6 @@ public partial class MapView
 
         if (_clickAnimationing)
         {
-
             Go.killAllTweensWithTarget(MapCamera.transform);
             _clickAnimationing = false;
         }

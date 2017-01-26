@@ -33,6 +33,14 @@ public class BattleUIView : MonoBehaviour
     public Text CountDownText;
     public GameObject CountDownObject;
 
+    public Text SelfNameText;
+    public Text TargetNameText;
+
+    public Image SelfBloodImage;
+    public Image TargetBloodImage;
+
+    public Button DimmerButton;
+
     public void StartCountDown(int sec)
     {
         CountDownObject.SetActive(true);

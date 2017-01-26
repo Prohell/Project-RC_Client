@@ -29,4 +29,16 @@ public class TestFPS : MonoBehaviour {
     {
         EventManager.GetInstance().SendEvent(EventId.StartFight, mInputField2.text);
     }
+    public void SendMarch()
+    {
+        EventManager.GetInstance().SendEvent(EventId.SendMarch);
+    }
+    public void UseSkill()
+    {
+        EventManager.GetInstance().SendEvent(EventId.UseSkill);
+    }
+    public void AutoFight()
+    {
+        EventManager.GetInstance().SendEvent(EventId.AutoFight);
+    }
 }

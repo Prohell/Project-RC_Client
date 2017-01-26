@@ -252,6 +252,23 @@ private static Dictionary<int, List<Tab_CityBuildingSlot> > g_CityBuildingSlot =
  }
  return true;
  }
+private static Dictionary<int, List<Tab_Hero> > g_Hero = new Dictionary<int, List<Tab_Hero> >(); 
+ public static bool InitTable_Hero()
+ {
+ g_Hero.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_Hero.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_Hero> values = new List<Tab_Hero>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_Hero)subit);
+ }
+ g_Hero.Add(kv.Key, values);
+ }
+ return true;
+ }
 private static Dictionary<int, List<Tab_PVETile> > g_PVETile = new Dictionary<int, List<Tab_PVETile> >(); 
  public static bool InitTable_PVETile()
  {
@@ -303,6 +320,40 @@ private static Dictionary<int, List<Tab_SceneClass> > g_SceneClass = new Diction
  }
  return true;
  }
+private static Dictionary<int, List<Tab_SkillEx> > g_SkillEx = new Dictionary<int, List<Tab_SkillEx> >(); 
+ public static bool InitTable_SkillEx()
+ {
+ g_SkillEx.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_SkillEx.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_SkillEx> values = new List<Tab_SkillEx>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_SkillEx)subit);
+ }
+ g_SkillEx.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_SkillTemplate> > g_SkillTemplate = new Dictionary<int, List<Tab_SkillTemplate> >(); 
+ public static bool InitTable_SkillTemplate()
+ {
+ g_SkillTemplate.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_SkillTemplate.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_SkillTemplate> values = new List<Tab_SkillTemplate>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_SkillTemplate)subit);
+ }
+ g_SkillTemplate.Add(kv.Key, values);
+ }
+ return true;
+ }
 private static Dictionary<int, List<Tab_TeamConfig> > g_TeamConfig = new Dictionary<int, List<Tab_TeamConfig> >(); 
  public static bool InitTable_TeamConfig()
  {
@@ -317,6 +368,23 @@ private static Dictionary<int, List<Tab_TeamConfig> > g_TeamConfig = new Diction
  values.Add((Tab_TeamConfig)subit);
  }
  g_TeamConfig.Add(kv.Key, values);
+ }
+ return true;
+ }
+private static Dictionary<int, List<Tab_Troop> > g_Troop = new Dictionary<int, List<Tab_Troop> >(); 
+ public static bool InitTable_Troop()
+ {
+ g_Troop.Clear();
+ Dictionary<int, List<object> > tmps = new Dictionary<int, List<object> >();
+ if (!Tab_Troop.LoadTable(tmps)) return false;
+ foreach (KeyValuePair<int, List<object> > kv in tmps)
+ {
+ List<Tab_Troop> values = new List<Tab_Troop>();
+ foreach (object subit in kv.Value)
+ {
+ values.Add((Tab_Troop)subit);
+ }
+ g_Troop.Add(kv.Key, values);
  }
  return true;
  }
@@ -350,13 +418,21 @@ bRet &= InitTable_CityBuildingLevel();
 
 bRet &= InitTable_CityBuildingSlot();
 
+bRet &= InitTable_Hero();
+
 bRet &= InitTable_PVETile();
 
 bRet &= InitTable_RoleBaseAttr();
 
 bRet &= InitTable_SceneClass();
 
+bRet &= InitTable_SkillEx();
+
+bRet &= InitTable_SkillTemplate();
+
 bRet &= InitTable_TeamConfig();
+
+bRet &= InitTable_Troop();
 
 bRet &= InitTable_UnitTemplate();
 
@@ -534,6 +610,40 @@ public static List<Tab_CityBuildingSlot> GetCityBuildingSlotByID(int nKey)
  return g_CityBuildingSlot;
  }
 
+public static List<Tab_Hero> GetHeroByID(int nKey)
+ {
+ if(g_Hero.Count==0)
+ {
+ InitTable_Hero();
+ }
+ if( g_Hero.ContainsKey(nKey))
+ {
+ return g_Hero[nKey];
+ }
+ return null;
+ }
+ public static Tab_Hero GetHeroByID(int nKey, int nIndex)
+ {
+ if(g_Hero.Count==0)
+ {
+ InitTable_Hero();
+ }
+ if( g_Hero.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_Hero[nKey].Count)
+ return g_Hero[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_Hero> > GetHero()
+ {
+ if(g_Hero.Count==0)
+ {
+ InitTable_Hero();
+ }
+ return g_Hero;
+ }
+
 public static List<Tab_PVETile> GetPVETileByID(int nKey)
  {
  if(g_PVETile.Count==0)
@@ -636,6 +746,74 @@ public static List<Tab_SceneClass> GetSceneClassByID(int nKey)
  return g_SceneClass;
  }
 
+public static List<Tab_SkillEx> GetSkillExByID(int nKey)
+ {
+ if(g_SkillEx.Count==0)
+ {
+ InitTable_SkillEx();
+ }
+ if( g_SkillEx.ContainsKey(nKey))
+ {
+ return g_SkillEx[nKey];
+ }
+ return null;
+ }
+ public static Tab_SkillEx GetSkillExByID(int nKey, int nIndex)
+ {
+ if(g_SkillEx.Count==0)
+ {
+ InitTable_SkillEx();
+ }
+ if( g_SkillEx.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_SkillEx[nKey].Count)
+ return g_SkillEx[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_SkillEx> > GetSkillEx()
+ {
+ if(g_SkillEx.Count==0)
+ {
+ InitTable_SkillEx();
+ }
+ return g_SkillEx;
+ }
+
+public static List<Tab_SkillTemplate> GetSkillTemplateByID(int nKey)
+ {
+ if(g_SkillTemplate.Count==0)
+ {
+ InitTable_SkillTemplate();
+ }
+ if( g_SkillTemplate.ContainsKey(nKey))
+ {
+ return g_SkillTemplate[nKey];
+ }
+ return null;
+ }
+ public static Tab_SkillTemplate GetSkillTemplateByID(int nKey, int nIndex)
+ {
+ if(g_SkillTemplate.Count==0)
+ {
+ InitTable_SkillTemplate();
+ }
+ if( g_SkillTemplate.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_SkillTemplate[nKey].Count)
+ return g_SkillTemplate[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_SkillTemplate> > GetSkillTemplate()
+ {
+ if(g_SkillTemplate.Count==0)
+ {
+ InitTable_SkillTemplate();
+ }
+ return g_SkillTemplate;
+ }
+
 public static List<Tab_TeamConfig> GetTeamConfigByID(int nKey)
  {
  if(g_TeamConfig.Count==0)
@@ -668,6 +846,40 @@ public static List<Tab_TeamConfig> GetTeamConfigByID(int nKey)
  InitTable_TeamConfig();
  }
  return g_TeamConfig;
+ }
+
+public static List<Tab_Troop> GetTroopByID(int nKey)
+ {
+ if(g_Troop.Count==0)
+ {
+ InitTable_Troop();
+ }
+ if( g_Troop.ContainsKey(nKey))
+ {
+ return g_Troop[nKey];
+ }
+ return null;
+ }
+ public static Tab_Troop GetTroopByID(int nKey, int nIndex)
+ {
+ if(g_Troop.Count==0)
+ {
+ InitTable_Troop();
+ }
+ if( g_Troop.ContainsKey(nKey))
+ {
+ if(nIndex>=0 && nIndex<g_Troop[nKey].Count)
+ return g_Troop[nKey][nIndex];
+ }
+ return null;
+ }
+ public static Dictionary<int, List<Tab_Troop> > GetTroop()
+ {
+ if(g_Troop.Count==0)
+ {
+ InitTable_Troop();
+ }
+ return g_Troop;
  }
 
 public static List<Tab_UnitTemplate> GetUnitTemplateByID(int nKey)

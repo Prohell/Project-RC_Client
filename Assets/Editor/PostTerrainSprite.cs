@@ -13,7 +13,7 @@ public class PostTerrainSprite : AssetPostprocessor
     {
         // Only post process textures if they are in a folder
         // "Terrain" or a sub folder of it.
-        if (assetPath.IndexOf("/Terrain/") == -1)
+        if (assetPath.IndexOf("/HexTerrain/") == -1)
             return;
         string AtlasName = new DirectoryInfo(Path.GetDirectoryName(assetPath)).Name;
         TextureImporter textureImporter = assetImporter as TextureImporter;

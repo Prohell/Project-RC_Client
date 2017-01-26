@@ -170,6 +170,7 @@ public static class CustomSettings
         _GT(typeof(UILabel)),
         _GT(typeof(UIGrid)),
         _GT(typeof(UIButton)),
+        _GT(typeof(UIToggle)),
         _GT(typeof(UIGrid.Arrangement)),
         _GT(typeof(NGUITools)),
         _GT(typeof(EventDelegate)),
@@ -187,6 +188,8 @@ public static class CustomSettings
         _GT(typeof(MySceneManager)),
         _GT(typeof(SceneId)),
         _GT(typeof(Game)),
+        _GT(typeof(TimeHelper)),
+        _GT(typeof(TimeHelper.ClockTime)),
 
         //Game module
         _GT(typeof(LuaTestProxy)),
@@ -197,6 +200,10 @@ public static class CustomSettings
         _GT(typeof(MainUIMediator)),
         _GT(typeof(MainResourceMediator)),
         _GT(typeof(LoginMediator)),
+
+        //World
+        _GT(typeof(WorldMediator)),
+        _GT(typeof(WorldController)),
 
 		//City
 		_GT(typeof(CameraMove)),

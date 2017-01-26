@@ -5,6 +5,14 @@ Shader "Unlit/UHexGon_Opt"
 	Properties
 	{
 		_TEXP("Tiling", Vector) = (10.0, 1.0, 1.0, 1.0)
+		//_NormalMap("NormalMap",2D) = "Bump"{}
+		//_NormalMap2("NormalMap2",2D) = "Bump"{}
+		//_NormalMap3("NormalMap3",2D) = "Bump"{}
+		_NormalMap4("NormalMap4",2D) = "Bump"{}
+		_NormalMap5("NormalMap5",2D) = "Bump"{}
+		_NormalMap6("NormalMap6",2D) = "Bump"{}
+		_LowValue("Low Value", Range(0,1)) = 0.34
+		_HighValue("High Value", Range(0,1)) = 0.54
 	}
 	SubShader
 	{
@@ -28,6 +36,7 @@ Shader "Unlit/UHexGon_Opt"
 				float4 tangent : TANGENT0;
 				float4 color : COLOR0;
 				float2 uv : TEXCOORD0;
+				float2 uv2 : TEXCOORD2;
 			};
 
 			struct v2f
@@ -44,6 +53,15 @@ Shader "Unlit/UHexGon_Opt"
 			sampler2D _ATLAS;
 			float4 _ARRAY[8];
 			float4 _TEXP;
+			uniform sampler2D _NormalMap;
+			float4 _NormalMap_ST;
+			uniform sampler2D _NormalMap2;
+			uniform sampler2D _NormalMap3;
+			uniform sampler2D _NormalMap4;
+			uniform sampler2D _NormalMap5;
+			uniform sampler2D _NormalMap6;
+			uniform float _LowValue;
+			uniform float _HighValue;
 
 			v2f vert (appdata v)
 			{
@@ -51,10 +69,12 @@ Shader "Unlit/UHexGon_Opt"
 				float4 vt = v.vertex;
 				float4 vm = mul(UNITY_MATRIX_M, vt);
 				o.vertex = mul(UNITY_MATRIX_VP, vm);
+				//test
+				//o.vertex.w=-1;
 				o.tex.x = dot(mul(UNITY_MATRIX_M, float4(1,0,0,0)), vm);
 				o.tex.y = dot(mul(UNITY_MATRIX_M, float4(0,1,0,0)), vm);
 				o.tex.xy*=1.0f/_TEXP.x;
-				o.tex.zw = float2(vt.z, o.vertex.z);
+				o.tex.zw = v.uv2;
 				o.tan = v.tangent;
 				o.clr = v.color;
 				//float3 vn = mul(v.normal.xyz,unity_WorldToObject);
@@ -76,61 +96,62 @@ Shader "Unlit/UHexGon_Opt"
 				uv.xy = i.tex.xy;
 				uv.zw = float2(0, i.ext.w);
 
-				//float2 fr = frac(i.ext.w)*float2(-1, 1) + float2(1, 0);
-				//float lod = cc.x*_TEXP.y;
-				//uv = all(fr>0.001) ? uv*2.5 : uv;
-				//int k = dot(i.clr.xyz > 0.01, float4(1, 2, 3))-1;
+				float2 uv2 = i.tex.zw;
 
-				//#define TEX8 1
+				float4 encodedNormal = 1;
+				/*if(i.tan.z < 1)
+				{
+					encodedNormal = tex2D(_NormalMap, uv2);
+					//return float4(1, 0, 0, 1);
+				}
+				else if(i.tan.z < 2)
+				{
+					encodedNormal = tex2D(_NormalMap2, uv2);
+					//return float4(0, 1, 0, 1);
+				}
+				else if(i.tan.z < 3)
+				{
+					encodedNormal = tex2D(_NormalMap3, uv2);
+					//return float4(0, 0, 1, 1);
+				}
+				*/
+
+				//return float4(uv2, 0, 1);
+
+				if (i.tan.z < 3)
+				{
+
+				}
+				else if(i.tan.z < 4)
+				{
+					encodedNormal = tex2D(_NormalMap4, uv2);
+					//return float4(0, 0, 1, 1);
+				}
+				else if (i.tan.z < 5)
+				{
+					encodedNormal = tex2D(_NormalMap5, uv2);
+					//return float4(0, 0, 1, 1);
+				}
+				else if (i.tan.z < 6)
+				{
+					encodedNormal = tex2D(_NormalMap6, uv2);
+					//return float4(0, 0, 1, 1);
+				}
+				//return encodedNormal;
+				encodedNormal = normalize(encodedNormal);
+				//return encodedNormal;
+				
+
+				float tmpN = encodedNormal.x;
+				tmpN = (tmpN - _LowValue) / (_HighValue - _LowValue);
+				encodedNormal = float4(tmpN, tmpN, tmpN, 1);
+				//return encodedNormal;
+
+
+
 				#define TEX4 1
 				//#define TEX3 1
 				//#define TEX2 1
-				//#define NOTEX 1
-
-				#ifdef NOTEX
-
-				#ifdef TEX8
-
-				fixed4 cl[8]={
-					fixed4(0,0,0,1),
-					fixed4(1,0,0,1),
-					fixed4(0,1,0,1),
-					fixed4(0,0,1,1),
-					fixed4(0,1,1,1),
-					fixed4(1,0,1,1),
-					fixed4(1,1,0,1),
-					fixed4(1,1,1,1),
-				};
-
-				#endif
-
-				#ifdef TEX4
-
-				fixed4 cl[4]={
-					fixed4(0,0,0,1),
-					fixed4(1,0,0,1),
-					fixed4(0,1,0,1),
-					fixed4(0,0,1,1),
-				};
-
-				#endif
-
-				#else
-
-				#ifdef TEX8
-
-				fixed4 cl[8]={
-					(fixed4)SampleAtlas(uv, _ARRAY[0]),
-					(fixed4)SampleAtlas(uv, _ARRAY[1]),
-					(fixed4)SampleAtlas(uv, _ARRAY[2]),
-					(fixed4)SampleAtlas(uv, _ARRAY[3]),
-					(fixed4)SampleAtlas(uv, _ARRAY[4]),
-					(fixed4)SampleAtlas(uv, _ARRAY[5]),
-					(fixed4)SampleAtlas(uv, _ARRAY[6]),
-					(fixed4)SampleAtlas(uv, _ARRAY[7]),  // sampling 8
-				};
-
-				#endif
 
 				#ifdef TEX4
 
@@ -162,15 +183,10 @@ Shader "Unlit/UHexGon_Opt"
 
 				#endif
 
-				#endif
-
-				bool bs = i.clr.a > 0.0f;
-
-				#ifdef TEX8
-				fixed4 col =
-					cl[0] * i.clr.x + cl[1] * i.clr.y + cl[2] * i.clr.z + cl[3] * i.clr.w
-					+ cl[4] * i.tan.x + cl[5] * i.tan.y + cl[6] * i.tan.z + cl[7] * i.tan.w;
-				#endif
+				//return cl[0] * i.clr.x;
+				//return cl[1] * i.clr.y;
+				//return cl[2] * i.clr.z;
+				//return cl[3] * i.clr.w;
 
 				#ifdef TEX4
 				fixed4 col =
@@ -188,7 +204,9 @@ Shader "Unlit/UHexGon_Opt"
 				#endif
 
 				//return col;
-				return col;// -float4(cc.xyz*.5, 0);
+
+				fixed3 withSpecular = fixed3(1, 1, 1) - (fixed3(1, 1, 1) - encodedNormal.xyz) / col.xyz;
+				return fixed4(withSpecular, 1)*0.3 + col*0.8;
 			}
 			ENDCG
 		}

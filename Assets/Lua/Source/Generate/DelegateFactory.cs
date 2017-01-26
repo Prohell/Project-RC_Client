@@ -94,6 +94,7 @@ public static class DelegateFactory
 		dict.Add(typeof(UIWidget.HitCheck), UIWidget_HitCheck);
 		dict.Add(typeof(UIGrid.OnReposition), UIGrid_OnReposition);
 		dict.Add(typeof(System.Comparison<UnityEngine.Transform>), System_Comparison_UnityEngine_Transform);
+		dict.Add(typeof(UIToggle.Validate), UIToggle_Validate);
 		dict.Add(typeof(EventDelegate.Callback), EventDelegate_Callback);
 		dict.Add(typeof(EventManager.EventHandler), EventManager_EventHandler);
 		dict.Add(typeof(MySceneManager.SceneSwitchHandler), MySceneManager_SceneSwitchHandler);
@@ -3888,6 +3889,57 @@ public static class DelegateFactory
 		{
 			System_Comparison_UnityEngine_Transform_Event target = new System_Comparison_UnityEngine_Transform_Event(func, self);
 			System.Comparison<UnityEngine.Transform> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UIToggle_Validate_Event : LuaDelegate
+	{
+		public UIToggle_Validate_Event(LuaFunction func) : base(func) { }
+		public UIToggle_Validate_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public bool Call(bool param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			bool ret = func.CheckBoolean();
+			func.EndPCall();
+			return ret;
+		}
+
+		public bool CallWithSelf(bool param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			bool ret = func.CheckBoolean();
+			func.EndPCall();
+			return ret;
+		}
+	}
+
+	public static Delegate UIToggle_Validate(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UIToggle.Validate fn = delegate(bool param0) { return false; };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UIToggle_Validate_Event target = new UIToggle_Validate_Event(func);
+			UIToggle.Validate d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UIToggle_Validate_Event target = new UIToggle_Validate_Event(func, self);
+			UIToggle.Validate d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

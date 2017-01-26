@@ -50,8 +50,8 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
     /// Get config and Open UI.
     /// </summary>
     /// <param name="p_name">name you defined</param>
-    /// <param name="p_viewInitCallBack"></param>
-    /// <param name="p_viewRefreshCallBack"></param>
+    /// <param name="p_viewInitCallBack">will stored in animation mode</param>
+    /// <param name="p_viewRefreshCallBack">will stored in animation mode</param>
     /// <param name="isShowAnimation"></param>
     public void OpenUI(string p_name, DelegateHelper.TableDelegate p_viewInitCallBack = null, DelegateHelper.TableDelegate p_viewRefreshCallBack = null, bool isShowAnimation = true)
     {
@@ -164,11 +164,6 @@ public partial class UIManager : Singleton<UIManager>, IInit, IDestroy, IReset
             Utils.StandardizeObject(m_UIItemMap[p_config.Name].RootObject);
             m_UIItemMap[p_config.Name].RootObject.SetActive(true);
             m_UIItemMap[p_config.Name].IsShowing = true;
-
-            if (m_UIItemMap[p_config.Name].View != null && p_viewRefreshCallBack != null)
-            {
-                p_viewRefreshCallBack(m_UIItemMap[p_config.Name].View);
-            }
 
             if (isShowAnimation)
             {

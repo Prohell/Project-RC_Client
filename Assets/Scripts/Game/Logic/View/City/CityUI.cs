@@ -8,7 +8,8 @@ public class CityUI : MonoBehaviour {
 
 	private CityUIMediator mediator;
 	void Awake(){
-		Debug.Log ("CityUIAwake");
+		EventManager.GetInstance().AddEventListener("Private_ShowBuildingButtons", ShowBtns);
+		EventManager.GetInstance().AddEventListener("Private_HideBuildingButtons", HideBtns);
 	}
 
 	void Start () {
@@ -21,10 +22,18 @@ public class CityUI : MonoBehaviour {
 	
 	}
 
+	private void HideBtns(object obj){
+		HideBtns ();
+	}
+
 	private void HideBtns(){
 		for (int i = 0; i < buttons.Count; i++) {
 			buttons [i].gameObject.SetActive (false);
 		}
+	}
+
+	private void ShowBtns(object obj){
+		ShowBtns (obj as string[]);
 	}
 
 	private void ShowBtns(string[] names){
@@ -44,19 +53,23 @@ public class CityUI : MonoBehaviour {
 	}
 
 	public void DetailsClick(){
-		EventManager.GetInstance().SendEvent(EventId.BuildingBtnClick, "details");
+		EventManager.GetInstance().SendEvent("Private_CityUIBtnClick", "details");
 	}
 
 	public void LevelUpClick(){
-		EventManager.GetInstance().SendEvent(EventId.BuildingBtnClick, "levelUp");
+		EventManager.GetInstance().SendEvent("Private_CityUIBtnClick", "levelUp");
 	}
 
 	public void TrainingClick(){
-		EventManager.GetInstance().SendEvent(EventId.BuildingBtnClick, "training");
+		EventManager.GetInstance().SendEvent("Private_CityUIBtnClick", "training");
 	}
 
 	public void CollectClick(){
-		EventManager.GetInstance().SendEvent(EventId.BuildingBtnClick, "collect");
+		EventManager.GetInstance().SendEvent("Private_CityUIBtnClick", "collect");
+	}
+
+	public void ResearchClick(){
+		EventManager.GetInstance().SendEvent("Private_CityUIBtnClick", "research");
 	}
 
 }

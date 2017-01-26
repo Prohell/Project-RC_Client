@@ -13,7 +13,7 @@ namespace SPacket.SocketInstance
  if (null == packet) return (uint)PACKET_EXE.PACKET_EXE_ERROR;
             //enter your logic
             BattleProxy proxy = GameFacade.GetProxy<BattleProxy>();
-            proxy.CurrentObjPos = packet;
+            BattleProxy.SetCurrentObjPos(proxy.CurrentObjPos, packet);
             EventManager.GetInstance().SendEvent(EventId.ReceiveSquadPosInfor, packet);            
  return (uint)PACKET_EXE.PACKET_EXE_CONTINUE;
  }

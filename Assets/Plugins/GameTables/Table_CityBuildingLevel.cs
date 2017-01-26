@@ -10,7 +10,7 @@ public class Tab_CityBuildingLevel
  {
  INVLAID_INDEX=-1,
 ID_ID,
-ID_NUMBER=2,
+ID_BUILDINGTYPE=2,
 ID_NAME,
 ID_LEVEL,
 ID_DESCRIPTION,
@@ -32,6 +32,9 @@ MAX_RECORD
 
 private string m_Asset;
  public string Asset { get{ return m_Asset;}}
+
+private int m_BuildingType;
+ public int BuildingType { get{ return m_BuildingType;}}
 
 private string m_Bundle;
  public string Bundle { get{ return m_Bundle;}}
@@ -73,9 +76,6 @@ private int m_NeedStone;
 private int m_NeedTime;
  public int NeedTime { get{ return m_NeedTime;}}
 
-private int m_Number;
- public int Number { get{ return m_Number;}}
-
 private int m_Prosperity;
  public int Prosperity { get{ return m_Prosperity;}}
 
@@ -95,6 +95,7 @@ public static bool LoadTable(Dictionary<int, List<object> > _tab)
  }
  Tab_CityBuildingLevel _values = new Tab_CityBuildingLevel();
  _values.m_Asset =  valuesList[(int)_ID.ID_ASSET] as string;
+_values.m_BuildingType =  Convert.ToInt32(valuesList[(int)_ID.ID_BUILDINGTYPE] as string);
 _values.m_Bundle =  valuesList[(int)_ID.ID_BUNDLE] as string;
 _values.m_Description =  valuesList[(int)_ID.ID_DESCRIPTION] as string;
 _values.m_Id =  Convert.ToInt32(valuesList[(int)_ID.ID_ID] as string);
@@ -109,7 +110,6 @@ _values.m_NeedIron =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDIRON] as string
 _values.m_NeedProsperity =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDPROSPERITY] as string);
 _values.m_NeedStone =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDSTONE] as string);
 _values.m_NeedTime =  Convert.ToInt32(valuesList[(int)_ID.ID_NEEDTIME] as string);
-_values.m_Number =  Convert.ToInt32(valuesList[(int)_ID.ID_NUMBER] as string);
 _values.m_Prosperity =  Convert.ToInt32(valuesList[(int)_ID.ID_PROSPERITY] as string);
 
  if (_hash.ContainsKey(skey))

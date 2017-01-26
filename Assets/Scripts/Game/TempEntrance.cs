@@ -59,10 +59,6 @@ public class TempEntrance : MonoBehaviour
             SwitchToCastle();
         }
 
-        if (GUILayout.Button("ShowMainUI"))
-        {
-            ShowMainUI();
-        }
         if (GUILayout.Button("ShowMap"))
         {
             SwitchToMapScene();
@@ -72,5 +68,22 @@ public class TempEntrance : MonoBehaviour
         {
             LuaHelper.CallFunction("LuaScriptHelper.StartDebugger");
         }
+
+        //if (GUILayout.Button("TestBattleUI"))
+        //{
+        //    Game.StartCoroutine(TestBattleUI());
+        //}
     }
+
+    //IEnumerator TestBattleUI()
+    //{
+    //    var ins = new BattleUIController();
+    //    ins.OnInit();
+
+    //    while (!ins.IsInited)
+    //    {
+    //        yield return new WaitForEndOfFrame();
+    //    }
+    //    ins.StartCountDown(10);
+    //}
 }

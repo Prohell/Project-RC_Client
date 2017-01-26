@@ -1,5 +1,5 @@
 ﻿
-//#define HEXGON0
+#define HEXGON0
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.IO;
 
 public class THEXGON : MonoBehaviour
 {
-    public List<int> spriteId = new List<int>();
+    public List<int> spriteIds = new List<int>();
     /// <summary>
     /// 是否有高度
     /// </summary>
@@ -120,8 +120,8 @@ public class THEXGON : MonoBehaviour
         HEX hex = _weak_hex.Target as HEX;
         Dictionary<int, int> TSet = new Dictionary<int, int>();
         List<Vector4> TArray = new List<Vector4>();
-        for (int i = 0; i < spriteId.Count; i++){
-			Vector4 pos = hex.GetSpritePosInfoByName(spriteId[i]);
+        for (int i = 0; i < spriteIds.Count; i++){
+			Vector4 pos = hex.GetSpritePosInfoByName(spriteIds[i]);
 			TArray.Add(pos);
 		}	
 		if(TArray.Count!=0){
@@ -181,14 +181,108 @@ public class THEXGON : MonoBehaviour
         public List<Color> vClr = new List<Color>();
         public List<Vector4> vTan = new List<Vector4>();
         public List<Vector2> vTex = new List<Vector2>();
+        public List<Vector2> vNorTex = new List<Vector2>();
     };
 	private static float Tx = Mathf.Sin(Mathf.PI / 3.0f);
 	private static float Ty = Mathf.Cos(Mathf.PI / 3.0f);
 	private static int[] lst = null;
 
-    private delegate int _reindex(ref element e, int ver, int col, int row);
+    private delegate int _reindex(ref element e, int ver, int col, int row, float normalz, Vector2 uv2);
 	private delegate bool _recheck(int ver, int col, int row);
-    void GenHexMesh(HEX _hex)
+
+    float CompareHeight(int thisHeight, int neighborHeight)
+    {
+        if (neighborHeight == -1)
+            return 4.5f;
+        else if (thisHeight == neighborHeight)
+            return 4.5f;
+        else if (thisHeight < neighborHeight)
+            return 3.5f;
+        else if (thisHeight > neighborHeight)
+            return 5.5f;
+        return 4.5f;
+    }
+
+    Coord GetNeighborCoord(int thisCoordX, int thisCoordY, int neighborInd)
+    {
+        int[,,] neighborOffset = new int[,,]
+        {
+            {
+                { 1, 1 },
+                { 1, 0 },
+                { 1, -1 },
+                { 0, -1 },
+                { -1, 0 },
+                { 0, 1 },
+            },
+            {
+                { 0, 1 },
+                { 1, 0 },
+                { 0, -1 },
+                { -1, -1 },
+                { -1, 0 },
+                { -1, 1 },
+            }
+        };
+
+        Coord c_neighbor;
+        if (thisCoordY % 2 == 0)
+        {
+            c_neighbor = new Coord(thisCoordX + neighborOffset[1, neighborInd, 0], thisCoordY + neighborOffset[1, neighborInd, 1]);
+        }
+        else
+        {
+            c_neighbor = new Coord(thisCoordX + neighborOffset[0, neighborInd, 0], thisCoordY + neighborOffset[0, neighborInd, 1]);
+        }
+        return c_neighbor;
+    }
+
+    int GetNeighborHeight(int thisCoordX, int thisCoordY, int neighborInd)
+    {
+        int height_neighbor = -1;
+        Coord c_neighbor= GetNeighborCoord(thisCoordX, thisCoordY, neighborInd);
+        MapProxy mapProxy = GameFacade.GetProxy<MapProxy>();
+        MapTileVO t_neighbor = mapProxy.GetTile(c_neighbor);
+        if (t_neighbor != null)
+        {
+            height_neighbor = t_neighbor.height;
+        }
+        return height_neighbor;
+    }
+
+    int CompareHeight_Tri0(int height5, int height4, int thisheight)
+    { // smaller number means higher
+        if(height5>height4 && height5>thisheight)
+        {
+            return 0;
+        }
+        else if(height5>height4 && thisheight>height4)
+        {
+            return 1;
+        }
+        else if (height5>thisheight && height4>thisheight)
+        {
+            return 2;
+        }
+        else if (height4>height5 && thisheight>height5)
+        {
+            return 3;
+        }
+        else if (thisheight>height4 && thisheight>height5)
+        {
+            return 4;
+        }
+        else if (height4>height5 && height4>thisheight)
+        {
+            return 5;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+void GenHexMesh(HEX _hex)
     {
         MapProxy mapProxy = GameFacade.GetProxy<MapProxy>();
         Vector3[] hexgon = {
@@ -234,13 +328,13 @@ public class THEXGON : MonoBehaviour
 
         element e = new element();
 
-		_reindex reindex = (ref element _elm, int _ver, int _col, int _row) =>
+		_reindex reindex = (ref element _elm, int _ver, int _col, int _row, float tmpindex, Vector2 uv2) =>
         {
             MapTileVO tileVo = mapProxy.GetTile(_col + _hex.xTile * _x, _row + _hex.yTile * _y);
             int loc = ((_row + 1) * (_hex.xTile + 1) + (_col + 1)) * 8 + _ver;
             int idx = lst[loc];
-            if (idx >= 0)
-                return idx;
+            //if (idx >= 0)
+            //    return idx;
 
             idx = _elm.vHex.Count;
             lst[loc] = idx;
@@ -249,7 +343,7 @@ public class THEXGON : MonoBehaviour
 			Vector3 _n = Vector3.zero;
 			Vector4 _t = Vector4.zero;
 			Vector2 _u = Vector2.zero;
-			Color _c;
+            Color _c;
             float _R = Tx * 2.0f + _hex.fvHex.x;
 
             int m = tileVo.mat;
@@ -304,9 +398,20 @@ public class THEXGON : MonoBehaviour
 			_elm.vNor.Add (_n);
 
 			_elm.vClr.Add(_c);
-			_elm.vTan.Add(_t);
+            
+            if(tmpindex<100)
+            {
+                _t.z = tmpindex;
+            }
+            else
+            {
+                _t.w = (int)tmpindex/100;
+                _t.z = tmpindex-_t.w*100;
+            }
+            _elm.vTan.Add(_t);
 
             _elm.vTex.Add(_u);
+            _elm.vNorTex.Add(uv2);
             return idx;
         };
 
@@ -360,18 +465,146 @@ public class THEXGON : MonoBehaviour
 		Color C0=new Color(0,0,0,0);
 		Vector4 V1=new Vector4(1,1,1,1);
 		Vector4 V0=new Vector4(0,0,0,0);
+        Vector2 uv2_zero = new Vector2(0,0);
 
-		for (int y = 0; y < _yTile; y++)
+        /*Vector2 uv2_normal_block0_6 = new Vector2(0.251f, 0.643f);
+        Vector2 uv2_normal_block0_5 = new Vector2(0.743f, 0.643f);
+        Vector2 uv2_normal_block0_2 = new Vector2(0.259f, 0.357f);
+        Vector2 uv2_normal_block0_3 = new Vector2(0.755f, 0.357f);
+        Vector2 uv2_normal_hex_0 = new Vector2(0.5f, 1.0f);
+        Vector2 uv2_normal_hex_5 = new Vector2(0.746f, 0.643f);
+        Vector2 uv2_normal_hex_6 = new Vector2(0.251f, 0.643f);
+        Vector2 uv2_normal_hex_00 = new Vector2(0.5f, 0.0f);
+        Vector2 uv2_normal_hex_2 = new Vector2(0.259f, 0.357f);
+        Vector2 uv2_normal_hex_3 = new Vector2(0.755f, 0.357f);
+        Vector2 uv2_normal_tri_6 = new Vector2(0.251f, 0.643f);
+        Vector2 uv2_normal_tri_2 = new Vector2(0.259f, 0.357f);
+        Vector2 uv2_normal_tri_4 = new Vector2(0.003f, 0.523f);
+        Vector2 uv2_normal_tri_5 = new Vector2(0.746f, 0.643f);
+        Vector2 uv2_normal_tri_1 = new Vector2(0.998f, 0.509f);
+        Vector2 uv2_normal_tri_3 = new Vector2(0.755f, 0.357f);*/
+
+        Vector2 uv2_normal_block0_6 = new Vector2(0.324f, 0.670f);
+        Vector2 uv2_normal_block0_5 = new Vector2(0.662f, 0.670f);
+        Vector2 uv2_normal_block0_2 = new Vector2(0.329f, 0.249f);
+        Vector2 uv2_normal_block0_3 = new Vector2(0.668f, 0.250f);
+        Vector2 uv2_normal_hex_0 = new Vector2(0.5f, 1.0f);
+        Vector2 uv2_normal_hex_5 = new Vector2(0.662f, 0.670f);
+        Vector2 uv2_normal_hex_6 = new Vector2(0.324f, 0.670f);
+        Vector2 uv2_normal_hex_00 = new Vector2(0.5f, 0.0f);
+        Vector2 uv2_normal_hex_2 = new Vector2(0.329f, 0.249f);
+        Vector2 uv2_normal_hex_3 = new Vector2(0.668f, 0.250f);
+        Vector2 uv2_normal_tri_6 = new Vector2(0.324f, 0.670f);
+        Vector2 uv2_normal_tri_2 = new Vector2(0.329f, 0.249f);
+        Vector2 uv2_normal_tri_4 = new Vector2(0.154f, 0.494f);
+        Vector2 uv2_normal_tri_5 = new Vector2(0.662f, 0.670f);
+        Vector2 uv2_normal_tri_1 = new Vector2(0.843f, 0.485f);
+        Vector2 uv2_normal_tri_3 = new Vector2(0.668f, 0.250f);
+
+        /*Vector2 uv2_normal_block0_6 = new Vector2(0.326f, 0.668f);
+        Vector2 uv2_normal_block0_5 = new Vector2(0.660f, 0.668f);
+        Vector2 uv2_normal_block0_2 = new Vector2(0.331f, 0.251f);
+        Vector2 uv2_normal_block0_3 = new Vector2(0.666f, 0.252f);
+        Vector2 uv2_normal_hex_0 = new Vector2(0.5f, 1.0f);
+        Vector2 uv2_normal_hex_5 = new Vector2(0.662f, 0.670f);
+        Vector2 uv2_normal_hex_6 = new Vector2(0.324f, 0.670f);
+        Vector2 uv2_normal_hex_00 = new Vector2(0.5f, 0.0f);
+        Vector2 uv2_normal_hex_2 = new Vector2(0.329f, 0.249f);
+        Vector2 uv2_normal_hex_3 = new Vector2(0.668f, 0.250f);
+        Vector2 uv2_normal_tri_6 = new Vector2(0.326f, 0.672f);
+        Vector2 uv2_normal_tri_2 = new Vector2(0.331f, 0.247f);
+        Vector2 uv2_normal_tri_4 = new Vector2(0.152f, 0.494f);
+        Vector2 uv2_normal_tri_5 = new Vector2(0.660f, 0.668f);
+        Vector2 uv2_normal_tri_1 = new Vector2(0.845f, 0.485f);
+        Vector2 uv2_normal_tri_3 = new Vector2(0.666f, 0.252f);*/
+
+
+        for (int y = 0; y < _yTile; y++)
         {
             for (int x = 0; x < _xTile; x++)
-			//int x=0;
             {
-				// hexgon
-				for (int i = 0; i < nHexIndices; i++)
+                /*if(!(x==1 && y==1 || x== && y==1))
                 {
-					if( recheck(tdx[i], x, y) == true )
-						vIdx.Add( reindex(ref e, tdx[i], x, y) );
-                }
+                    continue;
+                }*/
+                /*if (_x == 1 && _y == 1 && (x < 11 || y < 6))
+                {
+                    continue;
+                }*/
+
+                // get height info
+                int thisCoordX = x + _xTile * _x;
+                int thisCoordY = y + _yTile * _y;
+                Coord c = new Coord(thisCoordX, thisCoordY);
+                int thisHeight = mapProxy.GetTile(c).height;
+                int height_neighbor0 = GetNeighborHeight(thisCoordX, thisCoordY, 0);
+                int height_neighbor1 = GetNeighborHeight(thisCoordX, thisCoordY, 1);
+                int height_neighbor2 = GetNeighborHeight(thisCoordX, thisCoordY, 2);
+                int height_neighbor3 = GetNeighborHeight(thisCoordX, thisCoordY, 3);
+                int height_neighbor4 = GetNeighborHeight(thisCoordX, thisCoordY, 4);
+                int height_neighbor5 = GetNeighborHeight(thisCoordX, thisCoordY, 5);
+
+                // block5 left
+                Vector2 uv2_hex0_0 = new Vector2(0.0f, 0.5f);
+                Vector2 uv2_hex0_1 = new Vector2(0.375f, 0.211f);
+                Vector2 uv2_hex0_2 = new Vector2(0.375f, 0.785f);
+                // block0 right
+                Vector2 uv2_hex3_0 = new Vector2(1.0f, 0.5f);
+                Vector2 uv2_hex3_4 = new Vector2(0.621f, 0.785f);
+                Vector2 uv2_hex3_5 = new Vector2(0.621f, 0.211f);
+
+                float[] hex_index1 =
+                {
+                    1.5f,1.5f,1.5f,  0.5f,0.5f,0.5f,  2.5f,2.5f,2.5f,
+                    1.5f,1.5f,1.5f,  0.5f,0.5f,0.5f,  2.5f,2.5f,2.5f,
+                };
+
+                Vector2[] hex_index2 =
+                {
+                    uv2_hex0_0, uv2_hex0_1, uv2_hex0_1,
+                    uv2_hex0_0, uv2_hex0_1, uv2_hex0_1,
+                    uv2_hex0_0, uv2_hex0_1, uv2_hex0_1,
+                    uv2_hex3_0, uv2_hex3_4, uv2_hex3_5,
+                    uv2_hex3_0, uv2_hex3_4, uv2_hex3_5,
+                    uv2_hex3_0, uv2_hex3_4, uv2_hex3_5,
+                };
+
+                float heightCompare0 = CompareHeight(thisHeight, height_neighbor0);
+                float heightCompare1 = CompareHeight(thisHeight, height_neighbor1);
+                float heightCompare2 = CompareHeight(thisHeight, height_neighbor2);
+                float heightCompare3 = CompareHeight(thisHeight, height_neighbor3);
+                float heightCompare4 = CompareHeight(thisHeight, height_neighbor4);
+                float heightCompare5 = CompareHeight(thisHeight, height_neighbor5);
+
+                float[] hex_index3 =
+                {
+                    thisHeight*100+heightCompare0, thisHeight*100+heightCompare0, thisHeight*100+heightCompare0,
+                    thisHeight*100+heightCompare1, thisHeight*100+heightCompare1, thisHeight*100+heightCompare1,
+                    thisHeight*100+heightCompare2, thisHeight*100+heightCompare2, thisHeight*100+heightCompare2,
+                    thisHeight*100+heightCompare3, thisHeight*100+heightCompare3, thisHeight*100+heightCompare3,
+                    thisHeight*100+heightCompare4, thisHeight*100+heightCompare4, thisHeight*100+heightCompare4,
+                    thisHeight*100+heightCompare5, thisHeight*100+heightCompare5, thisHeight*100+heightCompare5,
+                };
+
+                Vector2[] hex_index4 =
+                {
+                    uv2_normal_hex_00, uv2_normal_hex_2, uv2_normal_hex_3,
+                    uv2_normal_hex_00, uv2_normal_hex_2, uv2_normal_hex_3,
+                    uv2_normal_hex_00, uv2_normal_hex_2, uv2_normal_hex_3,
+                    uv2_normal_hex_0, uv2_normal_hex_5, uv2_normal_hex_6,
+                    uv2_normal_hex_0, uv2_normal_hex_5, uv2_normal_hex_6,
+                    uv2_normal_hex_0, uv2_normal_hex_5, uv2_normal_hex_6,
+                };
+
+                // hexgon
+                for (int i = 0; i < nHexIndices; i++)
+                {
+                    if (recheck(tdx[i], x, y) == true)
+                    {
+                        //vIdx.Add(reindex(ref e, tdx[i], x, y, hex_index3[i], hex_index4[i]));
+                        vIdx.Add(reindex(ref e, tdx[i], x, y, 4.5f, hex_index4[i]));
+                    }
+                }        
 
                 // west -> x-1
                 // south west -> odd : x, y-1  even: x-1, y-1
@@ -384,7 +617,20 @@ public class THEXGON : MonoBehaviour
 
                 if (IsValid(ww, y))
                 {
-					// block 0
+                    Vector2 uv2_block0_6 = new Vector2(0.621f, 0.211f);
+                    Vector2 uv2_block0_5 = new Vector2(0.621f, 0.785f);
+                    Vector2 uv2_block0_3 = new Vector2(0.375f, 0.785f);
+                    Vector2 uv2_block0_2 = new Vector2(0.375f, 0.211f);
+
+                    Vector2 uv2_tri0_6 = new Vector2(0.621f, 0.211f);
+                    Vector2 uv2_tri0_2 = new Vector2(0.375f, 0.211f);
+                    Vector2 uv2_tri0_4 = new Vector2(0.5f, 0.0f);
+
+                    Vector2 uv2_tri5_5 = new Vector2(0.621f, 0.785f);
+                    Vector2 uv2_tri5_1 = new Vector2(0.5f, 1.0f);
+                    Vector2 uv2_tri5_3 = new Vector2(0.375f, 0.785f);
+
+                    // block 4
                     pass = true;
                     pass &= recheck(edx[0][0] - nIndexOffset, x, y);
                     pass &= recheck(edx[0][1] - nIndexOffset, x, y);
@@ -396,11 +642,14 @@ public class THEXGON : MonoBehaviour
 
 					if( pass == true && !bBld)
 					{
-						vSub.Add( reindex(ref e, edx[0][0] - nIndexOffset, x, y) );
-						vSub.Add( reindex(ref e, edx[0][1] - nIndexOffset, x, y) );
-						vSub.Add( reindex(ref e, edx[0][2] - nIndexOffset, ww, y) );
-					}
-					
+                        /*vSub.Add( reindex(ref e, edx[0][0] - nIndexOffset, x, y, 0.5f, uv2_block0_6) );
+                        vSub.Add( reindex(ref e, edx[0][1] - nIndexOffset, x, y, 0.5f, uv2_block0_5) );
+                        vSub.Add( reindex(ref e, edx[0][2] - nIndexOffset, ww, y, 0.5f, uv2_block0_2) );*/
+                        vSub.Add(reindex(ref e, edx[0][0] - nIndexOffset, x, y, heightCompare4, uv2_normal_block0_6));
+                        vSub.Add( reindex(ref e, edx[0][1] - nIndexOffset, x, y, heightCompare4, uv2_normal_block0_5) );
+                        vSub.Add( reindex(ref e, edx[0][2] - nIndexOffset, ww, y, heightCompare4, uv2_normal_block0_2) );
+                    }
+
                     pass = true;
                     pass &= recheck(edx[0][3] - nIndexOffset, ww, y);
                     pass &= recheck(edx[0][4] - nIndexOffset, ww, y);
@@ -408,51 +657,175 @@ public class THEXGON : MonoBehaviour
 
 					if( pass == true && !bBld)
 					{
-						vSub.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y));
-						vSub.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y));
-						vSub.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y));
-					}
+                        /*vSub.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y, 0.5f, uv2_block0_3));
+                        vSub.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y, 0.5f, uv2_block0_2));
+                        vSub.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y, 0.5f, uv2_block0_5));*/
+                        vSub.Add(reindex(ref e, edx[0][3] - nIndexOffset, ww, y, heightCompare4, uv2_normal_block0_3));
+                        vSub.Add(reindex(ref e, edx[0][4] - nIndexOffset, ww, y, heightCompare4, uv2_normal_block0_2));
+                        vSub.Add(reindex(ref e, edx[0][5] - nIndexOffset, x, y, heightCompare4, uv2_normal_block0_5));
+                    }
 
-					// triangle 0
-					if ( IsValid(nw, y+1) )
+                    // tri 4
+                    if ( IsValid(nw, y+1) )
 					{
 						pass = true;
 						pass &= recheck(edx[3][0] - nIndexOffset, x, y);
 						pass &= recheck(edx[3][1] - nIndexOffset, ww, y);
 						pass &= recheck(edx[3][2] - nIndexOffset, nw, y+1);
 
-						if ( pass == true && !bBld)
+                        Vector2 v0_uv = new Vector2();
+                        Vector2 v1_uv = new Vector2();
+                        Vector2 v2_uv = new Vector2();
+                        int heightCompare_type = CompareHeight_Tri0(height_neighbor5, height_neighbor4, thisHeight);
+                        float heightCompare_tri0=0;
+                        switch (heightCompare_type)
+                        {
+                            case 0:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_3;
+                                v1_uv = uv2_normal_tri_5;
+                                v2_uv = uv2_normal_tri_1;
+                                break;
+                            case 1:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_5;
+                                v1_uv = uv2_normal_tri_1;
+                                v2_uv = uv2_normal_tri_3;
+                                break;
+                            case 2:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_2;
+                                v1_uv = uv2_normal_tri_4;
+                                v2_uv = uv2_normal_tri_6;
+                                break;
+                            case 3:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_6;
+                                v1_uv = uv2_normal_tri_2;
+                                v2_uv = uv2_normal_tri_4;
+                                break;
+                            case 4:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_2;
+                                v1_uv = uv2_normal_tri_4;
+                                v2_uv = uv2_normal_tri_6;
+                                break;
+                            case 5:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_5;
+                                v1_uv = uv2_normal_tri_1;
+                                v2_uv = uv2_normal_tri_3;
+                                break;
+                            default:
+                                heightCompare_tri0 = 4.5f;
+                                break;
+                        }
+
+                        if ( pass == true && !bBld)
 						{
-							vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y));
-							vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y));
-							vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y+1));
-						}
+                            //if (heightCompare_type == 3)
+                            {
+                                /*vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y, 0.5f, uv2_tri0_6));
+                                vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y, 0.5f, uv2_tri0_2));
+                                vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y+1, 0.5f, uv2_tri0_4));*/
+                                vSub.Add(reindex(ref e, edx[3][0] - nIndexOffset, x, y, heightCompare_tri0, v0_uv));
+                                vSub.Add(reindex(ref e, edx[3][1] - nIndexOffset, ww, y, heightCompare_tri0, v2_uv));
+                                vSub.Add(reindex(ref e, edx[3][2] - nIndexOffset, nw, y + 1, heightCompare_tri0, v1_uv));
+                            }
+                        }
 					}
 				
-					// triangle 5
+					// tri 3
                     if (IsValid(sw, y - 1))
                     {
                         pass = true;
                         pass &= recheck(edx[3][3] - nIndexOffset, x, y);
                         pass &= recheck(edx[3][4] - nIndexOffset, sw, y - 1);
-                        pass &= recheck(edx[3][5] - nIndexOffset, ww, y);            
+                        pass &= recheck(edx[3][5] - nIndexOffset, ww, y);
 
-						if(y==0 && isBlend)
+                        Vector2 v0_uv = new Vector2();
+                        Vector2 v1_uv = new Vector2();
+                        Vector2 v2_uv = new Vector2();
+                        int heightCompare_type = CompareHeight_Tri0(height_neighbor3, thisHeight, height_neighbor4);
+                        float heightCompare_tri0 = 0;
+                        switch (heightCompare_type)
+                        {
+                            case 0:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_1;
+                                v1_uv = uv2_normal_tri_3;
+                                v2_uv = uv2_normal_tri_5;
+                                break;
+                            case 1:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_5;
+                                v1_uv = uv2_normal_tri_1;
+                                v2_uv = uv2_normal_tri_3;
+                                break;
+                            case 2:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_2;
+                                v1_uv = uv2_normal_tri_4;
+                                v2_uv = uv2_normal_tri_6;
+                                break;
+                            case 3:
+                                heightCompare_tri0 = 5.5f;
+                                v0_uv = uv2_normal_tri_6;
+                                v1_uv = uv2_normal_tri_2;
+                                v2_uv = uv2_normal_tri_4;
+                                break;
+                            case 4:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_2;
+                                v1_uv = uv2_normal_tri_4;
+                                v2_uv = uv2_normal_tri_6;
+                                break;
+                            case 5:
+                                heightCompare_tri0 = 3.5f;
+                                v0_uv = uv2_normal_tri_5;
+                                v1_uv = uv2_normal_tri_1;
+                                v2_uv = uv2_normal_tri_3;
+                                break;
+                            default:
+                                heightCompare_tri0 = 4.5f;
+                                break;
+                        }
+
+                        if (y==0 && isBlend)
 							bBld=true;
 
-						if ( pass == true && !bBld)
+                        float heightCompare_tri5 = 4.5f;
+                        if(heightCompare3!=4.5f)
+                        {
+                            heightCompare_tri5 = heightCompare3;
+                        }
+
+                        if (heightCompare4 != 4.5f)
+                        {
+                            heightCompare_tri5 = heightCompare4;
+                        }
+
+                        if ( pass == true && !bBld)
 						{
-							vSub.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y));
-							vSub.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y-1));
-							vSub.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y));
-						}
+                            /*vSub.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y, 0.5f, uv2_tri5_5));
+							vSub.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y-1, 0.5f, uv2_tri5_1));
+							vSub.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y, 0.5f, uv2_tri5_3));*/
+                            vSub.Add(reindex(ref e, edx[3][3] - nIndexOffset, x, y, heightCompare_tri5, v0_uv));
+                            vSub.Add(reindex(ref e, edx[3][4] - nIndexOffset, sw, y - 1, heightCompare_tri5, v1_uv));
+                            vSub.Add(reindex(ref e, edx[3][5] - nIndexOffset, ww, y, heightCompare_tri5, v2_uv));
+                        }
                     }
                 }
 
 				if (IsValid(sw, y - 1))
 				{
-					// block 5
-					pass = true;
+                    Vector2 uv2_block5_5 = new Vector2(0.621f, 0.211f);
+                    Vector2 uv2_block5_4 = new Vector2(0.621f, 0.785f);
+                    Vector2 uv2_block5_2 = new Vector2(0.375f, 0.785f);
+                    Vector2 uv2_block5_1 = new Vector2(0.375f, 0.211f);
+
+                    // block 3
+                    pass = true;
 					pass &= recheck(edx[1][0] - nIndexOffset, x, y);
 					pass &= recheck(edx[1][1] - nIndexOffset, x, y);
 					pass &= recheck(edx[1][2] - nIndexOffset, sw, y - 1);
@@ -463,10 +836,10 @@ public class THEXGON : MonoBehaviour
 			
 					if ( pass == true && !bBld)
 					{
-						vSub.Add(reindex(ref e, edx[1][0] - nIndexOffset, x, y));
-						vSub.Add(reindex(ref e, edx[1][1] - nIndexOffset, x, y));
-						vSub.Add(reindex(ref e, edx[1][2] - nIndexOffset, sw, y-1));
-					}
+                        vSub.Add(reindex(ref e, edx[1][0] - nIndexOffset, x, y, heightCompare3, uv2_normal_block0_6));
+                        vSub.Add(reindex(ref e, edx[1][1] - nIndexOffset, x, y, heightCompare3, uv2_normal_block0_5));
+                        vSub.Add(reindex(ref e, edx[1][2] - nIndexOffset, sw, y - 1, heightCompare3, uv2_normal_block0_2));
+                    }
 
 					pass = true;
 					pass &= recheck(edx[1][3] - nIndexOffset, sw, y-1);
@@ -475,15 +848,20 @@ public class THEXGON : MonoBehaviour
 
 					if ( pass == true && !bBld)
 					{
-						vSub.Add(reindex(ref e, edx[1][3] - nIndexOffset, sw, y-1));
-						vSub.Add(reindex(ref e, edx[1][4] - nIndexOffset, sw, y-1));
-						vSub.Add(reindex(ref e, edx[1][5] - nIndexOffset, x, y));
-					}
+                        vSub.Add(reindex(ref e, edx[1][3] - nIndexOffset, sw, y - 1, heightCompare3, uv2_normal_block0_3));
+                        vSub.Add(reindex(ref e, edx[1][4] - nIndexOffset, sw, y - 1, heightCompare3, uv2_normal_block0_2));
+                        vSub.Add(reindex(ref e, edx[1][5] - nIndexOffset, x, y, heightCompare3, uv2_normal_block0_5));
+                    }
 				}
 
                 if (IsValid(nw, y + 1))
                 {
-					// block 1
+                    Vector2 uv2_block1_1 = new Vector2(0.621f, 0.211f);
+                    Vector2 uv2_block1_6 = new Vector2(0.621f, 0.785f);
+                    Vector2 uv2_block1_4 = new Vector2(0.375f, 0.785f);
+                    Vector2 uv2_block1_3 = new Vector2(0.375f, 0.211f);
+
+                    // block 5
                     pass = true;
                     pass &= recheck(edx[2][0] - nIndexOffset, x, y);
                     pass &= recheck(edx[2][1] - nIndexOffset, x, y);
@@ -492,13 +870,13 @@ public class THEXGON : MonoBehaviour
 					bool bBld=false;
 					if(x==0 && y%2==0 && isBlend)
 						bBld=true;
-					
-					if( pass == true && !bBld)
+
+                    if ( pass == true && !bBld)
 					{
-						vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y));
-						vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y));
-						vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y+1));	
-					}
+                        vSub.Add(reindex(ref e, edx[2][0] - nIndexOffset, x, y, heightCompare5, uv2_normal_block0_6));
+                        vSub.Add(reindex(ref e, edx[2][1] - nIndexOffset, x, y, heightCompare5, uv2_normal_block0_5));
+                        vSub.Add(reindex(ref e, edx[2][2] - nIndexOffset, nw, y + 1, heightCompare5, uv2_normal_block0_2));
+                    }
 
 					pass = true;
 					pass &= recheck(edx[2][3] - nIndexOffset, nw, y+1);
@@ -507,10 +885,10 @@ public class THEXGON : MonoBehaviour
 
 					if( pass == true && !bBld)
 					{
-						vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, nw, y+1));
-						vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, nw, y+1));
-						vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y));	
-					}
+                        vSub.Add(reindex(ref e, edx[2][3] - nIndexOffset, nw, y + 1, heightCompare5, uv2_normal_block0_3));
+                        vSub.Add(reindex(ref e, edx[2][4] - nIndexOffset, nw, y + 1, heightCompare5, uv2_normal_block0_2));
+                        vSub.Add(reindex(ref e, edx[2][5] - nIndexOffset, x, y, heightCompare5, uv2_normal_block0_5));
+                    }
                 }
 			}
         }
@@ -525,7 +903,8 @@ public class THEXGON : MonoBehaviour
 		me.colors = e.vClr.ToArray();
 		me.tangents = e.vTan.ToArray(); 
 		me.uv = e.vTex.ToArray();
-		me.bounds = _bound;
+        me.uv2 = e.vNorTex.ToArray();
+        me.bounds = _bound;
 
 		var mf = gameObject.GetComponent<MeshFilter>();
 		if(mf == null)

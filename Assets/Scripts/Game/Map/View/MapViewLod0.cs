@@ -226,19 +226,24 @@ public class MapViewLod0 : MonoBehaviour
                 }
 			}
 
-            /*string s = "sub=(" + sub.xIdx.ToString() + ", " + sub.yIdx.ToString() + ") ";
-            if (sub.left != null)
-                s += "left=(" + sub.left.xIdx.ToString() + ", " + sub.left.yIdx.ToString() + ") ";
-            if(sub.prev!=null)
-                s += "prev=(" + sub.prev.xIdx.ToString() + ", " + sub.prev.yIdx.ToString() + ") ";
-            if (sub.diag != null)
-                s += "diag=(" + sub.diag.xIdx.ToString() + ", " + sub.diag.yIdx.ToString() + ") ";
-            Debug.Log(s);*/
 		}
 
         foreach (HexSubMapView sub in subMapViews.Values)
         {
             sub.InitPos();
+            if(sub.xIdx==0 && sub.mapEdgeLeft!=null)
+            {
+                Destroy(sub.mapEdgeLeft);
+            }
+            if (sub.yIdx == 0 && sub.mapEdgePrev != null)
+            {
+                Destroy(sub.mapEdgePrev);
+            }
+            if (sub.yIdx == 0 && sub.mapEdgeDiag != null)
+            {
+                Destroy(sub.mapEdgeDiag);
+            }
+
             sub.InitBg();
 
             if (sub.left != null || sub.prev != null || sub.diag != null)
@@ -247,105 +252,22 @@ public class MapViewLod0 : MonoBehaviour
             }
         }
 
-        // sz test
-        /*
-        foreach (HexSubMapView sub in subMapViews.Values)
-        {
-            if (sub.xIdx == 0 && sub.yIdx == 0)
-            {
-                sub.mHexBg.spriteId.Clear();
-                sub.mHexBg.spriteId.Add(1);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-            }
-            else if (sub.xIdx == 1 && sub.yIdx == 0)
-            {
-                sub.mHexBg.spriteId.Clear();
-                sub.mHexBg.spriteId.Add(6);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-            }
-            else if (sub.xIdx == 0 && sub.yIdx == 1)
-            {
-                sub.mHexBg.spriteId.Clear();
-                sub.mHexBg.spriteId.Add(6);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-            }
-            else if (sub.xIdx == 1 && sub.yIdx == 1)
-            {
-                sub.mHexBg.spriteId.Clear();
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-                sub.mHexBg.spriteId.Add(0);
-            }
-
-            if (sub.mBlendBg)
-            {
-                if (sub.xIdx == 1 && sub.yIdx == 0)
-                {
-                    sub.mBlendBg.spriteId.Clear();
-                    sub.mBlendBg.spriteId.Add(6);
-                    sub.mBlendBg.spriteId.Add(1);
-                    sub.mBlendBg.spriteId.Add(0);
-                    sub.mBlendBg.spriteId.Add(0);
-                }
-                else if (sub.xIdx == 0 && sub.yIdx == 1)
-                {
-                    sub.mBlendBg.spriteId.Clear();
-                    sub.mBlendBg.spriteId.Add(6);
-                    sub.mBlendBg.spriteId.Add(0);
-                    sub.mBlendBg.spriteId.Add(1);
-                    sub.mBlendBg.spriteId.Add(0);
-                }
-                else if (sub.xIdx == 1 && sub.yIdx == 1)
-                {
-                    sub.mBlendBg.spriteId.Clear();
-                    sub.mBlendBg.spriteId.Add(0);
-                    sub.mBlendBg.spriteId.Add(6);
-                    sub.mBlendBg.spriteId.Add(6);
-                    sub.mBlendBg.spriteId.Add(1);
-                }
-            }
-        }
-        // sz test
-         */
 
         foreach (HexSubMapView sub in subMapViews.Values)
         {
-            sub.UpdateInterSprList();
+            sub.InitBlend();
         }
 
         foreach (HexSubMapView sub in subMapViews.Values)
         {
-            /*string s = "sub=(" + sub.xIdx.ToString() + ", " + sub.yIdx.ToString() + ") ";
-            if (sub.left != null)
-                s += "left=(" + sub.left.xIdx.ToString() + ", " + sub.left.yIdx.ToString() + ") ";
-            if (sub.prev != null)
-                s += "prev=(" + sub.prev.xIdx.ToString() + ", " + sub.prev.yIdx.ToString() + ") ";
-            if (sub.diag != null)
-                s += "diag=(" + sub.diag.xIdx.ToString() + ", " + sub.diag.yIdx.ToString() + ") ";
-            Debug.Log(s);*/
-
-            /*string s="";
-            if (sub.mBlendBg!=null)
-                s += "blend=(" + sub.mBlendBg._x.ToString() + ", " + sub.yIdx.ToString() + ") ";
-            if (sub.mBlendBg != null && sub.mBlendBg.left != null)
-                s += "blend left=(" + sub.mBlendBg.left._x.ToString() + ", " + sub.mBlendBg.left._y.ToString() + ") ";
-            if (sub.mBlendBg != null && sub.mBlendBg.prev != null)
-                s += "blend prev=(" + sub.mBlendBg.prev._x.ToString() + ", " + sub.mBlendBg.prev._y.ToString() + ") ";
-            if (sub.mBlendBg != null && sub.mBlendBg.diag != null)
-                s += "blend diag=(" + sub.mBlendBg.diag._x.ToString() + ", " + sub.mBlendBg.diag._y.ToString() + ") ";
-            Debug.Log(s);*/
-
             sub.mHexBg.UpdateBlock();
             sub.mHexWater.UpdateBlock();
-            if(sub.mBlendBg!=null)
-                sub.mBlendBg.UpdateBlock();
+            if(sub.mHexBlendL!=null)
+                sub.mHexBlendL.UpdateBlock();
+            if (sub.mHexBlendP != null)
+                sub.mHexBlendP.UpdateBlock();
+            if (sub.mHexBlendD != null)
+                sub.mHexBlendD.UpdateBlock();
         }
 
         foreach (HexSubMapView sub in subMapViews.Values)

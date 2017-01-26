@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class THEXWATER : MonoBehaviour
 {
-    public List<int> spriteId = new List<int>();
+    public List<int> spriteIds = new List<int>();
     /// <summary>
     /// 是否有高度
     /// </summary>
@@ -115,8 +115,8 @@ public class THEXWATER : MonoBehaviour
 		HEX hex = _weak_hex.Target as HEX;
 		Dictionary<int, int> TSet = new Dictionary<int, int> ();
 		List<Vector4> TArray = new List<Vector4> ();
-		for (int i = 0; i < spriteId.Count; i++) {
-			Vector4 pos = hex.GetSpritePosInfoByName (spriteId [i]);
+		for (int i = 0; i < spriteIds.Count; i++) {
+			Vector4 pos = hex.GetSpritePosInfoByName (spriteIds [i]);
 			TArray.Add (pos);
 		}
 		if (TArray.Count > 0) {

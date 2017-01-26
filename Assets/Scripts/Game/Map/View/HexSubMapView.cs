@@ -8,7 +8,9 @@ public class HexSubMapView : MonoBehaviour
     public int yIdx = 0;
     public GameObject mapHexBg;
     public GameObject mapWaterBg;
-	public GameObject mapBlendBg;
+	public GameObject mapEdgeLeft;
+    public GameObject mapEdgePrev;
+    public GameObject mapEdgeDiag;
     public HEX hex = null;
     public HexMapLayout layout = null;
     public Dictionary<string, MapTile> tileTmpDict = null;
@@ -16,9 +18,11 @@ public class HexSubMapView : MonoBehaviour
 
     public THEXGON mHexBg = null;
     public THEXWATER mHexWater = null;
-	public THEXBLEND mBlendBg = null;
+	public THEXBLENDL mHexBlendL = null;
+    public THEXBLENDP mHexBlendP = null;
+    public THEXBLENDD mHexBlendD = null;
 
-	public HexSubMapView left = null;
+    public HexSubMapView left = null;
 	public HexSubMapView prev = null;
 	public HexSubMapView diag = null;
 
@@ -47,16 +51,48 @@ public class HexSubMapView : MonoBehaviour
         mapWaterBg.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
         mapWaterBg.transform.localPosition = new Vector3(0f, 8f, 0f);
 
-		if(mapBlendBg==null)
+		if(mapEdgeLeft==null && left!=null)
 		{
-			mapBlendBg = new GameObject();
-			mapBlendBg.name = "MapBlendBg";
-			mapBlendBg.transform.parent = mapHexBg.transform.parent;
-			//mapBlendBg = Instantiate (mapHexBg);
-		}
-		mapBlendBg.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-		mapBlendBg.transform.localPosition = new Vector3(0f, 8f, 0f);
-		mapBlendBg.transform.localScale = new Vector3 (1, 1, 1);
+            if (xIdx>0)
+            {
+                //Debug.Log("kk");
+                mapEdgeLeft = new GameObject();
+                mapEdgeLeft.name = "mapEdgeLeft";
+                mapEdgeLeft.transform.parent = mapHexBg.transform.parent;
+                mapEdgeLeft.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                mapEdgeLeft.transform.localPosition = new Vector3(0f, 8f, 0f);
+                mapEdgeLeft.transform.localScale = new Vector3(1, 1, 1);
+                //mapBlendBg = Instantiate (mapHexBg);
+            }
+        }
+
+        if (mapEdgePrev == null && prev!=null)
+        {
+            if (yIdx>0)
+            {
+                mapEdgePrev = new GameObject();
+                mapEdgePrev.name = "mapEdgePrev";
+                mapEdgePrev.transform.parent = mapHexBg.transform.parent;
+                mapEdgePrev.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                mapEdgePrev.transform.localPosition = new Vector3(0f, 8f, 0f);
+                mapEdgePrev.transform.localScale = new Vector3(1, 1, 1);
+                //mapBlendBg = Instantiate (mapHexBg);
+            }
+        }
+
+        if (mapEdgeDiag == null && left != null && prev != null)
+        {
+            if(xIdx>0 && yIdx>0)
+            {
+                mapEdgeDiag = new GameObject();
+                mapEdgeDiag.name = "mapEdgeDiag";
+                mapEdgeDiag.transform.parent = mapHexBg.transform.parent;
+                mapEdgeDiag.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                mapEdgeDiag.transform.localPosition = new Vector3(0f, 8f, 0f);
+                mapEdgeDiag.transform.localScale = new Vector3(1, 1, 1);
+                //mapBlendBg = Instantiate (mapHexBg);
+            }
+        }
     }
 
 	public void UpdateSprList()
@@ -67,134 +103,253 @@ public class HexSubMapView : MonoBehaviour
         }
         List<int> sprs = mapProxy.GetSprLists(xIdx, yIdx);
 
-		mHexBg.spriteId.Clear();
-		mHexBg.spriteId.AddRange(sprs);
+		mHexBg.spriteIds.Clear();
+		mHexBg.spriteIds.AddRange(sprs);
         
-        mHexWater.spriteId.Clear();
-        mHexWater.spriteId.AddRange(sprs);
+        mHexWater.spriteIds.Clear();
+        mHexWater.spriteIds.AddRange(sprs);
     }
   
+    int[] GetSameSpriteIds(List<int> Ids1, List<int> Ids2)
+    {
+        List<int> same = new List<int>();
+        for(int i=0; i<Ids1.Count; i++)
+        {
+            for (int j = 0; j < Ids2.Count; j++)
+            {
+                if(Ids1[i]==Ids2[j])
+                {
+                    if(!same.Contains(Ids1[i]))
+                    {
+                        same.Add(Ids1[i]);
+                    }
+                }
+            }
+        }
+
+        return same.ToArray();
+    }
+
     public void UpdateInterSprList()
     {
-        if (mBlendBg)
+        MapProxy mapProxy = GameFacade.GetProxy<MapProxy>();
+
+        MapTileVO theTile = mapProxy.GetTile(mHexBg._xTile * mHexBg._x, mHexBg._yTile * mHexBg._y);
+        int theMat = theTile.mat;
+        if (theMat > 3)
+            theMat = 0;
+
+        byte leftMat = 255;
+        byte prevMat = 255;
+        byte diagMat = 255;
+
+        if (left != null)
         {
-            MapProxy mapProxy = GameFacade.GetProxy<MapProxy>();
+            MapTileVO leftTile = mapProxy.GetTile(left.mHexBg._xTile * left.mHexBg._x, left.mHexBg._yTile * left.mHexBg._y);
+            leftMat = leftTile.mat;
+            if (leftMat > 3)
+                leftMat = 0;
+        }
 
-            MapTileVO theTile = mapProxy.GetTile(mHexBg._xTile * mHexBg._x, mHexBg._yTile * mHexBg._y);
-            int theMat = theTile.mat;
-            if (theMat > 3)
-                theMat = 0;
-            mBlendBg.spriteId.Clear();
-            mBlendBg.spriteId.Add(mHexBg.spriteId[theMat]);
-            mBlendBg.spriteId.Add(0);
-            mBlendBg.spriteId.Add(0);
-            mBlendBg.spriteId.Add(0);
+        if (prev != null)
+        {
+            MapTileVO prevTile = mapProxy.GetTile(prev.mHexBg._xTile * prev.mHexBg._x, prev.mHexBg._yTile * prev.mHexBg._y);
+            prevMat = prevTile.mat;
+            if (prevMat > 3)
+                prevMat = 0;
+        }
 
-            int leftMat = -1;
-            int prevMat = -1;
-            int diagMat = -1;
+        if (diag != null)
+        {
+            MapTileVO diagTile = mapProxy.GetTile(diag.mHexBg._xTile * diag.mHexBg._x, diag.mHexBg._yTile * diag.mHexBg._y);
+            diagMat = diagTile.mat;
+            if (diagMat > 3)
+                diagMat = 0;
+        }
 
-            if(left!=null)
+        bool hasLeft = false;
+        if (left != null && left.mHexBg.spriteIds.Count > 0)
+        {
+            hasLeft = true;
+        }
+
+        bool hasPrev = false;
+        if (prev != null && prev.mHexBg.spriteIds.Count > 0)
+        {
+            hasPrev = true;
+        }
+
+        if (mHexBlendL)
+        {
+            mHexBlendL.left = hasLeft;
+            mHexBlendL.thisSprites = mHexBg.spriteIds;
+
+            if (hasLeft)
             {
-                MapTileVO leftTile = mapProxy.GetTile(left.mHexBg._xTile * left.mHexBg._x, left.mHexBg._yTile * left.mHexBg._y);
-                leftMat = leftTile.mat;
-                if (leftMat > 3)
-                    leftMat = 0;
-            }
-            
-            if(prev!=null)
-            {
-                MapTileVO prevTile = mapProxy.GetTile(prev.mHexBg._xTile * prev.mHexBg._x, prev.mHexBg._yTile * prev.mHexBg._y);
-                prevMat = prevTile.mat;
-                if (prevMat > 3)
-                    prevMat = 0;
-            }
+                //int[] same = GetSameSpriteIds(mHexBg.spriteIds, left.mHexBg.spriteIds);
+                mHexBlendL.leftSprites = left.mHexBg.spriteIds;
+                mHexBlendL.spriteIds.Clear();
+                mHexBlendL.spriteIds.AddRange(mHexBg.spriteIds);
+                mHexBlendL.spriteIds.AddRange(left.mHexBg.spriteIds);
+            }   
+        }
 
-            if (diag != null)
-            {
-                MapTileVO diagTile = mapProxy.GetTile(diag.mHexBg._xTile * diag.mHexBg._x, diag.mHexBg._yTile * diag.mHexBg._y);
-                diagMat = diagTile.mat;
-                if (diagMat > 3)
-                    diagMat = 0;
-            }
+        if (mHexBlendP)
+        {
+            mHexBlendP.prev = hasPrev;
+            mHexBlendP.thisSprites = mHexBg.spriteIds;
 
-            bool hasLeft = false;
-            if (left != null && left.mHexBg.spriteId.Count > 0)
+            if (hasPrev)
             {
-                hasLeft = true;
-            }
+                //int[] same = GetSameSpriteIds(mHexBg.spriteIds, prev.mHexBg.spriteIds);
+                mHexBlendP.prevSprites = prev.mHexBg.spriteIds;
+                mHexBlendP.spriteIds.Clear();
+                mHexBlendP.spriteIds.AddRange(mHexBg.spriteIds);
+                mHexBlendP.spriteIds.AddRange(prev.mHexBg.spriteIds);
+            }  
+        }
 
-            bool hasPrev = false;
-            if (prev != null && prev.mHexBg.spriteId.Count > 0)
-            {
-                hasPrev = true;
-            }
-
-            mBlendBg.left = hasLeft;
-            mBlendBg.prev = hasPrev;
-       
-            if (hasLeft && !hasPrev)
-            {
-                mBlendBg.spriteId[1] = left.mHexBg.spriteId[leftMat];
-            }
-
-            if (hasPrev && !hasLeft)
-            {
-                mBlendBg.spriteId[2] = prev.mHexBg.spriteId[prevMat];
-            }
+        if (mHexBlendD)
+        {
+            mHexBlendD.left = hasLeft;
+            mHexBlendD.prev = hasPrev;
+            mHexBlendD.thisSprites = mHexBg.spriteIds;
 
             if (hasLeft && hasPrev)
             {
-                mBlendBg.spriteId[1] = left.mHexBg.spriteId[leftMat];
-                mBlendBg.spriteId[2] = prev.mHexBg.spriteId[prevMat];
-                if (diag != null && diag.mHexBg != null)
-                {
-                    mBlendBg.spriteId[3] = diag.mHexBg.spriteId[diagMat];
-                }
+                //int[] same = GetSameSpriteIds(mHexBg.spriteIds, prev.mHexBg.spriteIds);
+                mHexBlendD.leftSprites = left.mHexBg.spriteIds;
+                mHexBlendD.prevSprites = prev.mHexBg.spriteIds;
+                mHexBlendD.diagSprites = diag.mHexBg.spriteIds;
+                mHexBlendD.spriteIds.Clear();
+                mHexBlendD.spriteIds.Add(0);
+                mHexBlendD.spriteIds.Add(1);
+                mHexBlendD.spriteIds.Add(2);
+                mHexBlendD.spriteIds.Add(3);
             }
         }
     }
 
     public void InitBg(bool isGenheight = true)
     {
-		if (mHexBg == null) {
-			mHexBg = mapHexBg.AddComponent<THEXGON> ();
-			mHexBg.isGenHeight = isGenheight;
-			mHexBg.SetBounds (
-				new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
-				new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
-			mHexBg.Init(hex, xIdx, yIdx);
-		} else {
-			mHexBg.isGenHeight = isGenheight;
-			mHexBg.ReInit(xIdx, yIdx);
-		}
+        if (mHexBg == null)
+        {
+            mHexBg = mapHexBg.AddComponent<THEXGON>();
+            mHexBg.isGenHeight = isGenheight;
+            mHexBg.SetBounds(
+                new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+            mHexBg.Init(hex, xIdx, yIdx);
+        }
+        else
+        {
+            mHexBg.isGenHeight = isGenheight;
+            mHexBg.ReInit(xIdx, yIdx);
+        }
 
-		if (mHexWater == null) {
-			mHexWater = mapWaterBg.AddComponent<THEXWATER> ();
-			mHexWater.SetBounds (
-				new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
-				new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
-			mHexWater.Init (hex, xIdx, yIdx);
-		} else {
-			mHexWater.ReInit(xIdx, yIdx);
-		}
-
-		if (mBlendBg == null) {
-			if (left != null || prev != null) {
-				mBlendBg = mapBlendBg.AddComponent<THEXBLEND> ();
-				mBlendBg.isGenHeight = isGenheight;
-				mBlendBg.SetBounds (
-					new Vector3 (-layout.HexTileWidth, -layout.HexTileWidth, -10),
-					new Vector3 (layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
-				mBlendBg.Init(hex, xIdx, yIdx);
-			}
-		} else {
-			if (left != null || prev != null) {
-				mBlendBg.ReInit (xIdx, yIdx);
-			}
-		}
+        if (mHexWater == null)
+        {
+            mHexWater = mapWaterBg.AddComponent<THEXWATER>();
+            mHexWater.SetBounds(
+                new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+            mHexWater.Init(hex, xIdx, yIdx);
+        }
+        else
+        {
+            mHexWater.ReInit(xIdx, yIdx);
+        }
 
         UpdateSprList();
+    }
+
+    public void InitBlend(bool isGenheight = true)
+    {
+        bool initLeft = false;
+		if (mHexBlendL == null && left != null)
+        {
+            if(xIdx==0 && yIdx==0)
+            {
+                Debug.Log("kk");
+            }
+
+            if (xIdx > 0)
+            {
+                mHexBlendL = mapEdgeLeft.AddComponent<THEXBLENDL>();
+                mHexBlendL.isGenHeight = isGenheight;
+                mHexBlendL.SetBounds(
+                    new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                    new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+                initLeft = true;
+            }
+        }
+
+        bool initPrev = false;
+        if (mHexBlendP == null && prev != null)
+        {
+            if (xIdx == 0 && yIdx == 0)
+            {
+                Debug.Log("kk");
+            }
+
+            if (yIdx > 0)
+            {
+                mHexBlendP = mapEdgePrev.AddComponent<THEXBLENDP>();
+                mHexBlendP.isGenHeight = isGenheight;
+                mHexBlendP.SetBounds(
+                    new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                    new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+                initPrev = true;
+            } 
+        }
+
+        bool initDiag = false;
+        if (mHexBlendD == null && left !=null && prev != null)
+        {
+            if (xIdx == 0 && yIdx == 0)
+            {
+                Debug.Log("kk");
+            }
+
+            if (xIdx > 0 && yIdx>0)
+            {
+                mHexBlendD = mapEdgeDiag.AddComponent<THEXBLENDD>();
+                mHexBlendD.isGenHeight = isGenheight;
+                mHexBlendD.SetBounds(
+                    new Vector3(-layout.HexTileWidth, -layout.HexTileWidth, -10),
+                    new Vector3(layout.HexTileWidth * hex.xTile, layout.HexTileWidth * hex.yTile, 10));
+                initDiag = true;
+            }
+        }
+
+        UpdateInterSprList();
+
+        if (initLeft)
+        {
+            mHexBlendL.Init(hex, xIdx, yIdx);
+        }
+        else if(mHexBlendL != null && left != null)
+        {
+            mHexBlendL.ReInit(xIdx, yIdx);
+        }
+
+        if (initPrev)
+        {
+            mHexBlendP.Init(hex, xIdx, yIdx);
+        }
+        else if (mHexBlendP != null && prev != null)
+        {
+            mHexBlendP.ReInit(xIdx, yIdx);
+        }
+
+        if (initDiag)
+        {
+            mHexBlendD.Init(hex, xIdx, yIdx);
+        }
+        else if (mHexBlendD != null && left!=null && prev != null)
+        {
+            mHexBlendD.ReInit(xIdx, yIdx);
+        }
     }
 
 #if UNITY_EDITOR
@@ -231,10 +386,6 @@ public class HexSubMapView : MonoBehaviour
                     else if(op == MapEditorEntry.EDIT_OP.EDIT_LV)
                     {
                         index = tileVo.level;
-                    }
-                    else if (op == MapEditorEntry.EDIT_OP.EDIT_TILETYPE)
-                    {
-                        index = (int)tileVo.type;
                     }
                     else
                     {

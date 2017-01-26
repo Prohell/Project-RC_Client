@@ -26,6 +26,11 @@ public class TimeHelper : Mono_Singleton<TimeHelper>
             second = l_second;
         }
 
+        public ClockTime(int p_sec)
+        {
+            this = SecondToClockTime(p_sec);
+        }
+
         public static ClockTime zero = new ClockTime(0, 0, 0);
 
         public int hour;
@@ -48,6 +53,11 @@ public class TimeHelper : Mono_Singleton<TimeHelper>
                 Debug.LogError("Transfer ClockTime fail, contact LiangXiao if you donot know how to solve this, exception:" + e.Source + "\nstackTrace:" + e.StackTrace);
                 return zero;
             }
+        }
+
+        public int ToSeconds()
+        {
+            return hour * 3600 + minute * 60 + second;
         }
 
         public override string ToString()

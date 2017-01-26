@@ -10,7 +10,7 @@ public class Tab_CityBuildingSlot
  {
  INVLAID_INDEX=-1,
 ID_ID,
-ID_SLOT=2,
+ID_BUILDINGTYPE=2,
 ID_UNLOCKLEVEL,
 ID_EFFECT_1,
 ID_EFFECT_2,
@@ -21,6 +21,9 @@ MAX_RECORD
  }
  public static string GetInstanceFile(){return TAB_FILE_DATA; }
 
+private int m_BuildingType;
+ public int BuildingType { get{ return m_BuildingType;}}
+
 public int getEffectCount() { return 5; } 
  private int[] m_Effect = new int[5];
  public int GetEffectbyIndex(int idx) {
@@ -30,9 +33,6 @@ public int getEffectCount() { return 5; }
 
 private int m_Id;
  public int Id { get{ return m_Id;}}
-
-private int m_Slot;
- public int Slot { get{ return m_Slot;}}
 
 private int m_UnlockLevel;
  public int UnlockLevel { get{ return m_UnlockLevel;}}
@@ -52,13 +52,13 @@ public static bool LoadTable(Dictionary<int, List<object> > _tab)
  throw TableException.ErrorReader("Load {0} error as CodeSize:{1} not Equal DataSize:{2}", GetInstanceFile(),_ID.MAX_RECORD,valuesList.Length);
  }
  Tab_CityBuildingSlot _values = new Tab_CityBuildingSlot();
- _values.m_Effect [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_1] as string);
+ _values.m_BuildingType =  Convert.ToInt32(valuesList[(int)_ID.ID_BUILDINGTYPE] as string);
+_values.m_Effect [ 0 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_1] as string);
 _values.m_Effect [ 1 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_2] as string);
 _values.m_Effect [ 2 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_3] as string);
 _values.m_Effect [ 3 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_4] as string);
 _values.m_Effect [ 4 ] =  Convert.ToInt32(valuesList[(int)_ID.ID_EFFECT_5] as string);
 _values.m_Id =  Convert.ToInt32(valuesList[(int)_ID.ID_ID] as string);
-_values.m_Slot =  Convert.ToInt32(valuesList[(int)_ID.ID_SLOT] as string);
 _values.m_UnlockLevel =  Convert.ToInt32(valuesList[(int)_ID.ID_UNLOCKLEVEL] as string);
 
  if (_hash.ContainsKey(skey))

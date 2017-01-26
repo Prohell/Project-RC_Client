@@ -907,19 +907,19 @@ public override bool IsInitialized() {
 public class CG_REQ_NEAR_LIST : PacketDistributed
 {
 
-public const int marchIdFieldNumber = 1;
- private bool hasMarchId;
- private Int32 marchId_ = 0;
- public bool HasMarchId {
- get { return hasMarchId; }
+public const int blockidFieldNumber = 1;
+ private bool hasBlockid;
+ private Int32 blockid_ = 0;
+ public bool HasBlockid {
+ get { return hasBlockid; }
  }
- public Int32 MarchId {
- get { return marchId_; }
- set { SetMarchId(value); }
+ public Int32 Blockid {
+ get { return blockid_; }
+ set { SetBlockid(value); }
  }
- public void SetMarchId(Int32 value) { 
- hasMarchId = true;
- marchId_ = value;
+ public void SetBlockid(Int32 value) { 
+ hasBlockid = true;
+ blockid_ = value;
  }
 
 public const int sceneIdFieldNumber = 2;
@@ -943,8 +943,8 @@ public const int sceneIdFieldNumber = 2;
  int size = memoizedSerializedSize;
  if (size != -1) return size;
  size = 0;
-  if (HasMarchId) {
-size += pb::CodedOutputStream.ComputeInt32Size(1, MarchId);
+  if (HasBlockid) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Blockid);
 }
  if (HasSceneId) {
 size += pb::CodedOutputStream.ComputeInt32Size(2, SceneId);
@@ -957,8 +957,8 @@ public override void WriteTo(pb::CodedOutputStream output)
  {
  int size = SerializedSize();
   
-if (HasMarchId) {
-output.WriteInt32(1, MarchId);
+if (HasBlockid) {
+output.WriteInt32(1, Blockid);
 }
  
 if (HasSceneId) {
@@ -975,7 +975,7 @@ public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDis
  return _inst;
  }
     case  8: {
- _inst.MarchId = input.ReadInt32();
+ _inst.Blockid = input.ReadInt32();
 break;
 }
    case  16: {
@@ -989,7 +989,7 @@ break;
  }
 //end merged
 public override bool IsInitialized() {
-  if (!hasMarchId) return false;
+  if (!hasBlockid) return false;
  if (!hasSceneId) return false;
  return true;
  }
@@ -1002,8 +1002,8 @@ public class GC_NEAR_MARCHLIST : PacketDistributed
 {
 
 public const int GuidFieldNumber = 1;
- private pbc::PopsicleList<UInt64> Guid_ = new pbc::PopsicleList<UInt64>();
- public scg::IList<UInt64> GuidList {
+ private pbc::PopsicleList<Int64> Guid_ = new pbc::PopsicleList<Int64>();
+ public scg::IList<Int64> GuidList {
  get { return pbc::Lists.AsReadOnly(Guid_); }
  }
  
@@ -1011,10 +1011,10 @@ public const int GuidFieldNumber = 1;
  get { return Guid_.Count; }
  }
  
-public UInt64 GetGuid(int index) {
+public Int64 GetGuid(int index) {
  return Guid_[index];
  }
- public void AddGuid(UInt64 value) {
+ public void AddGuid(Int64 value) {
  Guid_.Add(value);
  }
 
@@ -1099,6 +1099,40 @@ public const int sceneIdFieldNumber = 6;
  sceneId_ = value;
  }
 
+public const int posXFieldNumber = 7;
+ private pbc::PopsicleList<Int32> posX_ = new pbc::PopsicleList<Int32>();
+ public scg::IList<Int32> posXList {
+ get { return pbc::Lists.AsReadOnly(posX_); }
+ }
+ 
+ public int posXCount {
+ get { return posX_.Count; }
+ }
+ 
+public Int32 GetPosX(int index) {
+ return posX_[index];
+ }
+ public void AddPosX(Int32 value) {
+ posX_.Add(value);
+ }
+
+public const int posZFieldNumber = 8;
+ private pbc::PopsicleList<Int32> posZ_ = new pbc::PopsicleList<Int32>();
+ public scg::IList<Int32> posZList {
+ get { return pbc::Lists.AsReadOnly(posZ_); }
+ }
+ 
+ public int posZCount {
+ get { return posZ_.Count; }
+ }
+ 
+public Int32 GetPosZ(int index) {
+ return posZ_[index];
+ }
+ public void AddPosZ(Int32 value) {
+ posZ_.Add(value);
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -1108,7 +1142,7 @@ public const int sceneIdFieldNumber = 6;
  {
 int dataSize = 0;
 for(int i=0; i<GuidList.Count; ++i){
-dataSize += pb::CodedOutputStream.ComputeUInt64SizeNoTag(GuidList[i]);
+dataSize += pb::CodedOutputStream.ComputeInt64SizeNoTag(GuidList[i]);
 }
 size += dataSize;
 size += 1 * Guid_.Count;
@@ -1143,6 +1177,22 @@ size += pb::CodedOutputStream.ComputeInt32Size(5, MarchId);
  if (HasSceneId) {
 size += pb::CodedOutputStream.ComputeInt32Size(6, SceneId);
 }
+{
+int dataSize = 0;
+for(int i=0; i<posXList.Count; ++i){
+dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(posXList[i]);
+}
+size += dataSize;
+size += 1 * posX_.Count;
+}
+{
+int dataSize = 0;
+for(int i=0; i<posZList.Count; ++i){
+dataSize += pb::CodedOutputStream.ComputeInt32SizeNoTag(posZList[i]);
+}
+size += dataSize;
+size += 1 * posZ_.Count;
+}
  memoizedSerializedSize = size;
  return size;
  }
@@ -1153,7 +1203,7 @@ public override void WriteTo(pb::CodedOutputStream output)
  {
 if (Guid_.Count > 0) {
 for(int i=0; i<Guid_.Count; ++i){
-output.WriteUInt64(1,Guid_[i]);
+output.WriteInt64(1,Guid_[i]);
 }
 }
 
@@ -1190,6 +1240,22 @@ output.WriteInt32(5, MarchId);
 if (HasSceneId) {
 output.WriteInt32(6, SceneId);
 }
+{
+if (posX_.Count > 0) {
+for(int i=0; i<posX_.Count; ++i){
+output.WriteInt32(7,posX_[i]);
+}
+}
+
+}
+{
+if (posZ_.Count > 0) {
+for(int i=0; i<posZ_.Count; ++i){
+output.WriteInt32(8,posZ_[i]);
+}
+}
+
+}
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
  GC_NEAR_MARCHLIST _inst = (GC_NEAR_MARCHLIST) _base;
@@ -1201,7 +1267,7 @@ public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDis
  return _inst;
  }
     case  8: {
- _inst.AddGuid(input.ReadUInt64());
+ _inst.AddGuid(input.ReadInt64());
 break;
 }
    case  18: {
@@ -1222,6 +1288,14 @@ break;
 }
    case  48: {
  _inst.SceneId = input.ReadInt32();
+break;
+}
+   case  56: {
+ _inst.AddPosX(input.ReadInt32());
+break;
+}
+   case  64: {
+ _inst.AddPosZ(input.ReadInt32());
 break;
 }
 
@@ -2323,6 +2397,194 @@ public override bool IsInitialized() {
   if (!hasObjid) return false;
  if (!hasPoscount) return false;
  if (!hasSceneId) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class CG_MARCH_MOVE : PacketDistributed
+{
+
+public const int marchidFieldNumber = 1;
+ private bool hasMarchid;
+ private Int64 marchid_ = 0;
+ public bool HasMarchid {
+ get { return hasMarchid; }
+ }
+ public Int64 Marchid {
+ get { return marchid_; }
+ set { SetMarchid(value); }
+ }
+ public void SetMarchid(Int64 value) { 
+ hasMarchid = true;
+ marchid_ = value;
+ }
+
+public const int posxFieldNumber = 2;
+ private bool hasPosx;
+ private Int32 posx_ = 0;
+ public bool HasPosx {
+ get { return hasPosx; }
+ }
+ public Int32 Posx {
+ get { return posx_; }
+ set { SetPosx(value); }
+ }
+ public void SetPosx(Int32 value) { 
+ hasPosx = true;
+ posx_ = value;
+ }
+
+public const int poszFieldNumber = 3;
+ private bool hasPosz;
+ private Int32 posz_ = 0;
+ public bool HasPosz {
+ get { return hasPosz; }
+ }
+ public Int32 Posz {
+ get { return posz_; }
+ set { SetPosz(value); }
+ }
+ public void SetPosz(Int32 value) { 
+ hasPosz = true;
+ posz_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasMarchid) {
+size += pb::CodedOutputStream.ComputeInt64Size(1, Marchid);
+}
+ if (HasPosx) {
+size += pb::CodedOutputStream.ComputeInt32Size(2, Posx);
+}
+ if (HasPosz) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Posz);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasMarchid) {
+output.WriteInt64(1, Marchid);
+}
+ 
+if (HasPosx) {
+output.WriteInt32(2, Posx);
+}
+ 
+if (HasPosz) {
+output.WriteInt32(3, Posz);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ CG_MARCH_MOVE _inst = (CG_MARCH_MOVE) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Marchid = input.ReadInt64();
+break;
+}
+   case  16: {
+ _inst.Posx = input.ReadInt32();
+break;
+}
+   case  24: {
+ _inst.Posz = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasMarchid) return false;
+ if (!hasPosx) return false;
+ if (!hasPosz) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_MARCH_MOVE : PacketDistributed
+{
+
+public const int retFieldNumber = 1;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Ret);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasRet) {
+output.WriteInt32(1, Ret);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_MARCH_MOVE _inst = (GC_MARCH_MOVE) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasRet) return false;
  return true;
  }
 
@@ -4491,6 +4753,21 @@ public const int sceneIdFieldNumber = 3;
  sceneId_ = value;
  }
 
+public const int sceneclassFieldNumber = 4;
+ private bool hasSceneclass;
+ private Int32 sceneclass_ = 0;
+ public bool HasSceneclass {
+ get { return hasSceneclass; }
+ }
+ public Int32 Sceneclass {
+ get { return sceneclass_; }
+ set { SetSceneclass(value); }
+ }
+ public void SetSceneclass(Int32 value) { 
+ hasSceneclass = true;
+ sceneclass_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -4505,6 +4782,9 @@ size += pb::CodedOutputStream.ComputeInt64Size(2, MarchId);
 }
  if (HasSceneId) {
 size += pb::CodedOutputStream.ComputeInt32Size(3, SceneId);
+}
+ if (HasSceneclass) {
+size += pb::CodedOutputStream.ComputeInt32Size(4, Sceneclass);
 }
  memoizedSerializedSize = size;
  return size;
@@ -4524,6 +4804,10 @@ output.WriteInt64(2, MarchId);
  
 if (HasSceneId) {
 output.WriteInt32(3, SceneId);
+}
+ 
+if (HasSceneclass) {
+output.WriteInt32(4, Sceneclass);
 }
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
@@ -4545,6 +4829,10 @@ break;
 }
    case  24: {
  _inst.SceneId = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.Sceneclass = input.ReadInt32();
 break;
 }
 
@@ -5159,6 +5447,36 @@ public const int retFieldNumber = 2;
  ret_ = value;
  }
 
+public const int sceneIdFieldNumber = 3;
+ private bool hasSceneId;
+ private Int32 sceneId_ = 0;
+ public bool HasSceneId {
+ get { return hasSceneId; }
+ }
+ public Int32 SceneId {
+ get { return sceneId_; }
+ set { SetSceneId(value); }
+ }
+ public void SetSceneId(Int32 value) { 
+ hasSceneId = true;
+ sceneId_ = value;
+ }
+
+public const int sceneClassFieldNumber = 4;
+ private bool hasSceneClass;
+ private Int32 sceneClass_ = 0;
+ public bool HasSceneClass {
+ get { return hasSceneClass; }
+ }
+ public Int32 SceneClass {
+ get { return sceneClass_; }
+ set { SetSceneClass(value); }
+ }
+ public void SetSceneClass(Int32 value) { 
+ hasSceneClass = true;
+ sceneClass_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -5170,6 +5488,12 @@ size += pb::CodedOutputStream.ComputeInt64Size(1, MarchId);
 }
  if (HasRet) {
 size += pb::CodedOutputStream.ComputeInt32Size(2, Ret);
+}
+ if (HasSceneId) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, SceneId);
+}
+ if (HasSceneClass) {
+size += pb::CodedOutputStream.ComputeInt32Size(4, SceneClass);
 }
  memoizedSerializedSize = size;
  return size;
@@ -5185,6 +5509,14 @@ output.WriteInt64(1, MarchId);
  
 if (HasRet) {
 output.WriteInt32(2, Ret);
+}
+ 
+if (HasSceneId) {
+output.WriteInt32(3, SceneId);
+}
+ 
+if (HasSceneClass) {
+output.WriteInt32(4, SceneClass);
 }
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
@@ -5204,6 +5536,14 @@ break;
  _inst.Ret = input.ReadInt32();
 break;
 }
+   case  24: {
+ _inst.SceneId = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.SceneClass = input.ReadInt32();
+break;
+}
 
  }
  }
@@ -5213,6 +5553,8 @@ break;
 public override bool IsInitialized() {
   if (!hasMarchId) return false;
  if (!hasRet) return false;
+ if (!hasSceneId) return false;
+ if (!hasSceneClass) return false;
  return true;
  }
 
@@ -6393,6 +6735,21 @@ public const int marchidFieldNumber = 8;
  marchid_ = value;
  }
 
+public const int queueindexFieldNumber = 9;
+ private bool hasQueueindex;
+ private Int32 queueindex_ = 0;
+ public bool HasQueueindex {
+ get { return hasQueueindex; }
+ }
+ public Int32 Queueindex {
+ get { return queueindex_; }
+ set { SetQueueindex(value); }
+ }
+ public void SetQueueindex(Int32 value) { 
+ hasQueueindex = true;
+ queueindex_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -6430,6 +6787,9 @@ size += pb::CodedOutputStream.ComputeInt32Size(7, Arrangeindex);
 }
  if (HasMarchid) {
 size += pb::CodedOutputStream.ComputeInt64Size(8, Marchid);
+}
+ if (HasQueueindex) {
+size += pb::CodedOutputStream.ComputeInt32Size(9, Queueindex);
 }
  memoizedSerializedSize = size;
  return size;
@@ -6479,6 +6839,10 @@ output.WriteInt32(7, Arrangeindex);
 if (HasMarchid) {
 output.WriteInt64(8, Marchid);
 }
+ 
+if (HasQueueindex) {
+output.WriteInt32(9, Queueindex);
+}
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
  GC_TroopData _inst = (GC_TroopData) _base;
@@ -6523,6 +6887,10 @@ break;
  _inst.Marchid = input.ReadInt64();
 break;
 }
+   case  72: {
+ _inst.Queueindex = input.ReadInt32();
+break;
+}
 
  }
  }
@@ -6539,6 +6907,7 @@ if (!cooldownList[i].IsInitialized()) return false;
 }
  if (!hasArrangeindex) return false;
  if (!hasMarchid) return false;
+ if (!hasQueueindex) return false;
  return true;
  }
 
@@ -6968,6 +7337,235 @@ public override bool IsInitialized() {
 
 
 [Serializable]
+public class GC_TrainData : PacketDistributed
+{
+
+public const int queueidFieldNumber = 1;
+ private bool hasQueueid;
+ private Int64 queueid_ = 0;
+ public bool HasQueueid {
+ get { return hasQueueid; }
+ }
+ public Int64 Queueid {
+ get { return queueid_; }
+ set { SetQueueid(value); }
+ }
+ public void SetQueueid(Int64 value) { 
+ hasQueueid = true;
+ queueid_ = value;
+ }
+
+public const int buildidFieldNumber = 2;
+ private bool hasBuildid;
+ private Int64 buildid_ = 0;
+ public bool HasBuildid {
+ get { return hasBuildid; }
+ }
+ public Int64 Buildid {
+ get { return buildid_; }
+ set { SetBuildid(value); }
+ }
+ public void SetBuildid(Int64 value) { 
+ hasBuildid = true;
+ buildid_ = value;
+ }
+
+public const int trooptypeFieldNumber = 3;
+ private bool hasTrooptype;
+ private Int32 trooptype_ = 0;
+ public bool HasTrooptype {
+ get { return hasTrooptype; }
+ }
+ public Int32 Trooptype {
+ get { return trooptype_; }
+ set { SetTrooptype(value); }
+ }
+ public void SetTrooptype(Int32 value) { 
+ hasTrooptype = true;
+ trooptype_ = value;
+ }
+
+public const int hpFieldNumber = 4;
+ private bool hasHp;
+ private Int32 hp_ = 0;
+ public bool HasHp {
+ get { return hasHp; }
+ }
+ public Int32 Hp {
+ get { return hp_; }
+ set { SetHp(value); }
+ }
+ public void SetHp(Int32 value) { 
+ hasHp = true;
+ hp_ = value;
+ }
+
+public const int begintimeFieldNumber = 5;
+ private bool hasBegintime;
+ private Int32 begintime_ = 0;
+ public bool HasBegintime {
+ get { return hasBegintime; }
+ }
+ public Int32 Begintime {
+ get { return begintime_; }
+ set { SetBegintime(value); }
+ }
+ public void SetBegintime(Int32 value) { 
+ hasBegintime = true;
+ begintime_ = value;
+ }
+
+public const int completimeFieldNumber = 6;
+ private bool hasCompletime;
+ private Int32 completime_ = 0;
+ public bool HasCompletime {
+ get { return hasCompletime; }
+ }
+ public Int32 Completime {
+ get { return completime_; }
+ set { SetCompletime(value); }
+ }
+ public void SetCompletime(Int32 value) { 
+ hasCompletime = true;
+ completime_ = value;
+ }
+
+public const int queueindexFieldNumber = 7;
+ private bool hasQueueindex;
+ private Int32 queueindex_ = 0;
+ public bool HasQueueindex {
+ get { return hasQueueindex; }
+ }
+ public Int32 Queueindex {
+ get { return queueindex_; }
+ set { SetQueueindex(value); }
+ }
+ public void SetQueueindex(Int32 value) { 
+ hasQueueindex = true;
+ queueindex_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasQueueid) {
+size += pb::CodedOutputStream.ComputeInt64Size(1, Queueid);
+}
+ if (HasBuildid) {
+size += pb::CodedOutputStream.ComputeInt64Size(2, Buildid);
+}
+ if (HasTrooptype) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Trooptype);
+}
+ if (HasHp) {
+size += pb::CodedOutputStream.ComputeInt32Size(4, Hp);
+}
+ if (HasBegintime) {
+size += pb::CodedOutputStream.ComputeInt32Size(5, Begintime);
+}
+ if (HasCompletime) {
+size += pb::CodedOutputStream.ComputeInt32Size(6, Completime);
+}
+ if (HasQueueindex) {
+size += pb::CodedOutputStream.ComputeInt32Size(7, Queueindex);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasQueueid) {
+output.WriteInt64(1, Queueid);
+}
+ 
+if (HasBuildid) {
+output.WriteInt64(2, Buildid);
+}
+ 
+if (HasTrooptype) {
+output.WriteInt32(3, Trooptype);
+}
+ 
+if (HasHp) {
+output.WriteInt32(4, Hp);
+}
+ 
+if (HasBegintime) {
+output.WriteInt32(5, Begintime);
+}
+ 
+if (HasCompletime) {
+output.WriteInt32(6, Completime);
+}
+ 
+if (HasQueueindex) {
+output.WriteInt32(7, Queueindex);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_TrainData _inst = (GC_TrainData) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Queueid = input.ReadInt64();
+break;
+}
+   case  16: {
+ _inst.Buildid = input.ReadInt64();
+break;
+}
+   case  24: {
+ _inst.Trooptype = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.Hp = input.ReadInt32();
+break;
+}
+   case  40: {
+ _inst.Begintime = input.ReadInt32();
+break;
+}
+   case  48: {
+ _inst.Completime = input.ReadInt32();
+break;
+}
+   case  56: {
+ _inst.Queueindex = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasQueueid) return false;
+ if (!hasBuildid) return false;
+ if (!hasTrooptype) return false;
+ if (!hasHp) return false;
+ if (!hasBegintime) return false;
+ if (!hasCompletime) return false;
+ if (!hasQueueindex) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
 public class GC_CityData : PacketDistributed
 {
 
@@ -7078,21 +7676,51 @@ public GC_BuildingData GetBuildlist(int index) {
  buildlist_.Add(value);
  }
 
-public const int trooplistFieldNumber = 8;
- private pbc::PopsicleList<GC_TroopData> trooplist_ = new pbc::PopsicleList<GC_TroopData>();
- public scg::IList<GC_TroopData> trooplistList {
- get { return pbc::Lists.AsReadOnly(trooplist_); }
+public const int trainListFieldNumber = 8;
+ private pbc::PopsicleList<GC_TrainData> trainList_ = new pbc::PopsicleList<GC_TrainData>();
+ public scg::IList<GC_TrainData> trainListList {
+ get { return pbc::Lists.AsReadOnly(trainList_); }
  }
  
- public int trooplistCount {
- get { return trooplist_.Count; }
+ public int trainListCount {
+ get { return trainList_.Count; }
  }
  
-public GC_TroopData GetTrooplist(int index) {
- return trooplist_[index];
+public GC_TrainData GetTrainList(int index) {
+ return trainList_[index];
  }
- public void AddTrooplist(GC_TroopData value) {
- trooplist_.Add(value);
+ public void AddTrainList(GC_TrainData value) {
+ trainList_.Add(value);
+ }
+
+public const int posxFieldNumber = 9;
+ private bool hasPosx;
+ private Int32 posx_ = 0;
+ public bool HasPosx {
+ get { return hasPosx; }
+ }
+ public Int32 Posx {
+ get { return posx_; }
+ set { SetPosx(value); }
+ }
+ public void SetPosx(Int32 value) { 
+ hasPosx = true;
+ posx_ = value;
+ }
+
+public const int poszFieldNumber = 10;
+ private bool hasPosz;
+ private Int32 posz_ = 0;
+ public bool HasPosz {
+ get { return hasPosz; }
+ }
+ public Int32 Posz {
+ get { return posz_; }
+ set { SetPosz(value); }
+ }
+ public void SetPosz(Int32 value) { 
+ hasPosz = true;
+ posz_ = value;
  }
 
  private int memoizedSerializedSize = -1;
@@ -7126,10 +7754,16 @@ size += pb::CodedOutputStream.ComputeTagSize((int)7) + pb::CodedOutputStream.Com
 }
 }
 {
-for(int i=0; i<trooplistList.Count; ++i){
-int subsize = trooplistList[i].SerializedSize();	
+for(int i=0; i<trainListList.Count; ++i){
+int subsize = trainListList[i].SerializedSize();	
 size += pb::CodedOutputStream.ComputeTagSize((int)8) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
 }
+}
+ if (HasPosx) {
+size += pb::CodedOutputStream.ComputeInt32Size(9, Posx);
+}
+ if (HasPosz) {
+size += pb::CodedOutputStream.ComputeInt32Size(10, Posz);
 }
  memoizedSerializedSize = size;
  return size;
@@ -7173,13 +7807,21 @@ buildlistList[i].WriteTo(output);
 }while(false);
 
 do{
-for(int i=0; i<trooplistList.Count; ++i){
+for(int i=0; i<trainListList.Count; ++i){
 output.WriteTag((int)8, pb::WireFormat.WireType.LengthDelimited);
-output.WriteRawVarint32((uint)trooplistList[i].SerializedSize());
-trooplistList[i].WriteTo(output);
+output.WriteRawVarint32((uint)trainListList[i].SerializedSize());
+trainListList[i].WriteTo(output);
 
 }
 }while(false);
+ 
+if (HasPosx) {
+output.WriteInt32(9, Posx);
+}
+ 
+if (HasPosz) {
+output.WriteInt32(10, Posz);
+}
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
  GC_CityData _inst = (GC_CityData) _base;
@@ -7221,9 +7863,17 @@ input.ReadMessage(subBuilder);
 break;
 }
     case  66: {
-GC_TroopData subBuilder =  new GC_TroopData();
+GC_TrainData subBuilder =  new GC_TrainData();
 input.ReadMessage(subBuilder);
- _inst.AddTrooplist(subBuilder);
+ _inst.AddTrainList(subBuilder);
+break;
+}
+   case  72: {
+ _inst.Posx = input.ReadInt32();
+break;
+}
+   case  80: {
+ _inst.Posz = input.ReadInt32();
 break;
 }
 
@@ -7242,9 +7892,11 @@ public override bool IsInitialized() {
 for(int i=0; i<buildlistList.Count; ++i) {
 if (!buildlistList[i].IsInitialized()) return false;
 }
-for(int i=0; i<trooplistList.Count; ++i) {
-if (!trooplistList[i].IsInitialized()) return false;
+for(int i=0; i<trainListList.Count; ++i) {
+if (!trainListList[i].IsInitialized()) return false;
 }
+ if (!hasPosx) return false;
+ if (!hasPosz) return false;
  return true;
  }
 
@@ -7944,6 +8596,36 @@ public GC_OBJINFOR GetObjList(int index) {
  objList_.Add(value);
  }
 
+public const int campFieldNumber = 3;
+ private bool hasCamp;
+ private Int32 camp_ = 0;
+ public bool HasCamp {
+ get { return hasCamp; }
+ }
+ public Int32 Camp {
+ get { return camp_; }
+ set { SetCamp(value); }
+ }
+ public void SetCamp(Int32 value) { 
+ hasCamp = true;
+ camp_ = value;
+ }
+
+public const int currentStateFieldNumber = 4;
+ private bool hasCurrentState;
+ private Int32 currentState_ = 0;
+ public bool HasCurrentState {
+ get { return hasCurrentState; }
+ }
+ public Int32 CurrentState {
+ get { return currentState_; }
+ set { SetCurrentState(value); }
+ }
+ public void SetCurrentState(Int32 value) { 
+ hasCurrentState = true;
+ currentState_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -7958,6 +8640,12 @@ for(int i=0; i<objListList.Count; ++i){
 int subsize = objListList[i].SerializedSize();	
 size += pb::CodedOutputStream.ComputeTagSize((int)2) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
 }
+}
+ if (HasCamp) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Camp);
+}
+ if (HasCurrentState) {
+size += pb::CodedOutputStream.ComputeInt32Size(4, CurrentState);
 }
  memoizedSerializedSize = size;
  return size;
@@ -7979,6 +8667,14 @@ objListList[i].WriteTo(output);
 
 }
 }while(false);
+ 
+if (HasCamp) {
+output.WriteInt32(3, Camp);
+}
+ 
+if (HasCurrentState) {
+output.WriteInt32(4, CurrentState);
+}
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
  GC_BATTLEINFOR _inst = (GC_BATTLEINFOR) _base;
@@ -7997,6 +8693,14 @@ break;
 GC_OBJINFOR subBuilder =  new GC_OBJINFOR();
 input.ReadMessage(subBuilder);
  _inst.AddObjList(subBuilder);
+break;
+}
+   case  24: {
+ _inst.Camp = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.CurrentState = input.ReadInt32();
 break;
 }
 
@@ -8938,6 +9642,21 @@ public const int levelFieldNumber = 2;
  level_ = value;
  }
 
+public const int retFieldNumber = 3;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
  private int memoizedSerializedSize = -1;
  public override int SerializedSize()
  {
@@ -8949,6 +9668,9 @@ size += pb::CodedOutputStream.ComputeInt64Size(1, BuildingID);
 }
  if (HasLevel) {
 size += pb::CodedOutputStream.ComputeInt32Size(2, Level);
+}
+ if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Ret);
 }
  memoizedSerializedSize = size;
  return size;
@@ -8964,6 +9686,10 @@ output.WriteInt64(1, BuildingID);
  
 if (HasLevel) {
 output.WriteInt32(2, Level);
+}
+ 
+if (HasRet) {
+output.WriteInt32(3, Ret);
 }
  }
 public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
@@ -8983,6 +9709,10 @@ break;
  _inst.Level = input.ReadInt32();
 break;
 }
+   case  24: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
 
  }
  }
@@ -8992,6 +9722,7 @@ break;
 public override bool IsInitialized() {
   if (!hasBuildingID) return false;
  if (!hasLevel) return false;
+ if (!hasRet) return false;
  return true;
  }
 
@@ -9066,6 +9797,859 @@ public override bool IsInitialized() {
    if (HasData) {
 if (!Data.IsInitialized()) return false;
 }
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class CG_Troop_Train : PacketDistributed
+{
+
+public const int queueindexFieldNumber = 1;
+ private bool hasQueueindex;
+ private Int32 queueindex_ = 0;
+ public bool HasQueueindex {
+ get { return hasQueueindex; }
+ }
+ public Int32 Queueindex {
+ get { return queueindex_; }
+ set { SetQueueindex(value); }
+ }
+ public void SetQueueindex(Int32 value) { 
+ hasQueueindex = true;
+ queueindex_ = value;
+ }
+
+public const int trooptypeFieldNumber = 2;
+ private bool hasTrooptype;
+ private Int32 trooptype_ = 0;
+ public bool HasTrooptype {
+ get { return hasTrooptype; }
+ }
+ public Int32 Trooptype {
+ get { return trooptype_; }
+ set { SetTrooptype(value); }
+ }
+ public void SetTrooptype(Int32 value) { 
+ hasTrooptype = true;
+ trooptype_ = value;
+ }
+
+public const int countFieldNumber = 3;
+ private bool hasCount;
+ private Int32 count_ = 0;
+ public bool HasCount {
+ get { return hasCount; }
+ }
+ public Int32 Count {
+ get { return count_; }
+ set { SetCount(value); }
+ }
+ public void SetCount(Int32 value) { 
+ hasCount = true;
+ count_ = value;
+ }
+
+public const int buildidFieldNumber = 4;
+ private bool hasBuildid;
+ private Int64 buildid_ = 0;
+ public bool HasBuildid {
+ get { return hasBuildid; }
+ }
+ public Int64 Buildid {
+ get { return buildid_; }
+ set { SetBuildid(value); }
+ }
+ public void SetBuildid(Int64 value) { 
+ hasBuildid = true;
+ buildid_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasQueueindex) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Queueindex);
+}
+ if (HasTrooptype) {
+size += pb::CodedOutputStream.ComputeInt32Size(2, Trooptype);
+}
+ if (HasCount) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Count);
+}
+ if (HasBuildid) {
+size += pb::CodedOutputStream.ComputeInt64Size(4, Buildid);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasQueueindex) {
+output.WriteInt32(1, Queueindex);
+}
+ 
+if (HasTrooptype) {
+output.WriteInt32(2, Trooptype);
+}
+ 
+if (HasCount) {
+output.WriteInt32(3, Count);
+}
+ 
+if (HasBuildid) {
+output.WriteInt64(4, Buildid);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ CG_Troop_Train _inst = (CG_Troop_Train) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Queueindex = input.ReadInt32();
+break;
+}
+   case  16: {
+ _inst.Trooptype = input.ReadInt32();
+break;
+}
+   case  24: {
+ _inst.Count = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.Buildid = input.ReadInt64();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasQueueindex) return false;
+ if (!hasCount) return false;
+ if (!hasBuildid) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_Troop_Train : PacketDistributed
+{
+
+public const int retFieldNumber = 1;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
+public const int dataFieldNumber = 2;
+ private bool hasData;
+ private GC_TrainData data_ =  new GC_TrainData();
+ public bool HasData {
+ get { return hasData; }
+ }
+ public GC_TrainData Data {
+ get { return data_; }
+ set { SetData(value); }
+ }
+ public void SetData(GC_TrainData value) { 
+ hasData = true;
+ data_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Ret);
+}
+{
+int subsize = Data.SerializedSize();	
+size += pb::CodedOutputStream.ComputeTagSize((int)2) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasRet) {
+output.WriteInt32(1, Ret);
+}
+{
+output.WriteTag((int)2, pb::WireFormat.WireType.LengthDelimited);
+output.WriteRawVarint32((uint)Data.SerializedSize());
+Data.WriteTo(output);
+
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_Troop_Train _inst = (GC_Troop_Train) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
+    case  18: {
+GC_TrainData subBuilder =  new GC_TrainData();
+ input.ReadMessage(subBuilder);
+ _inst.Data = subBuilder;
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasRet) return false;
+  if (HasData) {
+if (!Data.IsInitialized()) return false;
+}
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_TroopTrain_Over : PacketDistributed
+{
+
+public const int retFieldNumber = 1;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
+public const int buildidFieldNumber = 2;
+ private bool hasBuildid;
+ private Int64 buildid_ = 0;
+ public bool HasBuildid {
+ get { return hasBuildid; }
+ }
+ public Int64 Buildid {
+ get { return buildid_; }
+ set { SetBuildid(value); }
+ }
+ public void SetBuildid(Int64 value) { 
+ hasBuildid = true;
+ buildid_ = value;
+ }
+
+public const int queueidFieldNumber = 3;
+ private bool hasQueueid;
+ private Int32 queueid_ = 0;
+ public bool HasQueueid {
+ get { return hasQueueid; }
+ }
+ public Int32 Queueid {
+ get { return queueid_; }
+ set { SetQueueid(value); }
+ }
+ public void SetQueueid(Int32 value) { 
+ hasQueueid = true;
+ queueid_ = value;
+ }
+
+public const int trooptypeFieldNumber = 4;
+ private bool hasTrooptype;
+ private Int32 trooptype_ = 0;
+ public bool HasTrooptype {
+ get { return hasTrooptype; }
+ }
+ public Int32 Trooptype {
+ get { return trooptype_; }
+ set { SetTrooptype(value); }
+ }
+ public void SetTrooptype(Int32 value) { 
+ hasTrooptype = true;
+ trooptype_ = value;
+ }
+
+public const int hpFieldNumber = 5;
+ private bool hasHp;
+ private Int32 hp_ = 0;
+ public bool HasHp {
+ get { return hasHp; }
+ }
+ public Int32 Hp {
+ get { return hp_; }
+ set { SetHp(value); }
+ }
+ public void SetHp(Int32 value) { 
+ hasHp = true;
+ hp_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Ret);
+}
+ if (HasBuildid) {
+size += pb::CodedOutputStream.ComputeInt64Size(2, Buildid);
+}
+ if (HasQueueid) {
+size += pb::CodedOutputStream.ComputeInt32Size(3, Queueid);
+}
+ if (HasTrooptype) {
+size += pb::CodedOutputStream.ComputeInt32Size(4, Trooptype);
+}
+ if (HasHp) {
+size += pb::CodedOutputStream.ComputeInt32Size(5, Hp);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasRet) {
+output.WriteInt32(1, Ret);
+}
+ 
+if (HasBuildid) {
+output.WriteInt64(2, Buildid);
+}
+ 
+if (HasQueueid) {
+output.WriteInt32(3, Queueid);
+}
+ 
+if (HasTrooptype) {
+output.WriteInt32(4, Trooptype);
+}
+ 
+if (HasHp) {
+output.WriteInt32(5, Hp);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_TroopTrain_Over _inst = (GC_TroopTrain_Over) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
+   case  16: {
+ _inst.Buildid = input.ReadInt64();
+break;
+}
+   case  24: {
+ _inst.Queueid = input.ReadInt32();
+break;
+}
+   case  32: {
+ _inst.Trooptype = input.ReadInt32();
+break;
+}
+   case  40: {
+ _inst.Hp = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasRet) return false;
+ if (!hasBuildid) return false;
+ if (!hasQueueid) return false;
+ if (!hasTrooptype) return false;
+ if (!hasHp) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class CG_OBJARRANGEINDEX : PacketDistributed
+{
+
+public const int objIdFieldNumber = 1;
+ private bool hasObjId;
+ private Int32 objId_ = 0;
+ public bool HasObjId {
+ get { return hasObjId; }
+ }
+ public Int32 ObjId {
+ get { return objId_; }
+ set { SetObjId(value); }
+ }
+ public void SetObjId(Int32 value) { 
+ hasObjId = true;
+ objId_ = value;
+ }
+
+public const int arrangeindexFieldNumber = 2;
+ private bool hasArrangeindex;
+ private Int32 arrangeindex_ = 0;
+ public bool HasArrangeindex {
+ get { return hasArrangeindex; }
+ }
+ public Int32 Arrangeindex {
+ get { return arrangeindex_; }
+ set { SetArrangeindex(value); }
+ }
+ public void SetArrangeindex(Int32 value) { 
+ hasArrangeindex = true;
+ arrangeindex_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasObjId) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, ObjId);
+}
+ if (HasArrangeindex) {
+size += pb::CodedOutputStream.ComputeInt32Size(2, Arrangeindex);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasObjId) {
+output.WriteInt32(1, ObjId);
+}
+ 
+if (HasArrangeindex) {
+output.WriteInt32(2, Arrangeindex);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ CG_OBJARRANGEINDEX _inst = (CG_OBJARRANGEINDEX) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.ObjId = input.ReadInt32();
+break;
+}
+   case  16: {
+ _inst.Arrangeindex = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasObjId) return false;
+ if (!hasArrangeindex) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class CG_BATTLEPREPARE : PacketDistributed
+{
+
+public const int sceneIdFieldNumber = 1;
+ private bool hasSceneId;
+ private Int32 sceneId_ = 0;
+ public bool HasSceneId {
+ get { return hasSceneId; }
+ }
+ public Int32 SceneId {
+ get { return sceneId_; }
+ set { SetSceneId(value); }
+ }
+ public void SetSceneId(Int32 value) { 
+ hasSceneId = true;
+ sceneId_ = value;
+ }
+
+public const int objListFieldNumber = 2;
+ private pbc::PopsicleList<CG_OBJARRANGEINDEX> objList_ = new pbc::PopsicleList<CG_OBJARRANGEINDEX>();
+ public scg::IList<CG_OBJARRANGEINDEX> objListList {
+ get { return pbc::Lists.AsReadOnly(objList_); }
+ }
+ 
+ public int objListCount {
+ get { return objList_.Count; }
+ }
+ 
+public CG_OBJARRANGEINDEX GetObjList(int index) {
+ return objList_[index];
+ }
+ public void AddObjList(CG_OBJARRANGEINDEX value) {
+ objList_.Add(value);
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasSceneId) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, SceneId);
+}
+{
+for(int i=0; i<objListList.Count; ++i){
+int subsize = objListList[i].SerializedSize();	
+size += pb::CodedOutputStream.ComputeTagSize((int)2) + pb::CodedOutputStream.ComputeRawVarint32Size((uint)subsize) + subsize;
+}
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasSceneId) {
+output.WriteInt32(1, SceneId);
+}
+
+do{
+for(int i=0; i<objListList.Count; ++i){
+output.WriteTag((int)2, pb::WireFormat.WireType.LengthDelimited);
+output.WriteRawVarint32((uint)objListList[i].SerializedSize());
+objListList[i].WriteTo(output);
+
+}
+}while(false);
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ CG_BATTLEPREPARE _inst = (CG_BATTLEPREPARE) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.SceneId = input.ReadInt32();
+break;
+}
+    case  18: {
+CG_OBJARRANGEINDEX subBuilder =  new CG_OBJARRANGEINDEX();
+input.ReadMessage(subBuilder);
+ _inst.AddObjList(subBuilder);
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasSceneId) return false;
+for(int i=0; i<objListList.Count; ++i) {
+if (!objListList[i].IsInitialized()) return false;
+}
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_BATTLEPREPARE : PacketDistributed
+{
+
+public const int retFieldNumber = 1;
+ private bool hasRet;
+ private Int32 ret_ = 0;
+ public bool HasRet {
+ get { return hasRet; }
+ }
+ public Int32 Ret {
+ get { return ret_; }
+ set { SetRet(value); }
+ }
+ public void SetRet(Int32 value) { 
+ hasRet = true;
+ ret_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasRet) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, Ret);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasRet) {
+output.WriteInt32(1, Ret);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_BATTLEPREPARE _inst = (GC_BATTLEPREPARE) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.Ret = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasRet) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_BATTLEEND : PacketDistributed
+{
+
+public const int sceneIdFieldNumber = 1;
+ private bool hasSceneId;
+ private Int32 sceneId_ = 0;
+ public bool HasSceneId {
+ get { return hasSceneId; }
+ }
+ public Int32 SceneId {
+ get { return sceneId_; }
+ set { SetSceneId(value); }
+ }
+ public void SetSceneId(Int32 value) { 
+ hasSceneId = true;
+ sceneId_ = value;
+ }
+
+public const int campFieldNumber = 2;
+ private bool hasCamp;
+ private Int32 camp_ = 0;
+ public bool HasCamp {
+ get { return hasCamp; }
+ }
+ public Int32 Camp {
+ get { return camp_; }
+ set { SetCamp(value); }
+ }
+ public void SetCamp(Int32 value) { 
+ hasCamp = true;
+ camp_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasSceneId) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, SceneId);
+}
+ if (HasCamp) {
+size += pb::CodedOutputStream.ComputeInt32Size(2, Camp);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasSceneId) {
+output.WriteInt32(1, SceneId);
+}
+ 
+if (HasCamp) {
+output.WriteInt32(2, Camp);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_BATTLEEND _inst = (GC_BATTLEEND) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.SceneId = input.ReadInt32();
+break;
+}
+   case  16: {
+ _inst.Camp = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasSceneId) return false;
+ if (!hasCamp) return false;
+ return true;
+ }
+
+}
+
+
+[Serializable]
+public class GC_BattleStart : PacketDistributed
+{
+
+public const int sceneIdFieldNumber = 1;
+ private bool hasSceneId;
+ private Int32 sceneId_ = 0;
+ public bool HasSceneId {
+ get { return hasSceneId; }
+ }
+ public Int32 SceneId {
+ get { return sceneId_; }
+ set { SetSceneId(value); }
+ }
+ public void SetSceneId(Int32 value) { 
+ hasSceneId = true;
+ sceneId_ = value;
+ }
+
+ private int memoizedSerializedSize = -1;
+ public override int SerializedSize()
+ {
+ int size = memoizedSerializedSize;
+ if (size != -1) return size;
+ size = 0;
+  if (HasSceneId) {
+size += pb::CodedOutputStream.ComputeInt32Size(1, SceneId);
+}
+ memoizedSerializedSize = size;
+ return size;
+ }
+
+public override void WriteTo(pb::CodedOutputStream output)
+ {
+ int size = SerializedSize();
+  
+if (HasSceneId) {
+output.WriteInt32(1, SceneId);
+}
+ }
+public override PacketDistributed MergeFrom(pb::CodedInputStream input,PacketDistributed _base) {
+ GC_BattleStart _inst = (GC_BattleStart) _base;
+ while (true) {
+ uint tag = input.ReadTag();
+ switch (tag) {
+ case 0:
+ {
+ return _inst;
+ }
+    case  8: {
+ _inst.SceneId = input.ReadInt32();
+break;
+}
+
+ }
+ }
+ return _inst;
+ }
+//end merged
+public override bool IsInitialized() {
+  if (!hasSceneId) return false;
  return true;
  }
 

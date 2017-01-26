@@ -25,6 +25,15 @@ public class UIItemConfigFile : ScriptableObject
         },
         new UIItemConfig()
         {
+            MediatorType = "WorldMediator",
+            Name = "World",
+            BundleName = "load_preload$s_ui$worldui.assetbundle",
+            AssetName = "WorldUI",
+            Type = "FullScreen",
+            ViewName = "WorldView"
+        },
+        new UIItemConfig()
+        {
             MediatorType = "MainResourceMediator",
             Name = "MainResource",
             BundleName = "load_preload$s_ui$mainresource.assetbundle",
@@ -97,12 +106,21 @@ public class UIItemConfigFile : ScriptableObject
 		},
 		new UIItemConfig()
 		{
-			MediatorType = "DetailsUIMediator",
-			Name = "DetailsUI",
-			BundleName = "load_preload$s_ui$detailsui.assetbundle",
-			AssetName = "DetailsUI",
+			MediatorType = "CityInfoUIMediator",
+			Name = "CityInfoUI",
+			BundleName = "load_preload$s_ui$cityinfoui.assetbundle",
+			AssetName = "CityInfoUI",
 			Type = "Window",
-			ViewName = "DetailsUI"
-		}
+			ViewName = "CityInfoUI"
+		},
+		new UIItemConfig()
+		{
+			MediatorType = "ResearchUIMediator",
+			Name = "ResearchUI",
+			BundleName = "load_preload$s_ui$researchui.assetbundle",
+			AssetName = "ResearchUI",
+			Type = "Window",
+			ViewName = "ResearchUI"
+		},
     };
 }

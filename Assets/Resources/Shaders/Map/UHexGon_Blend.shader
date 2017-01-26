@@ -74,36 +74,50 @@ Shader "Unlit/UHexGon_Blend"
 
 			fixed4 frag (v2f i) : SV_Target
 			{
+				//return i.clr;
 				//return i.clr.xxxx;
 				//return i.clr.yyyy;
 				//return i.clr.zzzz;
 				//return i.clr.wwww;
+				//return i.tan*5;
 
 				float4 uv;
 				uv.xy = i.tex.xy;
 				uv.zw = float2(0, i.ext.w);
 
-				fixed4 cl[4]={
-					(fixed4)SampleAtlas(uv, _ARRAY[0]),
-					(fixed4)SampleAtlas(uv, _ARRAY[1]),
-					(fixed4)SampleAtlas(uv, _ARRAY[2]),
-					(fixed4)SampleAtlas(uv, _ARRAY[3]),  // sampling 4
-				};
+				//return (fixed4)SampleAtlas(uv, _ARRAY[0]);
+				//return (fixed4)SampleAtlas(uv, _ARRAY[1]);
 
-				fixed4 col =
-					0
-					//+ cl[0]
-					//+ cl[1]
-					//+ cl[2]
-					//+ cl[3]
-					+ cl[0] * i.clr.x
-					+ cl[1] * i.clr.y
-					+ cl[2] * i.clr.z
-					+ cl[3] * i.clr.w
-					;
-
+				fixed4 col = 0;
+				if (i.tan.x > -0.01)
+				{
+					float tmp = i.tan.x * 10;
+					int _ARRAY_ind0 = frac(tmp) > 0.5f ? ceil(tmp) : floor(tmp);
+					col += (fixed4)SampleAtlas(uv, _ARRAY[_ARRAY_ind0]) * i.clr.x;
+				}
+				if (i.tan.y > -0.01)
+				{
+					float tmp = i.tan.y * 10;
+					int _ARRAY_ind1 = frac(tmp) > 0.5f ? ceil(tmp) : floor(tmp);
+					col += (fixed4)SampleAtlas(uv, _ARRAY[_ARRAY_ind1]) * i.clr.y;
+				}
+				if (i.tan.z > -0.01)
+				{
+					float tmp = i.tan.z * 10;
+					int _ARRAY_ind2 = frac(tmp) > 0.5f ? ceil(tmp) : floor(tmp);
+					col += (fixed4)SampleAtlas(uv, _ARRAY[_ARRAY_ind2]) * i.clr.z;
+				}
+				if (i.tan.w > -0.01)
+				{
+					float tmp = i.tan.w * 10;
+					int _ARRAY_ind3 = frac(tmp) > 0.5f ? ceil(tmp) : floor(tmp);
+					col += (fixed4)SampleAtlas(uv, _ARRAY[_ARRAY_ind3]) * i.clr.w;
+				}
+					
 				//return col;
-				return col;// -float4(cc.xyz*.5, 0);
+
+				fixed3 withSpecular = fixed3(1, 1, 1) - fixed3(0.195, 0.195, 0.195) / col.xyz;
+				return fixed4(withSpecular, 1)*0.3 + col*0.8;
 			}
 			ENDCG
 		}

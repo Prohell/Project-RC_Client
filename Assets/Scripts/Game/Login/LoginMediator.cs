@@ -4,9 +4,10 @@ using LuaInterface;
 
 public class LoginMediator : IUIMediator, IMediator
 {
-    public void ConnectToServer(string account, string password)
+    public void ConnectToServer(string account, string password, string port)
     {
-        ProxyManager.GetInstance().Get<LoginProxy>().ConnectToServer(account, password);
+        int serverPort = string.IsNullOrEmpty(port) ? -1 : int.Parse(port);
+        ProxyManager.GetInstance().Get<LoginProxy>().ConnectToServer(account, password, serverPort);
     }
 
     public void EnterGame()

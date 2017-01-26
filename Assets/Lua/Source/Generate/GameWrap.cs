@@ -88,7 +88,7 @@ public class GameWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
+			ToLua.CheckArgsCount(L, 2);
 			System.Action<bool,string> arg0 = null;
 			LuaTypes funcType1 = LuaDLL.lua_type(L, 1);
 
@@ -102,7 +102,8 @@ public class GameWrap
 				arg0 = DelegateFactory.CreateDelegate(typeof(System.Action<bool,string>), func) as System.Action<bool,string>;
 			}
 
-			Game.ConnectToServer(arg0);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+			Game.ConnectToServer(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)

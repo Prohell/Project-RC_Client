@@ -21,6 +21,16 @@ public struct Coord
             throw new UnityException("Error Coord Input : " + coordText);
     }
 
+    public static Coord operator +(Coord lhs, Coord rhs)
+    {
+        return new Coord(lhs.x + rhs.x, lhs.y + rhs.y);
+    }
+
+    public static Coord operator -(Coord lhs, Coord rhs)
+    {
+        return new Coord(lhs.x - rhs.x, lhs.y - rhs.y);
+    }
+
     public static bool operator <(Coord lhs, Coord rhs)
     {
         if (lhs.x != rhs.x)

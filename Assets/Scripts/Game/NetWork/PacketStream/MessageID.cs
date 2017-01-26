@@ -16,6 +16,8 @@ PACKET_GC_NOTICE,	//notice from server
 PACKET_GC_UPDATE_SCENE_INSTACTIVATION,	//Update Scene InstActivation
 PACKET_CG_MOVE,	//Player Move
 PACKET_GC_MOVE,	//Notify Character Move
+PACKET_CG_MARCH_MOVE,	//
+PACKET_GC_MARCH_MOVE,	//
 PACKET_GC_STOP,	//Notify Character Stop
 PACKET_GC_TELEMOVE,	//TeleMove
 PACKET_CG_SKILL_USE,	//client send use skill
@@ -49,6 +51,13 @@ PACKET_GC_OBJGETHURT,	//
 PACKET_CG_BUILDING_LEVELUP,	// Send Building LevelUp
 PACKET_GC_BUILDING_LEVELUP,	// Ret Building LevelUp
 PACKET_GC_UPDATE_MARCH,	//
+PACKET_CG_TROOP_TRAIN,	// Send Troop Train
+PACKET_GC_TROOP_TRAIN,	//
+PACKET_GC_TROOPTRAIN_OVER,	//
+PACKET_CG_BATTLEPREPARE,	// send arrange change
+PACKET_GC_BATTLEPREPARE,	// ret arrange change to client
+PACKET_GC_BATTLEEND,	// battle end
+PACKET_GC_BATTLESTART,	// battle state
 
  PACKET_SIZE
  }

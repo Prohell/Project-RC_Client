@@ -98,9 +98,6 @@ public class BattleController : MonoBehaviour {
 
         EventManager.GetInstance().AddEventListener(EventId.LoadSquad, LoadSquad);
         EventManager.GetInstance().AddEventListener(EventId.StartBattle, StartBattleTest);
-
-        //Open Battle UI.
-        // MediatorManager.GetInstance().Add(new BattleUIController());
     }
 
     void OnDestroy()
@@ -337,6 +334,6 @@ public class BattleController : MonoBehaviour {
 }
 public class BattleMode
 {
-    public const bool Client = true;
+    public const bool Client = false;
 }
 

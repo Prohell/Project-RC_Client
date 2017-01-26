@@ -4,7 +4,8 @@ using GCGame.Table;
 
 public class BuildingData
 {
-	public int id;
+	public long guid;
+	public int type;
 	public int slot;
 	public int level;
 	public int maxLevel;
@@ -14,7 +15,7 @@ public class BuildingData
 	public string asset;
 	public string bundle;
 	public int prosperity;
-	public List<int> needBuildingID;
+	public List<int> needBuildingID = new List<int>();
 	public int needTime;
 	public int needFood;
 	public int needStone;
@@ -31,9 +32,13 @@ public class CityMediator : Mediator<CityView>
 
 	private List<BuildingData> buildings = new List<BuildingData>();
 
+	public int curSlot;
+	public int curSlotType;
+
     override public void OnInit()
 	{
 		EventManager.GetInstance().AddEventListener(EventId.PlayerProxyUpdate,PlayerProxyUpdate);
+		EventManager.GetInstance().AddEventListener(EventId.BuildingLevelUp,BuildingLevelUp);
     }
 
 	override public void OnDestroy()
@@ -41,30 +46,30 @@ public class CityMediator : Mediator<CityView>
 	}
 
 	// guid 建筑ID	type 建筑类型	slot 建筑位置	level 建筑等级
-	private void PlayerProxyUpdate(object obj){
+	public void PlayerProxyUpdate(object obj){
 		PlayerProxy proxy = GameFacade.GetProxy<PlayerProxy> ();
 
-		cityLevel = proxy.city.Level;
-		food = proxy.city.Food;
-		stone = proxy.city.Stone;
-		iron = proxy.city.Iron;
+		cityLevel = proxy.city.level;
+		food = proxy.city.food;
+		stone = proxy.city.stone;
+		iron = proxy.city.iron;
 
-		if(proxy.city.buildlistCount != 0){
-			for(int i = 0;i < proxy.city.buildlistCount;i++){
+		if(proxy.city.buildList.Count != 0){
+			for(int i = 0;i < proxy.city.buildList.Count;i++){
 				BuildingData data = new BuildingData ();
-
-				data.id = proxy.city.buildlistList [i].Type;
-				data.slot = proxy.city.buildlistList [i].Slot;
-				data.level = proxy.city.buildlistList [i].Level;
+				data.guid = proxy.city.buildList [i].guid;
+				data.type = proxy.city.buildList [i].type;
+				data.slot = proxy.city.buildList [i].slot;
+				data.level = proxy.city.buildList [i].level;
 
 				//建筑基本信息
-				List<Tab_CityBuildingDefault> cityBuilding = TableManager.GetCityBuildingDefaultByID (data.id);
+				List<Tab_CityBuildingDefault> cityBuilding = TableManager.GetCityBuildingDefaultByID (data.type);
 				data.buildName = cityBuilding[0].Name;
 				data.isUpgrade = (cityBuilding[0].IsUpgrade == 0)?false:true;
 				data.maxLevel = cityBuilding[0].MaxLevel;
 
 				//建筑等级信息
-				List<Tab_CityBuildingLevel> levelList = TableManager.GetCityBuildingLevelByID (data.id);
+				List<Tab_CityBuildingLevel> levelList = TableManager.GetCityBuildingLevelByID (data.type);
 
 				for(int n = 0;n < levelList.Count;n++){
 					if(levelList [n].Level == data.level){
@@ -93,9 +98,18 @@ public class CityMediator : Mediator<CityView>
 //		view.UpdateAllData (buildings);
 	}
 
-	public BuildingData GetDataByNum(int num){
+	public BuildingData GetDataBySlot(int s){
 		for(int i = 0;i < buildings.Count;i++){
-			if(buildings [i].slot == num){
+			if(buildings [i].slot == s){
+				return buildings [i];
+			}
+		}
+		return null;
+	}
+
+	public BuildingData GetDataByGuid(long guid){
+		for(int i = 0;i < buildings.Count;i++){
+			if(buildings [i].guid == guid){
 				return buildings [i];
 			}
 		}
@@ -103,6 +117,23 @@ public class CityMediator : Mediator<CityView>
 	}
 
 
+	private void BuildingLevelUp(object id){
+		long guid = (long)id;
 
+		PlayerProxy proxy = GameFacade.GetProxy<PlayerProxy> ();
+		for(int i = 0;i < proxy.city.buildList.Count;i++){
+			BuildingVo buildingData = proxy.city.buildList [i];
+			if(buildingData.guid == guid){
+				for(int j = 0;j < buildings.Count;j++){
+					if(buildings [j].guid == guid){
+						buildings [j].level = buildingData.level;
 
+						EventManager.GetInstance ().SendEvent ("Private_RefreshBuildingLevel", guid);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
 }

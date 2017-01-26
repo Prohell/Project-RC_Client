@@ -311,7 +311,7 @@ public class NetWorkLogic
                     && pPacket.GetType().Name != "GC_CONNECTED_HEARTBEATHandler"
                     && pPacket.GetType().Name != "GC_MOVEHandler")
                 {
-                    Debug.LogWarning("Packet :" + pPacket.GetType().Name);
+                    LogModule.WarningLog("Packet :" + pPacket.GetType().Name);
                 }
                 //Profiler.EndSample();
 
@@ -377,7 +377,7 @@ public class NetWorkLogic
             string name = pPacket.GetType().Name;
             if (name != "CG_PING" && name != "CG_CONNECTED_HEARTBEAT" && name != "CG_MOVE")
             {
-                Debug.LogWarning(name);
+                LogModule.WarningLog(name);
             }
 
             int nValidbyteSize = pPacket.SerializedSize();

@@ -13,35 +13,42 @@ public class Slot : MonoBehaviour {
 	private TextMesh nameTxt;
 	private TextMesh levelTxt;
 
-	public void ShowBuildingName(){
+	void Awake(){
+		if(levelTxt == null){
+			levelTxt = transform.FindChild ("Level").GetComponent<TextMesh>();
+		}
 		if(nameTxt == null){
 			nameTxt = transform.FindChild ("Name").GetComponent<TextMesh>();
 		}
+	}
+
+	public void ShowBuildingName(){
 		nameTxt.text = slotName;
 		nameTxt.gameObject.SetActive (true);
 	}
 
 	public void HideBuildingName(){
-		if(nameTxt == null){
-			nameTxt = transform.FindChild ("Name").GetComponent<TextMesh>();
-		}
 		nameTxt.gameObject.SetActive (false);
 	}
 
-
-	public int level = 0;
-	public void ShowBuildingLevel(){
-		if(levelTxt == null){
-			levelTxt = transform.FindChild ("Level").GetComponent<TextMesh>();
+	private int _level = 0;
+	public int level{
+		get{ 
+			return _level;
 		}
+		set{ 
+			_level = value;
+			levelTxt.text = "等级 " + _level.ToString();
+		}
+	}
+
+
+	public void ShowBuildingLevel(){
 		levelTxt.text = "等级 " + level.ToString();
 		levelTxt.gameObject.SetActive (true);
 	}
 
 	public void HideBuildingLevel(){
-		if(levelTxt == null){
-			levelTxt = transform.FindChild ("Level").GetComponent<TextMesh>();
-		}
 		levelTxt.gameObject.SetActive (false);
 	}
 }
